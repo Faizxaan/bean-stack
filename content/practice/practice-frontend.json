@@ -1,0 +1,270 @@
+[
+  {
+    "answerIndex": 1,
+    "category": "JavaScript",
+    "difficulty": "Easy",
+    "explanation": "Strict equality (===) compares type and value without coercion, so number 1 is not equal to string \"1\". Loose equality (==) coerces the string to a number, so it returns true. The other options get at least one comparison wrong, which is why preferring === avoids this whole class of surprise.",
+    "id": "pr-fe-mcq-equality",
+    "options": [
+      "true and true",
+      "false and true",
+      "false and false",
+      "true and false"
+    ],
+    "prompt": "What is the result of 1 === \"1\" and 1 == \"1\" in JavaScript?",
+    "title": "Strict versus loose equality",
+    "topicId": "fe-js-fundamentals",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 2,
+    "category": "JavaScript",
+    "difficulty": "Easy",
+    "explanation": "A closure keeps its enclosing scope alive: the inner function retains a reference to the variable, not a copy, so increments persist across calls. It is not destroyed (that would break closures entirely), not a frozen snapshot, and not global \u2014 it is reachable only through the closure.",
+    "id": "pr-fe-mcq-closure",
+    "options": [
+      "It is destroyed, so the inner function throws on every call.",
+      "It is copied once, so every inner function shares the same snapshot forever.",
+      "It stays alive, captured by the closure, and each call sees the latest value.",
+      "It becomes a global variable accessible from anywhere."
+    ],
+    "prompt": "A function returns an inner function that increments a variable declared in the outer function. What happens to that variable after the outer function returns?",
+    "title": "Closure state",
+    "topicId": "fe-js-fundamentals",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 2,
+    "category": "JavaScript",
+    "difficulty": "Medium",
+    "explanation": "Synchronous code runs first (A, D). Then the microtask queue drains before any macrotask, so the promise callback (C) runs before the timer callback (B), even though the timer was scheduled first. The other orders either run the timer too early or interleave synchronous and async code incorrectly.",
+    "id": "pr-fe-mcq-microtask",
+    "options": [
+      "A, B, C, D",
+      "A, D, B, C",
+      "A, D, C, B",
+      "A, C, D, B"
+    ],
+    "prompt": "console.log('A'); setTimeout(() => console.log('B'), 0); Promise.resolve().then(() => console.log('C')); console.log('D'); In what order do the letters print?",
+    "title": "Microtask versus macrotask order",
+    "topicId": "fe-js-async",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "JavaScript",
+    "difficulty": "Medium",
+    "explanation": "fetch rejects only on network failure. HTTP statuses, including 404 and 500, resolve normally with a Response, so code must check response.ok or response.status. It does not retry, and it never resolves with null for a completed HTTP response.",
+    "id": "pr-fe-mcq-fetch-404",
+    "options": [
+      "It rejects with a 404 error.",
+      "It resolves with a Response whose ok property is false.",
+      "It retries automatically until it succeeds.",
+      "It resolves with null."
+    ],
+    "prompt": "A fetch request receives an HTTP 404 response. What does the returned promise do?",
+    "title": "Fetch and HTTP errors",
+    "topicId": "fe-js-async",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "JavaScript",
+    "difficulty": "Easy",
+    "explanation": "Clicks bubble from the target up to ancestors, so a parent listener can inspect event.target and handle every item, including items added later, with a single listener. Clicks do bubble, addEventListener works on any element, and delegated listeners run during bubbling, after the target phase.",
+    "id": "pr-fe-mcq-delegation",
+    "options": [
+      "Because clicks do not bubble, so items cannot handle their own clicks.",
+      "Because one parent listener uses bubbling to handle current and future items with less memory.",
+      "Because addEventListener only works on container elements.",
+      "Because delegated listeners run before the event reaches its target."
+    ],
+    "prompt": "Why attach one click listener to a list element instead of one listener to each list item?",
+    "title": "Event delegation",
+    "topicId": "fe-js-dom",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "TypeScript",
+    "difficulty": "Easy",
+    "explanation": "unknown accepts any value but forbids using it until it is narrowed with a check, so mistakes become compile errors. any also accepts everything but disables checking entirely, so errors surface at runtime. never accepts nothing, and object is too broad to use safely without narrowing anyway.",
+    "id": "pr-fe-mcq-any-unknown",
+    "options": [
+      "any, because it accepts everything",
+      "unknown, because it forces narrowing before use",
+      "never, because it accepts everything",
+      "object, because it covers all JSON values"
+    ],
+    "prompt": "A function receives untrusted JSON data. Which type is the safe choice for its parameter?",
+    "title": "any versus unknown",
+    "topicId": "fe-ts-types",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "React",
+    "difficulty": "Medium",
+    "explanation": "React.memo compares props shallowly by reference. A new object literal every render is never referentially equal to the previous one, so memo sees a changed prop and re-renders. React.memo works for function components, accepts object props, and does not require useMemo on the component itself \u2014 the fix is a stable reference for that prop.",
+    "id": "pr-fe-mcq-memo",
+    "options": [
+      "React.memo only works for class components.",
+      "The inline object is a new reference on every render, so the shallow prop comparison fails.",
+      "React.memo requires all props to be primitives.",
+      "The component must also be wrapped in useMemo."
+    ],
+    "prompt": "A component wrapped in React.memo still re-renders on every parent render. Its parent passes an inline object literal as a prop. Why?",
+    "title": "React.memo defeated by props",
+    "topicId": "fe-react-performance",
+    "type": "mcq"
+  },
+  {
+    "back": "A function that retains access to variables from the scope where it was created, even after the outer function has returned.",
+    "category": "JavaScript",
+    "difficulty": "Easy",
+    "front": "What is a JavaScript closure?",
+    "id": "pr-fe-flash-closure",
+    "topicId": "fe-js-fundamentals",
+    "type": "flashcard",
+    "prompt": "What is a JavaScript closure?"
+  },
+  {
+    "back": "A union of object types sharing a literal field (such as kind or type); switching on that field narrows the union to exactly one variant.",
+    "category": "TypeScript",
+    "difficulty": "Medium",
+    "front": "What is a discriminated union in TypeScript?",
+    "id": "pr-fe-flash-discriminated",
+    "topicId": "fe-ts-types",
+    "type": "flashcard",
+    "prompt": "What is a discriminated union in TypeScript?"
+  },
+  {
+    "back": "Every consumer re-renders, because context has no selector mechanism \u2014 so split contexts by how often their values change.",
+    "category": "React",
+    "difficulty": "Medium",
+    "front": "What happens to context consumers when the context value changes?",
+    "id": "pr-fe-flash-context-rerender",
+    "topicId": "fe-react-state",
+    "type": "flashcard",
+    "prompt": "What happens to context consumers when the context value changes?"
+  },
+  {
+    "category": "JavaScript",
+    "description": "Write a debounce function: it takes a function fn and a delay in milliseconds, and returns a new function that postpones calling fn until the returned function has not been called for delay milliseconds. Only the most recent arguments should be used.",
+    "difficulty": "Medium",
+    "examples": [
+      "debounced('a'); debounced('b'); \u2014 after the delay, fn is called once, with 'b'."
+    ],
+    "hints": [
+      "Keep a timer id in a closure and clear it on every call before setting a new timer.",
+      "Forward the latest arguments with rest parameters and spread."
+    ],
+    "id": "pr-fe-coding-debounce",
+    "solution": "function debounce(fn, delay) {\n  let timerId;\n  return (...args) => {\n    clearTimeout(timerId);\n    timerId = setTimeout(() => fn(...args), delay);\n  };\n}",
+    "title": "Implement debounce",
+    "topicId": "fe-js-dom",
+    "type": "coding"
+  },
+  {
+    "category": "TypeScript",
+    "description": "Write a generic TypeScript function first that takes an array of any element type and returns its first element, or undefined for an empty array. The return type must follow the array's element type.",
+    "difficulty": "Easy",
+    "examples": [
+      "first([10, 20]) returns 10, typed as number | undefined.",
+      "first([]) returns undefined."
+    ],
+    "hints": [
+      "Declare a type parameter T and type the parameter as T[].",
+      "Return items[0], whose type is T | undefined under noUncheckedIndexedAccess-free defaults only if you annotate the return type as T | undefined."
+    ],
+    "id": "pr-fe-coding-first",
+    "solution": "function first<T>(items: T[]): T | undefined {\n  return items[0];\n}",
+    "title": "Generic first element",
+    "topicId": "fe-ts-generics",
+    "type": "coding"
+  },
+  {
+    "category": "React",
+    "description": "Write a React custom hook useCounter that takes an initial value (default 0) and returns an object with count, increment, decrement, and reset. Each component using the hook must get independent state.",
+    "difficulty": "Easy",
+    "examples": [
+      "const { count, increment } = useCounter(5); \u2014 count starts at 5 and increment raises it to 6."
+    ],
+    "hints": [
+      "Use useState inside the hook; each caller gets its own state automatically.",
+      "Use functional updates (setCount(c => c + 1)) so rapid calls do not use stale values.",
+      "reset should restore the initial value captured by the hook."
+    ],
+    "id": "pr-fe-coding-usecounter",
+    "solution": "import { useState } from 'react';\n\nexport function useCounter(initial = 0) {\n  const [count, setCount] = useState(initial);\n  return {\n    count,\n    increment: () => setCount((c) => c + 1),\n    decrement: () => setCount((c) => c - 1),\n    reset: () => setCount(initial),\n  };\n}",
+    "title": "A useCounter custom hook",
+    "topicId": "fe-react-components-hooks",
+    "type": "coding"
+  },
+  {
+    "answerIndex": 1,
+    "category": "JavaScript",
+    "code": "for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}",
+    "difficulty": "Medium",
+    "explanation": "var is function-scoped, so all three callbacks share the same i. The timers run after the loop finishes, by which time i is 3, so each callback prints 3. With let, each iteration would get its own binding and print 0, 1, 2.",
+    "id": "pr-fe-output-var-let",
+    "options": [
+      "0, 1, 2",
+      "3, 3, 3",
+      "0, 0, 0",
+      "undefined three times"
+    ],
+    "prompt": "What does this code print? for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), 0); }",
+    "title": "var in a loop with setTimeout",
+    "topicId": "fe-js-fundamentals",
+    "type": "output"
+  },
+  {
+    "answerIndex": 1,
+    "category": "JavaScript",
+    "code": "console.log('1');\nasync function f() {\n  console.log('2');\n  await Promise.resolve();\n  console.log('3');\n}\nf();\nconsole.log('4');",
+    "difficulty": "Medium",
+    "explanation": "Calling an async function runs its body synchronously until the first await, so 1 and 2 print, then the await suspends f and its continuation becomes a microtask. Synchronous code continues with 4, then the microtask runs 3. Hence 1, 2, 4, 3.",
+    "id": "pr-fe-output-async-order",
+    "options": [
+      "1, 2, 3, 4",
+      "1, 2, 4, 3",
+      "1, 4, 2, 3",
+      "2, 1, 4, 3"
+    ],
+    "prompt": "What is the output order? console.log('1'); async function f() { console.log('2'); await Promise.resolve(); console.log('3'); } f(); console.log('4');",
+    "title": "Async function ordering",
+    "topicId": "fe-js-async",
+    "type": "output"
+  },
+  {
+    "category": "React",
+    "description": "A search box fetches results on every keystroke. A user types quickly, an earlier slow request finishes after a later fast one, and the UI shows results for the old query. How do you fix this, and what else should change about the fetching approach?",
+    "difficulty": "Hard",
+    "id": "pr-fe-scenario-stale-search",
+    "solution": "Cancel the in-flight request when a new query starts, using AbortController with an AbortSignal passed to fetch, and ignore or discard responses that do not match the latest query. Also debounce the input (for example 300 ms) so a request is not fired per keystroke, show a loading state, and handle abort errors separately from real failures so they do not show an error message. For a fuller solution, use a server-state library, which handles cancellation, deduping, and caching.",
+    "title": "Stale search results",
+    "topicId": "fe-js-async",
+    "type": "scenario"
+  },
+  {
+    "category": "React",
+    "description": "A form input's value lives in a single app-wide context, and every keystroke re-renders the entire application, including expensive unrelated components. Diagnose the problem and propose a fix that keeps the code simple.",
+    "difficulty": "Medium",
+    "id": "pr-fe-scenario-context-rerender",
+    "solution": "The input state is shared through one context, and context has no selectors, so every consumer re-renders on every change. The simplest fix is to move the input state down into the form component itself, since nothing else needs it. If some value genuinely must be shared, split the context so fast-changing and rarely changing values live in separate contexts, memoise the provider value, and memoise expensive children so they skip renders when their props are unchanged.",
+    "title": "Whole app re-renders on every keystroke",
+    "topicId": "fe-react-state",
+    "type": "scenario"
+  },
+  {
+    "category": "TypeScript",
+    "description": "A team has three nearly identical list components for users, products, and orders, differing only in the item type and how each item renders. They want one component without losing type safety. How should it be typed, and how does the caller use it?",
+    "difficulty": "Medium",
+    "id": "pr-fe-scenario-typed-list",
+    "solution": "Write a generic component: interface ListProps<T> { items: T[]; renderItem: (item: T) => ReactNode; } and function List<T>({ items, renderItem }: ListProps<T>). At each use site TypeScript infers T from the items prop, so renderItem receives the correct item type and its properties are checked. This replaces three duplicated components with one type-safe one, and callers need no explicit type arguments in the common case.",
+    "title": "Typing a reusable list component",
+    "topicId": "fe-ts-react",
+    "type": "scenario"
+  }
+]

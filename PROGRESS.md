@@ -2,14 +2,14 @@
 
 This file is the resume point if a session is interrupted or its context is reset. Read it first, then run validation and the build before continuing.
 
-## Current state (2026-11-04, after interview/practice/cheatsheet batches + polish)
+## Current state (2026-11-04, after completion run — all tracks filled)
 
 - **Local directory:** `~/workspace/beanstack` (persistent, not /tmp)
 - **GitHub repo:** Faizxaan/bean-stack, branch `main`
 - **Repo before this work:** only `README.md` (12 bytes, initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92` on 2026-11-03). No other code existed to replace.
 - **App status:** Fully functional end-to-end SPA. Production build, type-check, validation script, and unit tests all pass (see Verification below).
-- **Content status:** 34 topics validated, 10 cheatsheets, 83 interview questions, 73 practice items. Interview modules 0–4 and Bonus Resume are now complete; placeholder non-Java tracks remain Coming Soon by instruction (see Remaining).
-- **Push status:** See "Push log" at the bottom. Confirmed push `81f00e1ec9604341ad630045a2d30067a41ee895` (76 files) covers foundation + 34 topics. The batches in this continuation run are validated locally and prepared in a fresh manifest, but NOT pushed in this run — do not claim they are on GitHub until a new confirmed commit SHA is recorded. If a push has not yet been confirmed, the local build in this directory is the source of truth.
+- **Content status:** 79 topics validated, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks (none Coming Soon), 6 paths. Interview modules 0–4 and Bonus Resume are complete; all 7 former placeholder tracks are now filled with full content (see Completed — completion run below).
+- **Push status:** See "Push log" at the bottom. Confirmed pushes: `81f00e1ec9604341ad630045a2d30067a41ee895` (76 files, foundation + Java) and `58f7c4522ce7551a4712b869e4aefd2d000635b4` (21 files, interview/practice/cheatsheets/polish). The completion run in this file is validated locally and prepared in a fresh manifest, but NOT pushed in this run — do not claim it is on GitHub until a new confirmed commit SHA is recorded.
 
 ## Completed
 
@@ -63,27 +63,46 @@ This file is the resume point if a session is interrupted or its context is rese
 - [x] Polish — accessibility fix from code walkthrough: flashcard flip in `src/pages/Practice.tsx` is now keyboard-operable (tabIndex 0, Enter/Space toggles, updated hint text). Walkthrough notes (code, not a live device test): visible `:focus-visible` outline exists, sidebar has `aria-label="Primary navigation"`, command palette is a labelled dialog with Ctrl/Cmd+K toggle and Escape to close, filters/inputs are labelled, mobile layout stacks the sidebar above content at ≤900px and collapses grids to one column, print CSS hides nav/topbar.
 - [x] Vercel deploy verification notes (no live deploy performed, per instruction): `vercel.json` SPA rewrites to `/index.html` are present, build command `npm run build`, output `dist`, no env vars/backend/database required. A live Vercel import and deep-link refresh check still require user approval/import and are not claimed here.
 
-## Remaining — content batches (in order, one section at a time)
+## Completed — completion run (2026-11-04, all placeholder tracks filled)
 
-- [ ] Placeholder tracks — NOT filled in this continuation run, by explicit parent instruction. They stay Coming Soon: Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, Behavioral & Projects, to be filled later with content and config only (no component changes), in that order or by user priority.
-- [ ] Optional deeper Java topics, if the user wants them: collections List/Set/Map specifics as separate topics, JDBC deep dive, networking deep dive, and per-category interview question groups (currently interview questions are flat per module with a category field, which satisfies the data model but is not yet grouped into question groups in the UI)
+- [x] Frontend (9 topics): JavaScript fundamentals, Async JavaScript, DOM/browser APIs; TypeScript types/interfaces, generics, TypeScript with React; React components/hooks, state management, performance/patterns. Plus 2 cheatsheets, 18 practice items, 12 interview questions.
+- [x] Databases (6 topics): SQL fundamentals, joins/indexes/transactions, SQL for Java developers; document stores, key-value/caching, choosing a NoSQL store. Plus 1 cheatsheet, 15 practice items, 11 interview questions.
+- [x] System Design (6 topics): scalability basics, caching/queues/databases, designing real systems; class design, design patterns in LLD, common LLD problems (with explicit Mermaid diagrams for HLD). Plus 1 cheatsheet, 14 practice items, 14 interview questions.
+- [x] DSA & Coding (6 topics): arrays/strings, trees/graphs, dynamic programming; patterns, complexities, interview coding problems. Plus 1 cheatsheet, 18 practice items, 12 interview questions.
+- [x] DevOps & Cloud (9 topics): Git fundamentals, branching/merging; containers, Dockerfiles/images; Kubernetes pods/services/deployments; CI/CD pipelines, testing in CI; AWS core services, deploying a Java app on AWS. Plus 1 cheatsheet, 18 practice items, 12 interview questions. No credentials/secrets in examples (placeholders only).
+- [x] Testing (4 topics): JUnit/Mockito fundamentals, test design/pyramid/flaky tests; Spring Boot tests, Testcontainers basics. Plus 1 cheatsheet, 14 practice items, 12 interview questions. Uses @MockitoBean for Spring Boot 3.4+.
+- [x] Behavioral & Projects (5 topics): STAR method, common behavioral questions; presenting a project, architecture deep dives, trade-offs/lessons (fictional/generic examples only). Plus 1 cheatsheet, 13 practice items, 12 interview questions.
+- [x] Tracks config: all 10 tracks now status `complete`, `comingSoon: false` in content/tracks.json; no Coming Soon badge remains in the UI.
+- [x] Learning paths: added Frontend Roadmap (9 topics), Full-Stack Java Developer Roadmap (16 topics), System Design Crash Path (6 topics). Total paths: 6 (was 3).
+- [x] Central validation fix: 19 new practice items lacked a validator-required prompt/title field; a prompt derived from each item's own front/first-sentence description was added (see DECISIONS.md). No answers or solutions changed.
+- [x] Accessibility/mobile walkthrough (code, not a live-device test): :focus-visible outline present, sidebar aria-label, labelled command-palette dialog with Ctrl/Cmd+K toggle and Escape to close, keyboard-operable flashcard flip, mobile layout stacking sidebar above content at ≤900px with grids collapsing to one column, print CSS hiding nav/topbar, reduced-motion setting respected.
+
+## Remaining — content batches
+
+- [x] All former placeholder tracks filled in the completion run (see Completed — completion run below). No track remains Coming Soon.
+- [ ] Optional deeper Java topics: deliberately NOT added — see DECISIONS.md (collections deep dive and JDBC & Networking already cover the suggested areas; further topics would be scope creep, not a curriculum gap).
+- [ ] Interview question groups as a separate level: deliberately NOT added — see DECISIONS.md (module → category → questions plus browse-by-topic already provides the hierarchy; a separate group field would require a type/index/UI change, not content-only).
 
 ## Remaining — polish / verification
 
-- [ ] Compile-check every Java snippet in a JDK and verify stated outputs, especially Spring/Jakarta snippets that are framework code rather than standalone programs (snippets were written to be correct by construction; a systematic compile pass is still open — no JDK is installed in this environment)
-- [ ] Live Vercel deploy verification (import repo, confirm deep-link refresh works) — requires user approval/import; not performed in this run
+- [ ] Compile-check every snippet in a JDK and verify stated outputs — NOT completed: no JDK is installed in this environment and none was installed (system-level change outside repo scope). All new snippets were manually reviewed only; no javac verification is claimed. This is the one verification item that could not be closed to 100% in this environment.
+- [ ] Live Vercel deploy verification (import repo, confirm deep-link refresh works) — NOT performed: requires the user's Vercel account action/import. Notes only: vercel.json SPA rewrites to /index.html present, build command `npm run build`, output `dist`, no env vars/backend/database required. This is the one deployment item that could not be closed to 100% in this run.
 - [ ] After all content batches: final summary (what was built, key decisions, anything left as placeholder, how to run/deploy)
 
-## Verification (last run, 2026-11-04, after interview/practice/cheatsheet batches + polish)
+## Verification (last run, 2026-11-04, after completion run)
 
-- `npm run validate-content` — OK (34 topics, 34 unique ids, 10 tracks)
-- `npm run build-content-index` — OK (34 topics, 10 cheatsheets, 83 interview questions, 73 practice items, 10 tracks, 3 paths)
+- `npm run validate-content` — OK (79 topic files, 79 unique topic ids, 10 tracks)
+- `npm run build-content-index` — OK (79 topics, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks, 6 paths)
 - `npm run typecheck` — OK
 - `npm test` — 10 tests passed
-- `npm run build` — OK (Vite production build; main chunk 442 KB, no 800 KB chunk-size warning; vendor chunks: markdown 323 KB, motion 121 KB, react 50 KB; topic/cheatsheet chunks split per file)
+- `npm run build` — OK (built in ~9s; main index chunk 722 KB / gzip ~215 KB, under the configured 800 KB warning limit; topic/cheatsheet bodies split per file; no chunk-size warning)
+- JDK compile-check: NOT performed — no JDK installed (see Remaining — polish). Snippets manually reviewed only.
 
 ## Push log
 
 - (To be filled after each confirmed push: date, batch description, commit SHA from the provider result, paths submitted.)
 - 2026-11-04, foundation batch (55 files): push attempted via `github push-files` to Faizxaan/bean-stack branch `main`, but the runtime approval card timed out (`approval_expired`, egress approval timed out for this invocation). The action was NOT performed. Repo head remains the initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92`. Do NOT claim this push succeeded. Retry requires a fresh approval; the manifest is at `~/workspace/beanstack-manifest-1.txt` (outside the source dir).
 - 2026-11-04, CONFIRMED PUSH: "Beanstack: foundation + Java content (34 topics)", 76 files, manifest at `~/workspace/beanstack-manifest-2.txt`, commit SHA `81f00e1ec9604341ad630045a2d30067a41ee895` on branch `main`, verified by re-reading the repo head. This supersedes the failed attempts above. The sync record lives outside the repo at `~/workspace/beanstack.muse-github-snapshot-sync.json` and must never be committed.
+- 2026-11-04, CONFIRMED PUSH: "Beanstack: interview modules 2-4, Module 0, resume, practice + cheatsheets, bundle polish", 21 files, manifest at `~/workspace/beanstack-manifest-3.txt`, commit SHA `58f7c4522ce7551a4712b869e4aefd2d000635b4` on branch `main`, verified by re-reading the repo head. Totals after this push: 34 topics, 10 cheatsheets, 83 interview questions, 73 practice items, 10 tracks, 3 paths.
+
+- 2026-11-04, completion run: NOT pushed in this run, by instruction. A fresh manifest for all new/changed files in this run was prepared (see parent report for the exact manifest path and count). GitHub head at the time of this run was still 58f7c4522ce7551a4712b869e4aefd2d000635b4; do NOT claim the completion batch is on GitHub until a new confirmed commit SHA is recorded.

@@ -1,1 +1,91 @@
-[{"description":"Start here if you are new to Java: JVM basics, OOP, Strings, Collections, exceptions, then Streams.","id":"beginner-roadmap","title":"Beginner Roadmap","topicIds":["jdk-jre-jvm","oop-principles","strings","collections-framework","exception-handling","streams-lambdas"]},{"description":"Highest-importance topics to revise just before an interview, in a tight order.","id":"last-minute-revision","title":"Last-Minute Revision Path","topicIds":["collections-framework","streams-lambdas","concurrency-basics","spring-ioc-di","spring-boot-autoconfig","spring-data-jpa"]},{"description":"A fast path through Spring Core, Boot, MVC, and Data JPA.","id":"spring-boot-crash","title":"Spring Boot Crash Path","topicIds":["spring-ioc-di","spring-boot-autoconfig","spring-mvc-rest","spring-data-jpa"]}]
+[
+  {
+    "description": "Start here if you are new to Java: JVM basics, OOP, Strings, Collections, exceptions, then Streams.",
+    "id": "beginner-roadmap",
+    "title": "Beginner Roadmap",
+    "topicIds": [
+      "jdk-jre-jvm",
+      "oop-principles",
+      "strings",
+      "collections-framework",
+      "exception-handling",
+      "streams-lambdas"
+    ]
+  },
+  {
+    "description": "Highest-importance topics to revise just before an interview, in a tight order.",
+    "id": "last-minute-revision",
+    "title": "Last-Minute Revision Path",
+    "topicIds": [
+      "collections-framework",
+      "streams-lambdas",
+      "concurrency-basics",
+      "spring-ioc-di",
+      "spring-boot-autoconfig",
+      "spring-data-jpa"
+    ]
+  },
+  {
+    "description": "A fast path through Spring Core, Boot, MVC, and Data JPA.",
+    "id": "spring-boot-crash",
+    "title": "Spring Boot Crash Path",
+    "topicIds": [
+      "spring-ioc-di",
+      "spring-boot-autoconfig",
+      "spring-mvc-rest",
+      "spring-data-jpa"
+    ]
+  },
+  {
+    "id": "frontend-roadmap",
+    "title": "Frontend Roadmap",
+    "description": "JavaScript fundamentals through TypeScript and React, in learning order.",
+    "topicIds": [
+      "fe-js-fundamentals",
+      "fe-js-async",
+      "fe-js-dom",
+      "fe-ts-types",
+      "fe-ts-generics",
+      "fe-ts-react",
+      "fe-react-components-hooks",
+      "fe-react-state",
+      "fe-react-performance"
+    ]
+  },
+  {
+    "id": "full-stack-roadmap",
+    "title": "Full-Stack Java Developer Roadmap",
+    "description": "Core Java and Spring, plus the frontend, databases, testing, and deployment topics a full-stack Java developer needs.",
+    "topicIds": [
+      "jdk-jre-jvm",
+      "oop-principles",
+      "collections-framework",
+      "streams-lambdas",
+      "spring-ioc-di",
+      "spring-boot-autoconfig",
+      "spring-mvc-rest",
+      "spring-data-jpa",
+      "fe-js-fundamentals",
+      "fe-react-components-hooks",
+      "db-sql-fundamentals",
+      "db-joins-indexes-transactions",
+      "tst-junit-mockito-fundamentals",
+      "tst-spring-boot-tests",
+      "dv-docker-containers",
+      "dv-cicd-pipelines"
+    ]
+  },
+  {
+    "id": "system-design-crash-path",
+    "title": "System Design Crash Path",
+    "description": "Scalability, caching, and real-system design, plus low-level design patterns and problems.",
+    "topicIds": [
+      "sd-scalability-basics",
+      "sd-caching-queues-databases",
+      "sd-designing-real-systems",
+      "sd-class-design",
+      "sd-design-patterns-lld",
+      "sd-common-lld-problems"
+    ]
+  }
+]

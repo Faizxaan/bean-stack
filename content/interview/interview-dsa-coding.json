@@ -1,0 +1,331 @@
+[
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Sorting the input when original indices are required, which loses the answer.",
+      "Using a nested loop and calling it O(n) because the loops look small."
+    ],
+    "detailedAnswer": "Two options. If the array is sorted, use two pointers from both ends: if the sum is too small, move the left pointer up; if too large, move the right pointer down; each step is safe because of sorted order, giving O(n) time and O(1) space. If the array is unsorted, use a HashMap from value to index in one pass: for each value, check whether target minus the value has been seen, before inserting the current value so the same element is not reused. That is O(n) time and O(n) space. Sorting an unsorted array first is also valid if indices are not required, at O(n log n) time.",
+    "difficulty": "Easy",
+    "followUps": [
+      "What changes if the array is sorted?",
+      "What if you must return all pairs, not just one?",
+      "How do you handle duplicates?"
+    ],
+    "id": "iq-dsa-two-sum",
+    "module": "module-1",
+    "question": "How do you find two numbers in an array that add up to a target?",
+    "relatedTopics": [
+      "dsa-patterns",
+      "dsa-complexities"
+    ],
+    "shortAnswer": "Sorted array: two pointers in O(n) time and O(1) space. Unsorted array: a HashMap of value to index in one pass, O(n) time and O(n) space.",
+    "tips": [
+      "State whether the input is sorted before choosing an approach.",
+      "Check the map before inserting, so you cannot reuse the same element."
+    ],
+    "title": "Two sum",
+    "topicId": "dsa-arrays-strings"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Moving the left pointer backwards, which breaks linearity.",
+      "Forgetting the guard that the previous occurrence must be inside the current window."
+    ],
+    "detailedAnswer": "Maintain a window [left, right] and a map from character to its last seen index. As right advances, if the current character was seen at an index at or after left, move left to just past that previous occurrence. Update the best length as right minus left plus one. The scan is O(n) because left only moves forward: each character is visited at most twice, once by right and once by left. Space is O(k) for the alphabet in the window, or O(1) for a fixed alphabet such as 26 lowercase letters, where a frequency array replaces the map.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What if at most k distinct characters are allowed instead of zero repeats?",
+      "What if the alphabet is only lowercase letters?",
+      "How does the answer change for a subarray with a sum constraint?"
+    ],
+    "id": "iq-dsa-longest-unique-substring",
+    "module": "module-1",
+    "question": "How do you find the longest substring without repeating characters?",
+    "relatedTopics": [
+      "dsa-patterns"
+    ],
+    "shortAnswer": "Sliding window with a map of last seen indices: move left past the previous occurrence of a repeat, track the maximum window length, in O(n) time.",
+    "tips": [
+      "Say the invariant aloud: the window always contains distinct characters.",
+      "The left pointer never moves backwards; that is the whole linearity argument."
+    ],
+    "title": "Longest substring without repeating characters",
+    "topicId": "dsa-arrays-strings"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Checking only the immediate parent instead of the whole ancestor range.",
+      "Using int bounds, which fail when a node holds Integer.MIN_VALUE or MAX_VALUE."
+    ],
+    "detailedAnswer": "A BST is valid when every node satisfies the constraints from all its ancestors, not just its parent. Pass down an allowed (min, max) range: the root has no bounds, a left child must be below its parent and above the inherited minimum, and a right child must be above its parent and below the inherited maximum. Use long bounds (or null bounds) so extreme int values do not break the check. The traversal is O(n) time and O(h) recursion space. Inorder traversal giving sorted order is a useful cross-check, but the range method is the direct validation and also handles duplicates according to the stated rule.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you handle duplicate values?",
+      "What is the space complexity for a skewed tree?",
+      "Can you do it iteratively?"
+    ],
+    "id": "iq-dsa-valid-bst",
+    "module": "module-1",
+    "question": "How do you check whether a binary tree is a valid binary search tree?",
+    "relatedTopics": [
+      "dsa-patterns",
+      "dsa-complexities"
+    ],
+    "shortAnswer": "Pass an allowed (min, max) range down from each ancestor, not just a parent comparison, and use long or null bounds to avoid overflow at int extremes.",
+    "tips": [
+      "Give the counterexample: a node that is valid against its parent but violates a grandparent.",
+      "State your duplicate rule before coding."
+    ],
+    "title": "Validate a binary search tree",
+    "topicId": "dsa-trees-graphs"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Marking nodes visited at dequeue time instead of enqueue time, causing duplicate work.",
+      "Starting from one node and missing disconnected components."
+    ],
+    "detailedAnswer": "Use BFS when you need shortest paths in an unweighted graph, because BFS explores level by level and the first time it reaches a node is via the shortest path. Use DFS when you need cycle detection, connected components, or topological order, because DFS goes deep and its recursion stack naturally tracks the current path. Both run in O(V + E) time and O(V) space. Mark BFS nodes visited when enqueued, use three states for directed cycle detection (unvisited, on the current stack, finished), and loop over all start nodes because the graph may be disconnected.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What if edges have non-negative weights?",
+      "How do you detect a cycle in an undirected graph?",
+      "What changes for a grid instead of an adjacency list?"
+    ],
+    "id": "iq-dsa-bfs-vs-dfs",
+    "module": "module-1",
+    "question": "When do you choose BFS over DFS, and what are their complexities?",
+    "relatedTopics": [
+      "dsa-patterns",
+      "dsa-complexities"
+    ],
+    "shortAnswer": "BFS (queue, level by level) for unweighted shortest paths; DFS (stack or recursion) for cycles, components, and topological order. Both are O(V + E) time and O(V) space.",
+    "tips": [
+      "Name the visited-state discipline for each: enqueue-time marking for BFS, three states for directed cycles.",
+      "Mention disconnected graphs unprompted."
+    ],
+    "title": "BFS versus DFS",
+    "topicId": "dsa-trees-graphs"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Claiming DP without checking that subproblems overlap.",
+      "Jumping to a compressed table without defining the state."
+    ],
+    "detailedAnswer": "Dynamic programming applies when a problem has optimal substructure (an optimal solution contains optimal solutions to subproblems) and overlapping subproblems (the same subproblems recur, so caching pays). The method is: define the state in words, write the recurrence, list the base cases, then implement top-down with memoization or bottom-up with tabulation. Complexity is the number of distinct states times the work per state. For example, 0/1 knapsack has n times W states, each doing constant work, giving O(n times W) time; the one-row version uses O(W) space but must iterate capacity backwards so each item is used at most once.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Memoization or tabulation: which would you choose here, and why?",
+      "How do you recover the actual solution, not just its value?",
+      "When would greedy be better than DP?"
+    ],
+    "id": "iq-dsa-when-dp-applies",
+    "module": "module-2",
+    "question": "When is dynamic programming the right technique, and how do you analyse it?",
+    "relatedTopics": [
+      "dsa-patterns",
+      "dsa-complexities"
+    ],
+    "shortAnswer": "When the problem has optimal substructure and overlapping subproblems; define state, recurrence, and base cases first, then time is states times work per state.",
+    "tips": [
+      "Use knapsack or coin change as your worked example.",
+      "Mention the backwards-iteration rule for 0/1 knapsack unprompted."
+    ],
+    "title": "Recognising dynamic programming",
+    "topicId": "dsa-dynamic-programming"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Iterating capacity forwards in 0/1 knapsack, silently turning it into unbounded knapsack.",
+      "Using a sentinel that could also be a valid answer."
+    ],
+    "detailedAnswer": "In 0/1 knapsack each item may be used at most once; in unbounded knapsack items may be reused. With a one-row table, iterating capacity backwards guarantees that dp[w minus weight] still holds the value from before the current item was considered, so the item cannot be taken twice. Iterating forwards lets the same item contribute repeatedly, which is exactly the unbounded recurrence. For coin change (minimum coins, unlimited coins), the unbounded version is correct: dp[sum] is the minimum over coins of dp[sum minus coin] plus one, with dp[0] equal to zero and unreachable states marked with a sentinel larger than any possible answer, such as amount plus one, converted back to minus one at the end.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How do you count the number of ways instead of the minimum?",
+      "What changes if each coin can be used at most once?",
+      "How do you handle amounts too large for an O(amount) table?"
+    ],
+    "id": "iq-dsa-knapsack-vs-coin-change",
+    "module": "module-2",
+    "question": "What is the difference between 0/1 knapsack and unbounded coin change, and why does iteration direction matter?",
+    "relatedTopics": [
+      "dsa-patterns"
+    ],
+    "shortAnswer": "0/1 uses each item once, so a one-row table must iterate capacity backwards; unbounded reuses items, so forwards iteration is correct. Mixing them up silently changes the problem.",
+    "tips": [
+      "Explain the bug, not just the rule: forwards iteration re-reads the updated cell.",
+      "State your sentinel and why it cannot be a valid answer."
+    ],
+    "title": "0/1 knapsack versus coin change",
+    "topicId": "dsa-dynamic-programming"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Using (left + right) / 2, which can overflow.",
+      "Mixing the array binary search template with the binary search on the answer template."
+    ],
+    "detailedAnswer": "Binary search on the answer applies when a feasibility predicate is monotonic: if an answer x works, every larger answer works too (or the reverse). Search the range of possible answers, not an array, testing feasibility at each midpoint. For example, to find the minimum ship capacity that delivers packages within D days, feasibility means simulating delivery with a given capacity and checking whether it fits in D days; that predicate is monotonic in capacity, so binary search over capacities gives O(log range) times the simulation cost. The loop uses low less than high and converges on the false-to-true boundary, which is a different template from searching a sorted array, where the loop uses left less than or equal to right and returns on equality. In both templates, compute the midpoint as left plus (right minus left) divided by two to avoid overflow.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What if feasibility is not monotonic?",
+      "How do you choose the initial low and high bounds?",
+      "What is the complexity in terms of the feasibility check?"
+    ],
+    "id": "iq-dsa-binary-search-answer",
+    "module": "module-2",
+    "question": "What is binary search on the answer, and when is it valid?",
+    "relatedTopics": [
+      "dsa-complexities"
+    ],
+    "shortAnswer": "Search a range of possible answers using a monotonic feasibility predicate: if x works, every larger x works, so the boundary can be binary-searched in O(log range) feasibility checks.",
+    "tips": [
+      "Give a concrete feasibility example, such as ship capacity within D days.",
+      "Distinguish the two loop templates explicitly."
+    ],
+    "title": "Binary search on the answer",
+    "topicId": "dsa-patterns"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Forgetting to undo a choice after recursion.",
+      "Storing a reference to mutable state instead of a copy in the results."
+    ],
+    "detailedAnswer": "Backtracking explores a decision tree: at each step, choose an option, recurse, then undo the choice so sibling branches start clean. The template is: check the base case, loop over candidate choices, apply one, recurse, undo it. For subsets, the base action is recording a copy of the current list at every call, then trying each remaining element in turn. Complexity is the size of the search tree: O(n times 2 to the power n) for subsets including output copying, with O(n) recursion depth. Pruning, such as skipping branches that violate a constraint, is what makes backtracking practical, and it must be applied before recursing, not after.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you avoid duplicate subsets when the input has duplicates?",
+      "What is the complexity if you only need one solution?",
+      "How would you convert this to an iterative solution?"
+    ],
+    "id": "iq-dsa-backtracking-template",
+    "module": "module-2",
+    "question": "Explain the backtracking template and its most common bug.",
+    "relatedTopics": [
+      "dsa-complexities"
+    ],
+    "shortAnswer": "Choose, recurse, undo: every choice applied before recursion must be undone after it, and results must store copies of mutable state, not references to it.",
+    "tips": [
+      "Write the undo step as you write the apply step, never as an afterthought.",
+      "State the search-tree size as the complexity."
+    ],
+    "title": "Backtracking",
+    "topicId": "dsa-patterns"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Quoting average-case complexity as worst case.",
+      "Ignoring recursion stack space or the size of the output."
+    ],
+    "detailedAnswer": "Big O is an asymptotic upper bound up to constant factors, usually quoted for the worst case. Big Omega is a lower bound, Big Theta a tight bound when both coincide. Analyse loops by multiplication (nested loops over n give n squared, halving gives log n) and recursion by a recurrence or recursion tree (merge sort: log n levels times O(n) work per level, giving O(n log n)). Remember hidden costs: string concatenation in a loop is quadratic, ArrayList remove from the front is O(n), and HashMap operations are O(1) average but O(n) worst case under collisions. Amortised O(1), as for ArrayList append, means cheap on average over a sequence, not cheap every time. Always define n first, and for graphs keep V and E separate.",
+    "difficulty": "Easy",
+    "followUps": [
+      "What is the complexity of HashMap get in the worst case?",
+      "Why is ArrayList append amortised O(1)?",
+      "How do you analyse a recursive algorithm?"
+    ],
+    "id": "iq-dsa-big-o-explained",
+    "module": "module-1",
+    "question": "Explain Big O, Big Theta, and Big Omega, and how you analyse an algorithm.",
+    "relatedTopics": [
+      "dsa-arrays-strings"
+    ],
+    "shortAnswer": "O is an upper bound, Omega a lower bound, Theta a tight bound; in interviews, complexity usually means worst-case Big O, analysed by counting loop work, recursion levels, and hidden library costs.",
+    "tips": [
+      "Always define n before quoting a complexity.",
+      "Mention amortised cost and hidden costs unprompted."
+    ],
+    "title": "Complexity analysis",
+    "topicId": "dsa-complexities"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Assuming a tree is balanced and quoting O(log n) without qualification.",
+      "Confusing depth with height, or getting the empty-tree height convention wrong."
+    ],
+    "detailedAnswer": "BST search, insertion, and deletion follow the ordering invariant down one path, so they cost O(h), where h is the height: O(log n) for a balanced tree, O(n) for a degenerate tree that is effectively a linked list. Balance is a property of the tree, not of the BST definition, which is why Java's TreeMap uses a red-black tree to guarantee O(log n). Inorder traversal of any BST yields sorted values, which is both a useful property and a debugging check. State your height convention (empty tree height zero is the common choice here) and your duplicate rule before analysing.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How do you keep a BST balanced?",
+      "What is the worst-case height of a BST built from sorted input?",
+      "How does TreeMap guarantee O(log n)?"
+    ],
+    "id": "iq-dsa-bst-complexity",
+    "module": "module-1",
+    "question": "What is the complexity of BST operations, and why is it O(h) rather than O(log n)?",
+    "relatedTopics": [
+      "dsa-patterns",
+      "dsa-complexities"
+    ],
+    "shortAnswer": "BST operations cost O(h), height, not automatically O(log n): balance is what makes height logarithmic, and a degenerate BST degrades to O(n).",
+    "tips": [
+      "Say O(h) first, then explain when h equals log n.",
+      "Mention TreeMap as the balanced production equivalent."
+    ],
+    "title": "BST complexity",
+    "topicId": "dsa-trees-graphs"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Solving the wrong problem by skipping clarification.",
+      "Testing only the happy path and missing empty input or the last-element flush."
+    ],
+    "detailedAnswer": "A reliable process is: restate the problem and confirm it with examples, clarify the five things that change solutions most (sorted or not, duplicates, negatives, empty or missing answers, mutability), work a small example by hand to find the pattern, state a brute force and its complexity, then optimise, code while explaining each step, and test in three layers: the given examples, edge cases (empty, single, identical, sorted, reverse), and one adversarial case aimed at your solution's weak point. State time and space complexity without being asked. If stuck for more than a few minutes, say so and ask for a hint; if time runs short, finish a working brute force rather than a half-finished optimal solution.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What do you do if you spot a better approach halfway through coding?",
+      "How do you handle a follow-up that breaks your solution?",
+      "How do you practise this process?"
+    ],
+    "id": "iq-dsa-interview-process",
+    "module": "module-3",
+    "question": "Walk through your process for a coding problem you have never seen before.",
+    "relatedTopics": [
+      "dsa-patterns"
+    ],
+    "shortAnswer": "Restate, clarify, hand-work an example, brute force, optimise, code aloud, test in three layers, state complexity, and anticipate follow-ups.",
+    "tips": [
+      "Timebox: roughly 5 minutes clarifying, 15 to 20 coding, the rest testing and follow-ups.",
+      "Name the follow-up ladder: space, constraints, scale, output."
+    ],
+    "title": "Interview problem-solving process",
+    "topicId": "dsa-interview-coding-problems"
+  },
+  {
+    "category": "DSA/Coding",
+    "commonMistakes": [
+      "Applying a sliding window where the invariant is not monotone.",
+      "Claiming a greedy solution without any safety argument."
+    ],
+    "detailedAnswer": "The constraint change decides the new pattern. Adding negative numbers breaks a sliding window for sum constraints, because shrinking can increase the sum, so switch to prefix sums with a map, or a monotonic deque for the shortest subarray variant. Requiring O(1) space rules out a HashMap, so switch to sorting plus two pointers if indices are not needed, or to an in-place technique. Asking for all solutions instead of one moves a problem from search to enumeration, often backtracking, and asking for a count moves it towards DP. The skill interviewers test here is not knowing every variant, but reasoning from why the original pattern worked and which of its preconditions the new constraint violates.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What if the input becomes a stream that does not fit in memory?",
+      "What if you need the count of solutions, not the solutions themselves?",
+      "What if duplicates are now allowed?"
+    ],
+    "id": "iq-dsa-followup-constraints",
+    "module": "module-3",
+    "question": "Your solution works, but the interviewer changes a constraint. How do you adapt?",
+    "relatedTopics": [
+      "dsa-patterns"
+    ],
+    "shortAnswer": "Identify which precondition of your pattern the new constraint violates, then switch to the pattern whose preconditions still hold, and re-state the new complexity.",
+    "tips": [
+      "Name the broken precondition explicitly, for example monotonicity for sliding windows.",
+      "Offer the replacement pattern, not just a patch."
+    ],
+    "title": "Adapting to changed constraints",
+    "topicId": "dsa-interview-coding-problems"
+  }
+]

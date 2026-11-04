@@ -58,7 +58,7 @@ Rules:
 - Quote YAML values that start with special characters (`@`, `*`, `:`) or contain `: `, e.g. `summary: "@Component vs @Bean, ..."`.
 - Body must contain at least `## Overview` and be more than 50 characters. Use these headings, in this order where applicable, so every topic page feels identical:
   `## Overview`, `## Theory`, `## Key Concepts`, `## Code Examples`, `## Best Practices`, `## Common Mistakes`, `## Interview Importance`, `## Interview Questions`, `## Revision Summary`
-- Code examples are Java-focused only. Use fenced code blocks with a language tag (usually `java`). State the output exactly, and verify it: code examples must compile and their stated output must be correct where practical.
+- Code examples use the track's primary language per example (Java for the Java tracks; JavaScript/TypeScript, SQL, Bash/Dockerfile/YAML, etc. elsewhere). Use fenced code blocks with a language tag. State the output exactly, and verify it: code examples must compile and their stated output must be correct where practical. No multi-language tabs, switchers, runners, or playgrounds.
 - Diagrams must be explicit in content (e.g. a Mermaid block or an image reference). Never rely on the UI to infer a diagram from a topic name.
 - Reading time is calculated automatically from body word count. Placeholders never show "0 min" — placeholder topics/sections show "Coming Soon" instead of a reading time in the UI.
 - Version differences: for Java/Spring topics, call out version differences interviews commonly ask about (Java 8 vs 11 vs 17 vs 21; Spring Boot versions where relevant).

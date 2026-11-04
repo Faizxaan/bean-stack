@@ -7,7 +7,7 @@ Beanstack is a personal Java full stack developer wiki and interview preparation
 - Frontend only. A static SPA deployed on Vercel. No backend, database, authentication, user accounts, external APIs, or runtime AI calls.
 - All user data (progress, bookmarks, notes, settings) lives in LocalStorage.
 - State management is React Context and hooks only. No Redux, MobX, or similar.
-- Code blocks are Java-focused. No multi-language tabs, switchers, runners, or playgrounds. Standard syntax highlighting for fenced code is enough.
+- Code blocks use the track's primary language per example (Java for the Java tracks; JavaScript/TypeScript, SQL, Bash/Dockerfile/YAML, etc. for the other tracks). No multi-language tabs, switchers, runners, or playgrounds. Standard syntax highlighting for fenced code is enough.
 - No hardcoded counts of topics, questions, or tracks anywhere. Everything is derived from content.
 - No plugin systems, enterprise patterns, or premature optimization.
 
@@ -96,4 +96,4 @@ src/
 
 ## Status
 
-Java tracks (Core Java, Advanced Java, Spring & Spring Boot) are being built out first. All other tracks are polished placeholders — visible, marked "Coming Soon", with planned sections — and can be filled later with content and config only, no component changes. See `PROGRESS.md` for exact completed vs remaining work.
+All 10 tracks are built out: Core Java, Advanced Java, and Spring & Spring Boot, plus Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, and Behavioral & Projects. No track remains a "Coming Soon" placeholder. See `PROGRESS.md` for exact completed work and known limitations.

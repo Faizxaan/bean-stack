@@ -1,0 +1,201 @@
+[
+  {
+    "answerIndex": 1,
+    "category": "SQL",
+    "difficulty": "Easy",
+    "explanation": "HAVING filters groups after aggregation, so it can use aggregate functions such as COUNT(*) > 5. WHERE filters individual rows before grouping and cannot use aggregates; ORDER BY sorts the result; GROUP BY defines the groups but does not filter them.",
+    "id": "pr-db-sql-where-having",
+    "options": [
+      "WHERE",
+      "HAVING",
+      "ORDER BY",
+      "GROUP BY"
+    ],
+    "prompt": "Which clause filters groups after aggregation in SQL?",
+    "topicId": "db-sql-fundamentals",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 2,
+    "category": "SQL",
+    "difficulty": "Easy",
+    "explanation": "NULL means unknown, so any comparison with = or <> evaluates to unknown and filters the row out; only IS NULL tests for absence of a value. Comparing to '' tests for an empty string, which is a real value, not NULL.",
+    "id": "pr-db-sql-null",
+    "options": [
+      "WHERE column = NULL",
+      "WHERE column <> NULL",
+      "WHERE column IS NULL",
+      "WHERE column = ''"
+    ],
+    "prompt": "A column contains NULL values. Which predicate correctly finds rows where the column has no value?",
+    "topicId": "db-sql-fundamentals",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "SQL",
+    "difficulty": "Medium",
+    "explanation": "LEFT JOIN keeps every customer and produces NULL order columns where there is no match, so filtering on those NULLs leaves exactly the customers without orders. INNER JOIN drops non-matching customers before the filter can see them, CROSS JOIN produces every combination, and the RIGHT JOIN option filters the wrong side.",
+    "id": "pr-db-join-no-match",
+    "options": [
+      "INNER JOIN orders and filter WHERE orders.id IS NULL",
+      "LEFT JOIN orders and filter WHERE orders.id IS NULL",
+      "CROSS JOIN orders and filter WHERE orders.id IS NULL",
+      "RIGHT JOIN customers and filter WHERE customers.id IS NULL"
+    ],
+    "prompt": "To list customers who have never placed an order, the correct approach is:",
+    "topicId": "db-joins-indexes-transactions",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "SQL",
+    "difficulty": "Medium",
+    "explanation": "A composite index is sorted by its first column, so it serves queries on customer_id (the leftmost prefix) but not queries filtering only on placed_at. The other options filter or sort on columns that are not leading in the index.",
+    "id": "pr-db-index-prefix",
+    "options": [
+      "WHERE placed_at > '2026-01-01'",
+      "WHERE customer_id = 7",
+      "WHERE placed_at > '2026-01-01' AND total_amount > 100",
+      "ORDER BY total_amount"
+    ],
+    "prompt": "A composite index exists on orders (customer_id, placed_at). Which query can use it efficiently?",
+    "topicId": "db-joins-indexes-transactions",
+    "type": "mcq"
+  },
+  {
+    "answerIndex": 1,
+    "category": "SQL",
+    "difficulty": "Medium",
+    "explanation": "READ COMMITTED prevents dirty reads because it only sees committed data, but re-reading a row in the same transaction can return a newly committed value (a non-repeatable read), and new rows can appear (phantom reads). SERIALIZABLE is the level that prevents all three.",
+    "id": "pr-db-isolation",
+    "options": [
+      "Dirty read",
+      "Non-repeatable read",
+      "Neither anomaly",
+      "Only phantom reads are impossible"
+    ],
+    "prompt": "Under READ COMMITTED, which anomaly is still possible?",
+    "topicId": "db-joins-indexes-transactions",
+    "type": "mcq"
+  },
+  {
+    "back": "One query loads N parent entities, then one additional query per parent loads an association, giving N+1 queries. Fix it with JOIN FETCH, an @EntityGraph, or a DTO projection, not by marking the association EAGER.",
+    "front": "What is the N+1 problem in JPA/Hibernate?",
+    "id": "pr-db-nplus1",
+    "topicId": "db-sql-java-developers",
+    "type": "flashcard",
+    "prompt": "What is the N+1 problem in JPA/Hibernate?"
+  },
+  {
+    "back": "Unchecked exceptions (RuntimeException and Error). Checked exceptions commit unless rollbackFor is specified.",
+    "front": "Which exceptions roll back a Spring @Transactional method by default?",
+    "id": "pr-db-transaction-rollback",
+    "topicId": "db-sql-java-developers",
+    "type": "flashcard",
+    "prompt": "Which exceptions roll back a Spring @Transactional method by default?"
+  },
+  {
+    "back": "A sorted set: each member has a score, members stay ordered by score, ZREVRANGE returns the top N and ZRANK returns a member's rank, all efficiently.",
+    "front": "Which Redis data structure would you use for a leaderboard, and why?",
+    "id": "pr-db-redis-structure",
+    "topicId": "db-key-value-caching",
+    "type": "flashcard",
+    "prompt": "Which Redis data structure would you use for a leaderboard, and why?"
+  },
+  {
+    "description": "Write a SQL query that returns each customer who has placed at least 3 non-cancelled orders, with their order count and total spend, ordered by total spend descending. Tables: customers (id, email), orders (id, customer_id, total_amount, status).",
+    "examples": [
+      {
+        "input": "orders: customer 1 has 4 orders totalling 500, customer 2 has 2 orders totalling 900",
+        "output": "Only customer 1 appears, with order_count 4 and total_spent 500"
+      }
+    ],
+    "hints": [
+      "Filter cancelled orders with WHERE before grouping.",
+      "Use GROUP BY customer_id with COUNT(*) and SUM(total_amount).",
+      "Filter groups with HAVING COUNT(*) >= 3, not WHERE."
+    ],
+    "id": "pr-db-sql-top-customers",
+    "solution": "SELECT customer_id, COUNT(*) AS order_count, SUM(total_amount) AS total_spent\nFROM orders\nWHERE status <> 'CANCELLED'\nGROUP BY customer_id\nHAVING COUNT(*) >= 3\nORDER BY total_spent DESC;",
+    "topicId": "db-sql-fundamentals",
+    "type": "coding",
+    "prompt": "Write a SQL query that returns each customer who has placed at least 3 non-cancelled orders, with their order count and total spend, ordered by total spend descending."
+  },
+  {
+    "description": "Write a SQL query that returns the id and email of every customer who has never placed an order. Tables: customers (id, email), orders (id, customer_id).",
+    "examples": [
+      {
+        "input": "customers 1 and 2; only customer 1 has an order",
+        "output": "customer 2's id and email"
+      }
+    ],
+    "hints": [
+      "Use a LEFT JOIN from customers to orders.",
+      "Filter for rows where the joined order side is NULL."
+    ],
+    "id": "pr-db-sql-no-orders",
+    "solution": "SELECT c.id, c.email\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE o.id IS NULL;",
+    "topicId": "db-joins-indexes-transactions",
+    "type": "coding",
+    "prompt": "Write a SQL query that returns the id and email of every customer who has never placed an order."
+  },
+  {
+    "answerIndex": 1,
+    "category": "SQL",
+    "code": "SELECT COUNT(*), COUNT(val) FROM t;",
+    "difficulty": "Easy",
+    "explanation": "COUNT(*) counts rows regardless of NULLs, so it returns 5. COUNT(val) counts only non-NULL values in val, so it returns 3. The other options confuse the two behaviours.",
+    "id": "pr-db-output-count",
+    "options": [
+      "5 and 5",
+      "5 and 3",
+      "3 and 5",
+      "3 and 3"
+    ],
+    "prompt": "A table t has 5 rows; column val is NULL in 2 of them. What do COUNT(*) and COUNT(val) return?",
+    "topicId": "db-sql-fundamentals",
+    "type": "output"
+  },
+  {
+    "answerIndex": 0,
+    "category": "NoSQL",
+    "code": "ZADD leaderboard 1500 \"player:7\" 1200 \"player:3\" 1800 \"player:9\"\nZREVRANGE leaderboard 0 1 WITHSCORES",
+    "difficulty": "Easy",
+    "explanation": "ZREVRANGE returns members in descending score order, and indices 0 to 1 take the top two: player:9 at 1800, then player:7 at 1500. Ascending order would put player:3 first, and a single index would return only one member.",
+    "id": "pr-db-output-redis-leaderboard",
+    "options": [
+      "player:9 (1800), player:7 (1500)",
+      "player:3 (1200), player:7 (1500)",
+      "player:7 (1500), player:9 (1800)",
+      "player:9 (1800) only"
+    ],
+    "prompt": "After these Redis commands, what does ZREVRANGE leaderboard 0 1 WITHSCORES return?",
+    "topicId": "db-key-value-caching",
+    "type": "output"
+  },
+  {
+    "description": "Users report that after updating their profile name, the old name keeps showing for up to an hour. The profile is cached in Redis with a 1-hour TTL, and the update path writes to the database but does not touch the cache. Diagnose the problem and propose a fix that keeps caching benefits.",
+    "id": "pr-db-scenario-stale-cache",
+    "solution": "Diagnosis: the cache is stale because the update path never invalidates the cached entry, so reads keep serving the old value until the TTL expires. Fix: evict (or update) the cached profile key in the same code path that writes the database, for example with Spring's @CacheEvict on the update method keyed by user id. Keep the TTL as a safety net for any missed invalidation, and consider a shorter TTL for frequently changed profile data. Verify with a test that updates the profile and then reads it back through the cache.",
+    "topicId": "db-key-value-caching",
+    "type": "scenario",
+    "prompt": "Users report that after updating their profile name, the old name keeps showing for up to an hour."
+  },
+  {
+    "description": "You are modelling a blogging platform in MongoDB. Each post has comments, and popular posts can accumulate tens of thousands of comments over years. Should comments be embedded in the post document or stored as separate documents referenced by post id? Justify your choice and note the trade-off.",
+    "id": "pr-db-scenario-embed-reference",
+    "solution": "Store comments as separate documents referenced by post id. Embedding suits bounded data read together with the parent, but a comment list that grows without bound will hit the 16 MB document limit, make every comment addition rewrite a huge document, and slow post reads that do not need comments. Referencing keeps post documents small and stable, lets comments be paginated and indexed independently, and costs an extra query (or aggregation) to load a page of comments, which is the correct trade-off here. A small embedded summary, such as a comment count, can be maintained on the post if needed.",
+    "topicId": "db-document-stores",
+    "type": "scenario",
+    "prompt": "You are modelling a blogging platform in MongoDB."
+  },
+  {
+    "description": "A team wants to move its order and payment data from PostgreSQL to a document store 'for scalability', although current load is modest and the main complaints are slow reports and occasional double-charges. Evaluate the proposal and recommend an approach.",
+    "id": "pr-db-scenario-choose-store",
+    "solution": "Do not migrate the transactional core: orders and payments need multi-row ACID transactions, integrity constraints, and join-heavy reporting, which PostgreSQL serves well and a document store serves poorly. The symptoms point elsewhere: slow reports suggest missing indexes or N+1-style query problems, and double-charges suggest missing idempotency or transaction boundaries, not the wrong database family. Fix those first, measure, and only consider a second store for a workload that genuinely fits it, such as a document store for the product catalogue or Redis for caching, keeping PostgreSQL as the system of record for orders and payments.",
+    "topicId": "db-choosing-nosql",
+    "type": "scenario",
+    "prompt": "A team wants to move its order and payment data from PostgreSQL to a document store 'for scalability', although current load is modest and the main complaints are slow reports and occasional..."
+  }
+]

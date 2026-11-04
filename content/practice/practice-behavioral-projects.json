@@ -1,0 +1,151 @@
+[
+  {
+    "answerIndex": 1,
+    "category": "Behavioral",
+    "difficulty": "Easy",
+    "explanation": "Action deserves roughly 60% of the answer: it shows your steps, choices, and reasoning. Long background leaves nothing to score, and a result without actions is just a claim.",
+    "id": "pr-bh-star-proportions",
+    "options": [
+      "The Situation, so the interviewer understands all the background.",
+      "The Action, because it is the evidence of what you personally did.",
+      "The Result, because outcomes matter more than process.",
+      "The Task, because your job title explains your seniority."
+    ],
+    "prompt": "In a well-structured STAR answer, which part should take the most time?",
+    "title": "STAR time proportions",
+    "topicId": "bh-star-method",
+    "type": "mcq"
+  },
+  {
+    "back": "Situation, Task, Action, Result. Situation and Task set context, Action is the evidence of your contribution, and Result states the outcome and lesson.",
+    "front": "What do the four letters of STAR stand for?",
+    "id": "pr-bh-star-parts",
+    "topicId": "bh-star-method",
+    "type": "flashcard",
+    "prompt": "What do the four letters of STAR stand for?"
+  },
+  {
+    "description": "A candidate answers 'Tell me about a time you handled a tight deadline' like this: 'We had a really busy period at work and everyone was stressed. The project was complicated and there were lots of stakeholders. We worked really hard and in the end we managed to deliver it, which was great.' Evaluate this answer and rewrite it into a strong STAR answer (use a clearly fictional scenario).",
+    "id": "pr-bh-weak-answer",
+    "solution": "Weaknesses: no specific situation, no personal task or role ('we' throughout), no concrete actions ('worked really hard' is not a step), and no measurable result. A strong rewrite: Situation \u2014 a fictional reporting tool had to launch in two weeks when its data source changed format. Task \u2014 the candidate owned the data-import part. Action \u2014 mapped the format differences, proposed a translation layer instead of rewriting every report, built it behind a flag, and compared old and new outputs on sample data. Result \u2014 launched on the original date with matching outputs, and the translation layer made the next format change take hours instead of days. Lesson: check external source stability early in planning.",
+    "topicId": "bh-star-method",
+    "type": "scenario",
+    "prompt": "A candidate answers 'Tell me about a time you handled a tight deadline' like this: 'We had a really busy period at work and everyone was stressed."
+  },
+  {
+    "answerIndex": 2,
+    "category": "Behavioral",
+    "difficulty": "Easy",
+    "explanation": "Humble-brag failures read as evasion: interviewers hear them constantly and score them as a refusal to answer. A real failure, owned plainly with a concrete lesson, scores far better.",
+    "id": "pr-bh-failure-trap",
+    "options": [
+      "A real failure with a clear account of your part and a specific behavior change afterwards.",
+      "A failure where the outcome was partial but the lesson is concrete.",
+      "A 'failure' that is secretly a strength, such as working too hard or caring too much.",
+      "A failure in which you misjudged a situation and explain what you would do differently."
+    ],
+    "prompt": "Which answer to 'Tell me about a time you failed' is most likely to be scored poorly?",
+    "title": "The failure question trap",
+    "topicId": "bh-common-behavioral-questions",
+    "type": "mcq"
+  },
+  {
+    "back": "Questions repeat competencies under different wordings. One story, re-emphasized, can answer leadership, challenge, ownership, and learning questions \u2014 so a small tagged story bank covers dozens of phrasings.",
+    "front": "Why prepare a bank of six to eight stories instead of one answer per interview question?",
+    "id": "pr-bh-story-bank",
+    "topicId": "bh-common-behavioral-questions",
+    "type": "flashcard",
+    "prompt": "Why prepare a bank of six to eight stories instead of one answer per interview question?"
+  },
+  {
+    "description": "A candidate answers a conflict question by spending most of the answer explaining why their teammate's approach was wrong and how the candidate eventually proved them wrong. Improve this answer: what should change in tone, structure, and ending?",
+    "id": "pr-bh-conflict-answer",
+    "solution": "Change the tone: describe the disagreement as a difference in view or priority, not as the teammate being wrong, and avoid blame or gossip. Change the structure: show listening first (what the teammate's concern was and why it was reasonable), then the discussion, then how a decision was reached. Change the ending: close with the resolution and the working relationship afterwards, plus what the candidate changed about how they handle disagreements \u2014 not with a victory lap.",
+    "topicId": "bh-common-behavioral-questions",
+    "type": "scenario",
+    "prompt": "A candidate answers a conflict question by spending most of the answer explaining why their teammate's approach was wrong and how the candidate eventually proved them wrong."
+  },
+  {
+    "answerIndex": 1,
+    "category": "Projects",
+    "difficulty": "Easy",
+    "explanation": "Lead with the problem: it gives the listener a reason to care about everything that follows. Technologies belong in the middle as decisions with reasons, and schemas and feature lists belong in follow-ups, not the opening.",
+    "id": "pr-bh-project-opening",
+    "options": [
+      "A list of the frameworks and databases the project used.",
+      "The problem the project solved, and for whom.",
+      "A detailed description of the database schema.",
+      "A list of every feature the project shipped."
+    ],
+    "prompt": "What is the strongest opening for a project presentation in an interview?",
+    "title": "Opening a project presentation",
+    "topicId": "bh-presenting-a-project",
+    "type": "mcq"
+  },
+  {
+    "back": "A two-minute version and a ten-minute version. The arc stays the same \u2014 problem, your role, the hard part, the outcome, the lesson \u2014 only the level of detail changes.",
+    "front": "What are the two versions of a project presentation you should prepare, and what stays the same between them?",
+    "id": "pr-bh-project-versions",
+    "topicId": "bh-presenting-a-project",
+    "type": "flashcard",
+    "prompt": "What are the two versions of a project presentation you should prepare, and what stays the same between them?"
+  },
+  {
+    "answerIndex": 1,
+    "category": "Projects",
+    "difficulty": "Medium",
+    "explanation": "Top-down order mirrors how a listener builds understanding: purpose first, then the flow of a request, then data choices, then reasoning about scale and failure. Starting with schema or framework detail loses listeners who do not yet know what the system does.",
+    "id": "pr-bh-deep-dive-order",
+    "options": [
+      "Database schema first, then components, then purpose.",
+      "Purpose and users, components and request flow, data and storage, scale and failure.",
+      "Framework choices first, then purpose, then failure modes.",
+      "The hardest bug first, then the overall architecture."
+    ],
+    "prompt": "When explaining a system in an architecture deep dive, which order is best?",
+    "title": "Architecture deep dive order",
+    "topicId": "bh-architecture-deep-dives",
+    "type": "mcq"
+  },
+  {
+    "description": "An interviewer asks: 'What happens when your notification service goes down?' A candidate replies: 'It never goes down; we built it well.' Rewrite this into a strong deep-dive answer using a fictional booking system where notifications are sent asynchronously from a queue.",
+    "id": "pr-bh-request-flow",
+    "solution": "A strong answer: bookings still succeed because the notification worker reads from a queue and is separate from the booking path, so a worker outage delays messages rather than losing bookings. On recovery, queued notifications are retried and delivered. Detection comes from queue-depth and worker-health alerts. The deliberate trade-off: delaying an email was judged acceptable, losing a booking was not. If the queue itself failed, bookings would still be recorded but notifications would need a replay from booking records \u2014 that is the residual risk, and it is why queue durability was chosen over speed.",
+    "topicId": "bh-architecture-deep-dives",
+    "type": "scenario",
+    "prompt": "An interviewer asks: 'What happens when your notification service goes down?' A candidate replies: 'It never goes down; we built it well.' Rewrite this into a strong deep-dive answer using a..."
+  },
+  {
+    "answerIndex": 1,
+    "category": "Projects",
+    "difficulty": "Medium",
+    "explanation": "Weak answers describe a choice as if it had no downside. Every decision has a cost; naming it unprompted, plus the condition under which you would revisit the decision, is what makes a trade-off answer credible.",
+    "id": "pr-bh-tradeoff-parts",
+    "options": [
+      "The decision that was made.",
+      "The cost: what was given up and how it was managed.",
+      "The name of the technology chosen.",
+      "The date the decision was made."
+    ],
+    "prompt": "Which element is most often missing from weak trade-off answers?",
+    "title": "Parts of a trade-off answer",
+    "topicId": "bh-tradeoffs-lessons",
+    "type": "mcq"
+  },
+  {
+    "back": "A specific behavior change caused by a specific experience \u2014 for example, adding loud validation for external data feeds after a silent format change broke an import \u2014 ideally with a later example of the new behavior in action.",
+    "front": "What makes a lesson learned credible in an interview, rather than a platitude?",
+    "id": "pr-bh-lesson-definition",
+    "topicId": "bh-tradeoffs-lessons",
+    "type": "flashcard",
+    "prompt": "What makes a lesson learned credible in an interview, rather than a platitude?"
+  },
+  {
+    "description": "Evaluate and improve this trade-off answer: 'We used one database for everything because it was simpler. It worked fine.' Use a fictional internal tool as the setting and supply the missing parts.",
+    "id": "pr-bh-tradeoff-answer",
+    "solution": "Missing parts: genuine alternatives, the deciding constraint, the cost, and the revisit condition. Improved version: Decision \u2014 one database for the application and its reporting layer. Alternative \u2014 a separate reporting store fed by a pipeline, which would isolate reporting load. Deciding constraint \u2014 a small team, a short deadline, and modest reporting volume (a few dozen reports a day). Cost \u2014 a heavy report could slow the main application, managed with report-size limits and scheduling heavy reports outside working hours. Revisit condition \u2014 at roughly ten times the reporting volume, the separate store becomes the right call, and that trigger was documented for the team.",
+    "topicId": "bh-tradeoffs-lessons",
+    "type": "scenario",
+    "prompt": "Evaluate and improve this trade-off answer: 'We used one database for everything because it was simpler."
+  }
+]
