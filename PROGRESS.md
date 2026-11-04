@@ -2,14 +2,14 @@
 
 This file is the resume point if a session is interrupted or its context is reset. Read it first, then run validation and the build before continuing.
 
-## Current state (2026-11-04, after foundation + sample content + three Java content batches)
+## Current state (2026-11-04, after interview/practice/cheatsheet batches + polish)
 
 - **Local directory:** `~/workspace/beanstack` (persistent, not /tmp)
 - **GitHub repo:** Faizxaan/bean-stack, branch `main`
 - **Repo before this work:** only `README.md` (12 bytes, initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92` on 2026-11-03). No other code existed to replace.
 - **App status:** Fully functional end-to-end SPA. Production build, type-check, validation script, and unit tests all pass (see Verification below).
-- **Content status:** 34 topics validated (Core Java, Advanced Java, Spring & Spring Boot largely covered — see Completed), 2 cheatsheets, 11 interview questions, 16 practice items. Interview modules 2–4, expanded practice/cheatsheets, and placeholder tracks remain (see Remaining).
-- **Push status:** See "Push log" at the bottom. If a push has not yet been confirmed, the local build in this directory is the source of truth — do not claim a push that is not recorded with a confirmed commit SHA.
+- **Content status:** 34 topics validated, 10 cheatsheets, 83 interview questions, 73 practice items. Interview modules 0–4 and Bonus Resume are now complete; placeholder non-Java tracks remain Coming Soon by instruction (see Remaining).
+- **Push status:** See "Push log" at the bottom. Confirmed push `81f00e1ec9604341ad630045a2d30067a41ee895` (76 files) covers foundation + 34 topics. The batches in this continuation run are validated locally and prepared in a fresh manifest, but NOT pushed in this run — do not claim they are on GitHub until a new confirmed commit SHA is recorded. If a push has not yet been confirmed, the local build in this directory is the source of truth.
 
 ## Completed
 
@@ -52,34 +52,38 @@ This file is the resume point if a session is interrupted or its context is rese
 - [x] One correction applied in review: `@MockBean` in the testing topic updated to `@MockitoBean` (Spring Boot 3.4+) with a note that older code uses `@MockBean`.
 - [x] Caveat carried forward: no JDK is installed in this environment, so Java snippets were manually reviewed for correctness, not compiled with `javac`. A systematic compile pass remains open (see polish list).
 
+## Completed — continuation run (2026-11-04, interview/practice/cheatsheets + polish)
+
+- [x] Interview modules 2, 3, 4: 14 questions each (42 total), all 13 categories in every module (Java, Collections, Streams, Concurrency, JVM, Spring Framework, Spring Boot, Spring MVC, Spring Data JPA, Microservices, SQL, Coding, Scenario-based). Module 2: 11 Medium / 3 Hard; Module 3: 6 Medium / 8 Hard; Module 4: 4 Medium / 10 Hard.
+- [x] Full Module 0 revision notes: 21 items (was 2), category Revision, covering JVM, OOP, Strings, Collections, Exceptions, Generics, Streams, Optional/functional, Concurrency, Java Memory Model, GC, Reflection/Serialization, JDBC, Patterns/SOLID, Spring IoC, Boot auto-configuration, MVC/REST, JPA, Security/JWT, Microservices/Actuator, plus Modern Java. Existing ids `iq-rev-jvm` and `iq-rev-collections` preserved.
+- [x] Full Bonus Resume: 12 items (was 1), category Resume, including separate copy-ready templates for 0–3, 3–5, 5–8, and 8–15 years, ATS/tailoring, impact bullets, projects/GitHub, job-switch/gap explanations, common mistakes, interview-prep use, and a pre-send checklist. Existing id `iq-resume-tips` preserved.
+- [x] Practice expansion: practice-2 (32 items: 10 MCQ, 6 flashcard, 6 coding, 6 output, 4 scenario) and practice-3 (25 items: 8 MCQ, 4 flashcard, 4 coding, 4 output, 5 scenario, focused on concurrency, JVM/GC, Security, JPA, microservices, generics, I/O). Total practice: 73 items (was 16).
+- [x] Cheatsheets expansion: 8 new cheatsheets (core-java, streams-functional, concurrency, jvm-gc, spring-core, spring-boot, jpa, rest-security). Total cheatsheets: 10 (was 2).
+- [x] Polish — vendor chunk-splitting + lazy pages: `vite.config.ts` manualChunks (react, markdown, motion, icons) and lazy-loaded page components in `src/App.tsx`. Main chunk fell from 1,006 KB to 442 KB; the production build no longer emits the 800 KB chunk-size warning. Topic Markdown bodies remain split per file.
+- [x] Polish — accessibility fix from code walkthrough: flashcard flip in `src/pages/Practice.tsx` is now keyboard-operable (tabIndex 0, Enter/Space toggles, updated hint text). Walkthrough notes (code, not a live device test): visible `:focus-visible` outline exists, sidebar has `aria-label="Primary navigation"`, command palette is a labelled dialog with Ctrl/Cmd+K toggle and Escape to close, filters/inputs are labelled, mobile layout stacks the sidebar above content at ≤900px and collapses grids to one column, print CSS hides nav/topbar.
+- [x] Vercel deploy verification notes (no live deploy performed, per instruction): `vercel.json` SPA rewrites to `/index.html` are present, build command `npm run build`, output `dist`, no env vars/backend/database required. A live Vercel import and deep-link refresh check still require user approval/import and are not claimed here.
+
 ## Remaining — content batches (in order, one section at a time)
 
-Content volume is the main remaining work. The app is ready; each batch is: write files → run validation → regenerate index → typecheck/test/build → push.
-
-- [ ] Interview modules — Module 2 (3–5 years), Module 3 (5–8 years), Module 4 (8–15 years), full Module 0 revision notes, full Bonus Resume templates; interview categories in every module: Java, Collections, Streams, Concurrency, JVM, Spring Framework, Spring Boot, Spring MVC, Spring Data JPA, Microservices, SQL as used by Java developers, coding, scenario-based
-- [ ] Practice material — expand MCQs, flashcards, coding, output-based, and scenario-based items per topic, so per-topic accuracy and weak areas are meaningful across the whole Java curriculum
-- [ ] Cheatsheets — expand to cover each major topic area, keeping every cheatsheet consistent with its topic content
-- [ ] Placeholder tracks — fill Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, Behavioral & Projects with content and config only (no component changes), in that order or by user priority
+- [ ] Placeholder tracks — NOT filled in this continuation run, by explicit parent instruction. They stay Coming Soon: Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, Behavioral & Projects, to be filled later with content and config only (no component changes), in that order or by user priority.
 - [ ] Optional deeper Java topics, if the user wants them: collections List/Set/Map specifics as separate topics, JDBC deep dive, networking deep dive, and per-category interview question groups (currently interview questions are flat per module with a category field, which satisfies the data model but is not yet grouped into question groups in the UI)
 
 ## Remaining — polish / verification
 
-- [ ] Vendor chunk-splitting to reduce the main bundle below the 800 KB warning (build currently warns, does not fail; main chunk ~820 KB, content chunks are already split)
-- [ ] Compile-check every Java snippet in a JDK and verify stated outputs, especially Spring/Jakarta snippets that are framework code rather than standalone programs (sample snippets were written to be correct by construction; a systematic compile pass is still open)
-- [ ] Manual accessibility pass on mobile navigation and dialogs (keyboard-only walkthrough)
-- [ ] Vercel deploy verification (import repo, confirm build command `npm run build`, output `dist`, deep-link refresh works via `vercel.json`)
+- [ ] Compile-check every Java snippet in a JDK and verify stated outputs, especially Spring/Jakarta snippets that are framework code rather than standalone programs (snippets were written to be correct by construction; a systematic compile pass is still open — no JDK is installed in this environment)
+- [ ] Live Vercel deploy verification (import repo, confirm deep-link refresh works) — requires user approval/import; not performed in this run
 - [ ] After all content batches: final summary (what was built, key decisions, anything left as placeholder, how to run/deploy)
 
-## Verification (last run, 2026-11-04, after three Java content batches)
+## Verification (last run, 2026-11-04, after interview/practice/cheatsheet batches + polish)
 
 - `npm run validate-content` — OK (34 topics, 34 unique ids, 10 tracks)
-- `npm run build-content-index` — OK (34 topics, 2 cheatsheets, 11 interview questions, 16 practice items, 10 tracks, 3 paths)
+- `npm run build-content-index` — OK (34 topics, 10 cheatsheets, 83 interview questions, 73 practice items, 10 tracks, 3 paths)
 - `npm run typecheck` — OK
 - `npm test` — 10 tests passed
-- `npm run build` — OK (Vite production build; each topic is its own chunk; one main-chunk size warning, see above)
+- `npm run build` — OK (Vite production build; main chunk 442 KB, no 800 KB chunk-size warning; vendor chunks: markdown 323 KB, motion 121 KB, react 50 KB; topic/cheatsheet chunks split per file)
 
 ## Push log
 
 - (To be filled after each confirmed push: date, batch description, commit SHA from the provider result, paths submitted.)
 - 2026-11-04, foundation batch (55 files): push attempted via `github push-files` to Faizxaan/bean-stack branch `main`, but the runtime approval card timed out (`approval_expired`, egress approval timed out for this invocation). The action was NOT performed. Repo head remains the initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92`. Do NOT claim this push succeeded. Retry requires a fresh approval; the manifest is at `~/workspace/beanstack-manifest-1.txt` (outside the source dir).
-- No successful push has been recorded yet. The sync record lives outside the repo at `~/workspace/beanstack.muse-github-snapshot-sync.json` and must never be committed.
+- 2026-11-04, CONFIRMED PUSH: "Beanstack: foundation + Java content (34 topics)", 76 files, manifest at `~/workspace/beanstack-manifest-2.txt`, commit SHA `81f00e1ec9604341ad630045a2d30067a41ee895` on branch `main`, verified by re-reading the repo head. This supersedes the failed attempts above. The sync record lives outside the repo at `~/workspace/beanstack.muse-github-snapshot-sync.json` and must never be committed.

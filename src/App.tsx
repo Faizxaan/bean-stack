@@ -1,16 +1,24 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AppProvider } from './store/AppContext'
 import { Layout } from './components/Layout'
-import { Home } from './pages/Home'
-import { LearnIndex, TrackPage, TopicPage } from './pages/Learn'
-import { InterviewIndex, InterviewQuestionPage } from './pages/Interview'
-import { Practice } from './pages/Practice'
-import { CheatsheetsIndex, CheatsheetPage } from './pages/Cheatsheets'
-import { Library } from './pages/Library'
-import { Settings } from './pages/Settings'
-import { NotFound, SearchPage } from './pages/Misc'
+
+// Page components are lazy-loaded (2026-11-04 polish) so the initial
+// bundle stays small; the Suspense fallback below covers all routes.
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
+const LearnIndex = lazy(() => import('./pages/Learn').then(m => ({ default: m.LearnIndex })))
+const TrackPage = lazy(() => import('./pages/Learn').then(m => ({ default: m.TrackPage })))
+const TopicPage = lazy(() => import('./pages/Learn').then(m => ({ default: m.TopicPage })))
+const InterviewIndex = lazy(() => import('./pages/Interview').then(m => ({ default: m.InterviewIndex })))
+const InterviewQuestionPage = lazy(() => import('./pages/Interview').then(m => ({ default: m.InterviewQuestionPage })))
+const Practice = lazy(() => import('./pages/Practice').then(m => ({ default: m.Practice })))
+const CheatsheetsIndex = lazy(() => import('./pages/Cheatsheets').then(m => ({ default: m.CheatsheetsIndex })))
+const CheatsheetPage = lazy(() => import('./pages/Cheatsheets').then(m => ({ default: m.CheatsheetPage })))
+const Library = lazy(() => import('./pages/Library').then(m => ({ default: m.Library })))
+const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })))
+const NotFound = lazy(() => import('./pages/Misc').then(m => ({ default: m.NotFound })))
+const SearchPage = lazy(() => import('./pages/Misc').then(m => ({ default: m.SearchPage })))
 
 function Page({ children }: { children: React.ReactNode }) {
   return (

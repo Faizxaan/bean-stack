@@ -16,6 +16,15 @@ Recorded so a later session (or a reviewer) can see why things are the way they 
 - **Placeholder tracks show planned sections, not empty pages.** Every placeholder track has sections with `plannedTopics`, so its page is useful and clearly marked "Coming Soon".
 - **Main bundle warning accepted for v1.** The production build warns about an 820 KB main chunk (React + router + markdown + highlighting). Content chunks are already split per topic. Vendor chunk-splitting is a polish item in PROGRESS.md, not a blocker, because the warning does not fail the build and initial content load is lazy.
 
+## Continuation decisions (2026-11-04 — interview, practice, cheatsheets, polish)
+
+- **Interview modules completed by content only, no component changes.** Modules 2–4, full Module 0, and full Bonus Resume were added as JSON under `content/interview/`; the existing Interview UI (browse by module/topic, self-test, bookmarks, deep links) needed no changes. Questions are flat per module with a `category` field; grouping into UI question groups is still an optional future item.
+- **Practice/cheatsheets expanded by content only.** practice-2/practice-3 and 8 new cheatsheets follow the existing JSON/Markdown formats and validation rules; no UI changes were needed except the flashcard keyboard fix below.
+- **Placeholder non-Java tracks deliberately NOT filled in this run.** Per the parent instruction for this continuation, Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, and Behavioral & Projects stay Coming Soon, even though the earlier PROGRESS order listed them as next. Filling them remains content/config-only work for a later run.
+- **Vendor chunk-splitting + lazy pages instead of raising the chunk warning limit.** `vite.config.ts` now uses `manualChunks` for react, markdown/highlight, motion, and icons, and `src/App.tsx` lazy-loads page components. Main chunk: 1,006 KB → 442 KB, warning cleared. This supersedes the earlier "main bundle warning accepted" note.
+- **Flashcard keyboard fix.** The flashcard flip was a clickable `div` with `role="button"` but no keyboard handling; it now has `tabIndex={0}` and Enter/Space toggling. Other interactive elements were already native buttons/selects/inputs.
+- **Push discipline for this run.** New/changed files are validated locally and prepared in a fresh manifest outside the source dir, but no GitHub push was attempted in this run, because prior push approvals timed out when the user was absent. Nothing in this run may be claimed as pushed without a new confirmed commit SHA.
+
 ## Content decisions (sample batch, 2026-11-04)
 
 - Sample content proves every feature end to end: 13 topics (6 Core Java, 3 Advanced Java, 4 Spring & Spring Boot), 2 cheatsheets, 11 interview questions, 16 practice items, 3 learning paths.

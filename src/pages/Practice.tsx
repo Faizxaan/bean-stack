@@ -40,9 +40,9 @@ function FlashcardCard({ item }: { item: typeof contentIndex.practiceItems[numbe
   return (
     <div className="card" style={{ marginBottom: 12 }}>
       <strong>{item.title}</strong>
-      <div style={{ minHeight: 80, padding: 12, border: '1px solid var(--border)', borderRadius: 8, margin: '10px 0', cursor: 'pointer' }} onClick={() => setFlipped(!flipped)} role="button" aria-label="Flip flashcard">
+      <div style={{ minHeight: 80, padding: 12, border: '1px solid var(--border)', borderRadius: 8, margin: '10px 0', cursor: 'pointer' }} onClick={() => setFlipped(!flipped)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlipped(!flipped) } }} tabIndex={0} role="button" aria-label="Flip flashcard">
         {flipped ? item.back : item.front}
-        <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginTop: 8 }}>{flipped ? 'Back — click to flip back' : 'Front — click to flip'}</div>
+        <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginTop: 8 }}>{flipped ? 'Back — click or press Enter to flip back' : 'Front — click or press Enter to flip'}</div>
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <button className="btn secondary small" onClick={() => setFlashcardBox(item.id, 1)}>Forgot — back to Box 1</button>
