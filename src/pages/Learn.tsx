@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Bookmark, Star, ArrowLeft, ArrowRight, Clock, ChevronDown } from 'lucide-react'
+import { Bookmark, Star, ArrowLeft, ArrowRight, Clock, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { contentIndex, extractSection, getTopic, getTrack, loadTopicBody, orderedTopics, prevNextTopic, stripFrontmatter, topicsForSection } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { MarkdownView } from '../components/MarkdownView'
@@ -95,6 +95,7 @@ export function TopicPage() {
   useEffect(() => {
     if (!topic) return
     markViewed(topic.id)
+    window.scrollTo(0, 0)
     setBody(null); setError(null)
     loadTopicBody(topic).then(raw => setBody(stripFrontmatter(raw))).catch(e => setError(String(e.message || e)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -140,6 +141,24 @@ export function TopicPage() {
   return (
     <div>
       <p style={{ color: 'var(--muted)' }}><Link to="/learn">Learn</Link> / <Link to={`/learn/${topic.track}`}>{track?.title || topic.track}</Link> / {topic.title}</p>
+      {/* Clickable topic navigation: left arrow = previous topic in this track, right arrow = next topic.
+          Deliberately click-only, not keyboard arrow keys, so it never conflicts with scrolling or text selection. */}
+      <nav className="topic-nav-top" aria-label="Previous and next topic">
+        {prev
+          ? <Link className="btn secondary small" to={topicUrl(prev)} aria-label={`Previous topic: ${prev.title}`}><ArrowLeft size={15} /><span className="topic-nav-label">Previous: {prev.title}</span></Link>
+          : <span className="btn secondary small" aria-disabled="true" style={{ opacity: 0.5 }}><ArrowLeft size={15} /><span className="topic-nav-label">No previous topic</span></span>}
+        {next
+          ? <Link className="btn secondary small" to={topicUrl(next)} aria-label={`Next topic: ${next.title}`}><span className="topic-nav-label">Next: {next.title}</span> <ArrowRight size={15} /></Link>
+          : <span className="btn secondary small" aria-disabled="true" style={{ opacity: 0.5 }}><span className="topic-nav-label">No next topic</span> <ArrowRight size={15} /></span>}
+      </nav>
+      <nav className="topic-arrows" aria-label="Previous and next topic">
+        {prev
+          ? <Link className="topic-arrow prev" to={topicUrl(prev)} aria-label={`Previous topic: ${prev.title}`} title={prev.title}><ChevronLeft size={24} /><span className="sr-only">Previous topic: {prev.title}</span></Link>
+          : <span className="topic-arrow prev disabled" aria-hidden="true"><ChevronLeft size={24} /></span>}
+        {next
+          ? <Link className="topic-arrow next" to={topicUrl(next)} aria-label={`Next topic: ${next.title}`} title={next.title}><ChevronRight size={24} /><span className="sr-only">Next topic: {next.title}</span></Link>
+          : <span className="topic-arrow next disabled" aria-hidden="true"><ChevronRight size={24} /></span>}
+      </nav>
       <h1 style={{ marginBottom: 4 }}>{topic.title}</h1>
       <p style={{ color: 'var(--muted)', marginTop: 0 }}>
         <span className="badge">{topic.difficulty}</span> {' '}

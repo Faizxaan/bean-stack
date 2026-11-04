@@ -77,6 +77,12 @@ This file is the resume point if a session is interrupted or its context is rese
 - [x] Central validation fix: 19 new practice items lacked a validator-required prompt/title field; a prompt derived from each item's own front/first-sentence description was added (see DECISIONS.md). No answers or solutions changed.
 - [x] Accessibility/mobile walkthrough (code, not a live-device test): :focus-visible outline present, sidebar aria-label, labelled command-palette dialog with Ctrl/Cmd+K toggle and Escape to close, keyboard-operable flashcard flip, mobile layout stacking sidebar above content at ≤900px with grids collapsing to one column, print CSS hiding nav/topbar, reduced-motion setting respected.
 
+## Completed — small UX change (2026-11-04, clickable topic arrows, NOT yet pushed)
+
+- [x] Topic page: clickable left/right arrow navigation to the previous/next topic in the same track, using the existing `prevNextTopic` order. A labelled top prev/next bar is shown on every topic page; large fixed chevron buttons appear only on very wide screens (≥1400px) to avoid overlapping content. The existing bottom prev/next links are kept for mobile. Deliberately click-only, not keyboard arrow keys, per the original prompt (plain arrow keys conflict with scrolling/text selection).
+- [x] Topic page now scrolls to the top when the topic changes, so clicking next/previous from the bottom of a long topic does not leave the new topic scrolled to the bottom.
+- [x] Verification for this change: `npm run validate-content` OK, `npm run build-content-index` OK (79 topics, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks, 6 paths), `npm run typecheck` OK, `npm test` 10 passed, `npm run build` OK in ~10s (main index chunk 722 KB, unchanged).
+
 ## Remaining — content batches
 
 - [x] All former placeholder tracks filled in the completion run (see Completed — completion run below). No track remains Coming Soon.

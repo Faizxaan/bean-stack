@@ -31,6 +31,11 @@ Recorded so a later session (or a reviewer) can see why things are the way they 
 - Java version target: current LTS Java (21 at time of writing, with 8/11/17/21 differences called out where interviews ask about them). Spring Boot: current stable, with auto-configuration imports path noted as in current Spring Boot.
 - Code examples in sample topics were written to be correct by construction (simple, deterministic programs). Full compile-checking of every snippet is a remaining verification step listed in PROGRESS.md; snippets that depend on Spring/Jakarta APIs are presented as framework code, not standalone-compilable programs, and are labelled as such by context.
 
+## Small UX changes (2026-11-04 — clickable topic arrows)
+
+- **Clickable left/right arrows, not keyboard arrow keys.** The original prompt forbids plain arrow keys for topic navigation (they conflict with scrolling and text selection). The new navigation is therefore click-only: a top prev/next bar with labelled arrows on every topic page, plus large fixed chevron buttons on very wide screens (≥1400px, where they cannot overlap the content). The existing bottom prev/next links are kept, so mobile users still have navigation. Arrows follow the existing `prevNextTopic` order — previous/next topic within the same track, not across tracks.
+- **Scroll to top on topic change.** Clicking next/previous from the bottom of a long topic used to leave the new topic scrolled to the bottom. TopicPage now scrolls to the top on topic change.
+
 ## Completion run 2026-11-04 — all tracks to 100%
 
 - **Non-Java tracks use their own primary language for code examples.** The original "Java-focused" constraint is preserved for the Java tracks and for the spirit of the rule (one language per example, no tabs/switchers/runners/playgrounds), but a Frontend topic written only in Java, or a SQL topic with no SQL, would be useless. Frontend topics use JavaScript/TypeScript/JSX, Databases use SQL (plus Java/JDBC where it illustrates Java usage), System Design uses Java for LLD and Mermaid for HLD diagrams, DSA uses Java, DevOps uses Bash/Dockerfile/YAML, Testing uses Java/JUnit/Mockito. CONTENT_GUIDE.md and README.md were updated to say this explicitly.
