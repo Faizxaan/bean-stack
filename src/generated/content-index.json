@@ -1,0 +1,1854 @@
+{
+  "generatedAt": "2026-11-04T01:44:21.512Z",
+  "tracks": [
+    {
+      "comingSoon": false,
+      "description": "Language basics, OOP, core APIs, collections, exceptions, generics, I/O, and Java 8+ functional programming.",
+      "domain": "Java Ecosystem",
+      "id": "java-core",
+      "sections": [
+        {
+          "description": "Syntax, JDK/JRE/JVM, compilation, and how Java code runs.",
+          "id": "basics",
+          "plannedTopics": [
+            "Language basics and syntax",
+            "JDK, JRE, JVM and compilation",
+            "Variables, operators, control flow"
+          ],
+          "title": "Language Basics & JVM"
+        },
+        {
+          "description": "Encapsulation, inheritance, polymorphism, abstraction, constructors.",
+          "id": "oop",
+          "plannedTopics": [
+            "OOP principles",
+            "Constructors and initialization",
+            "Interfaces, abstract classes, records"
+          ],
+          "title": "OOP, Constructors & Initialization"
+        },
+        {
+          "description": "Wrappers, String, enums, annotations, date/time, regex.",
+          "id": "core-apis",
+          "plannedTopics": [
+            "Wrapper classes",
+            "String, StringBuilder, StringBuffer",
+            "Enums and annotations",
+            "Date and time",
+            "Regular expressions"
+          ],
+          "title": "Core APIs"
+        },
+        {
+          "description": "List, Set, Map, queues, and how to choose between them.",
+          "id": "collections",
+          "plannedTopics": [
+            "Collections framework overview",
+            "List, Set, Map deep dives",
+            "Comparators, sorting, and iteration"
+          ],
+          "title": "Collections Framework"
+        },
+        {
+          "description": "Checked vs unchecked exceptions, generics, wildcards, and type safety.",
+          "id": "exceptions-generics",
+          "plannedTopics": [
+            "Exception handling",
+            "Generics and wildcards",
+            "Custom exceptions"
+          ],
+          "title": "Exceptions & Generics"
+        },
+        {
+          "description": "Streams, readers/writers, NIO basics, and file handling.",
+          "id": "io",
+          "plannedTopics": [
+            "File and I/O handling",
+            "NIO.2 basics"
+          ],
+          "title": "File & I/O Handling"
+        },
+        {
+          "description": "Lambdas, functional interfaces, method references, Streams, Optional.",
+          "id": "functional",
+          "plannedTopics": [
+            "Lambdas and functional interfaces",
+            "Streams",
+            "Optional",
+            "Method references"
+          ],
+          "title": "Java 8+ Functional Programming"
+        }
+      ],
+      "status": "draft",
+      "title": "Core Java"
+    },
+    {
+      "comingSoon": false,
+      "description": "Concurrency, JVM internals, memory and GC, reflection, serialization, JDBC, networking, patterns, and performance.",
+      "domain": "Java Ecosystem",
+      "id": "java-advanced",
+      "sections": [
+        {
+          "description": "Threads, executors, locks, concurrent collections, and the memory model.",
+          "id": "concurrency",
+          "plannedTopics": [
+            "Multithreading and concurrency",
+            "Executors and CompletableFuture",
+            "Concurrent collections",
+            "Java Memory Model"
+          ],
+          "title": "Multithreading & Concurrency"
+        },
+        {
+          "description": "Class loading, heap, stack, GC algorithms, and tuning.",
+          "id": "jvm-memory",
+          "plannedTopics": [
+            "JVM internals",
+            "Memory management and garbage collection",
+            "Performance tuning basics"
+          ],
+          "title": "JVM Internals, Memory & GC"
+        },
+        {
+          "description": "Reflection, proxies, serialization, and when to avoid them.",
+          "id": "reflection-serialization",
+          "plannedTopics": [
+            "Reflection",
+            "Serialization",
+            "Proxies"
+          ],
+          "title": "Reflection & Serialization"
+        },
+        {
+          "description": "JDBC, connection handling, sockets, and HTTP basics.",
+          "id": "jdbc-networking",
+          "plannedTopics": [
+            "JDBC",
+            "Networking basics"
+          ],
+          "title": "JDBC & Networking"
+        },
+        {
+          "description": "SOLID principles and the patterns interviewers actually ask about.",
+          "id": "patterns-solid",
+          "plannedTopics": [
+            "Design patterns",
+            "SOLID principles"
+          ],
+          "title": "Design Patterns & SOLID"
+        },
+        {
+          "description": "Profiling, modern language features, and best practices.",
+          "id": "performance-modern",
+          "plannedTopics": [
+            "Performance",
+            "Modern Java features",
+            "Best practices"
+          ],
+          "title": "Performance & Modern Java"
+        }
+      ],
+      "status": "draft",
+      "title": "Advanced Java"
+    },
+    {
+      "comingSoon": false,
+      "description": "Spring Core, Spring Boot, MVC/REST, Data JPA/Hibernate, security, testing, and microservices basics.",
+      "domain": "Java Ecosystem",
+      "id": "spring-boot",
+      "sections": [
+        {
+          "description": "IoC, dependency injection, beans, lifecycle, and scopes.",
+          "id": "spring-core",
+          "plannedTopics": [
+            "Spring core: IoC and dependency injection",
+            "Beans, lifecycle, and scopes"
+          ],
+          "title": "Spring Core"
+        },
+        {
+          "description": "Auto-configuration, starters, configuration, and profiles.",
+          "id": "spring-boot-core",
+          "plannedTopics": [
+            "Spring Boot auto-configuration",
+            "Starters, configuration, and profiles"
+          ],
+          "title": "Spring Boot"
+        },
+        {
+          "description": "Controllers, validation, exception handling, and ResponseEntity.",
+          "id": "mvc-rest",
+          "plannedTopics": [
+            "Spring MVC and REST APIs",
+            "Validation and exception handling"
+          ],
+          "title": "Spring MVC & REST APIs"
+        },
+        {
+          "description": "Query methods, specifications, pagination, sorting, and transactions.",
+          "id": "data-jpa",
+          "plannedTopics": [
+            "Spring Data JPA and Hibernate",
+            "Query methods and specifications",
+            "Pagination, sorting, and transactions"
+          ],
+          "title": "Spring Data JPA & Hibernate"
+        },
+        {
+          "description": "Spring Security, authentication, and JWT.",
+          "id": "security",
+          "plannedTopics": [
+            "Security and JWT"
+          ],
+          "title": "Security & JWT"
+        },
+        {
+          "description": "Logging, testing, OpenAPI/Swagger, Actuator, microservices, and containerization.",
+          "id": "testing-ops",
+          "plannedTopics": [
+            "Logging",
+            "Testing",
+            "API documentation (OpenAPI/Swagger)",
+            "Actuator",
+            "Microservices basics",
+            "Containerization and deployment basics"
+          ],
+          "title": "Testing, Docs, Actuator & Deployment"
+        }
+      ],
+      "status": "draft",
+      "title": "Spring & Spring Boot"
+    },
+    {
+      "comingSoon": true,
+      "description": "JavaScript, TypeScript, and React — planned for a later content batch.",
+      "domain": "Frontend",
+      "id": "frontend",
+      "sections": [
+        {
+          "id": "javascript",
+          "plannedTopics": [
+            "Language fundamentals",
+            "Async JavaScript",
+            "DOM and browser APIs"
+          ],
+          "title": "JavaScript"
+        },
+        {
+          "id": "typescript",
+          "plannedTopics": [
+            "Types and interfaces",
+            "Generics",
+            "TypeScript with React"
+          ],
+          "title": "TypeScript"
+        },
+        {
+          "id": "react",
+          "plannedTopics": [
+            "Components and hooks",
+            "State management",
+            "Performance and patterns"
+          ],
+          "title": "React"
+        }
+      ],
+      "status": "placeholder",
+      "title": "Frontend"
+    },
+    {
+      "comingSoon": true,
+      "description": "SQL and NoSQL, as used by Java developers.",
+      "domain": "Data",
+      "id": "databases",
+      "sections": [
+        {
+          "id": "sql",
+          "plannedTopics": [
+            "SQL fundamentals",
+            "Joins, indexes, and transactions",
+            "SQL for Java developers"
+          ],
+          "title": "SQL"
+        },
+        {
+          "id": "nosql",
+          "plannedTopics": [
+            "Document stores",
+            "Key-value and caching",
+            "Choosing a NoSQL store"
+          ],
+          "title": "NoSQL"
+        }
+      ],
+      "status": "placeholder",
+      "title": "Databases"
+    },
+    {
+      "comingSoon": true,
+      "description": "High-level and low-level system design.",
+      "domain": "Design",
+      "id": "system-design",
+      "sections": [
+        {
+          "id": "hld",
+          "plannedTopics": [
+            "Scalability basics",
+            "Caching, queues, and databases",
+            "Designing real systems"
+          ],
+          "title": "High-Level Design"
+        },
+        {
+          "id": "lld",
+          "plannedTopics": [
+            "Class design",
+            "Design patterns in LLD",
+            "Common LLD problems"
+          ],
+          "title": "Low-Level Design"
+        }
+      ],
+      "status": "placeholder",
+      "title": "System Design"
+    },
+    {
+      "comingSoon": true,
+      "description": "Data structures, algorithms, and coding practice.",
+      "domain": "Coding",
+      "id": "dsa-coding",
+      "sections": [
+        {
+          "id": "dsa",
+          "plannedTopics": [
+            "Arrays and strings",
+            "Trees and graphs",
+            "Dynamic programming"
+          ],
+          "title": "Data Structures & Algorithms"
+        },
+        {
+          "id": "coding",
+          "plannedTopics": [
+            "Patterns",
+            "Complexities",
+            "Interview coding problems"
+          ],
+          "title": "Coding Practice"
+        }
+      ],
+      "status": "placeholder",
+      "title": "DSA & Coding"
+    },
+    {
+      "comingSoon": true,
+      "description": "Git, Docker, Kubernetes, CI/CD, and AWS basics.",
+      "domain": "Platform",
+      "id": "devops-cloud",
+      "sections": [
+        {
+          "id": "git",
+          "plannedTopics": [
+            "Git fundamentals",
+            "Branching and merging"
+          ],
+          "title": "Git"
+        },
+        {
+          "id": "docker",
+          "plannedTopics": [
+            "Containers",
+            "Dockerfiles and images"
+          ],
+          "title": "Docker"
+        },
+        {
+          "id": "kubernetes",
+          "plannedTopics": [
+            "Pods, services, and deployments"
+          ],
+          "title": "Kubernetes"
+        },
+        {
+          "id": "cicd",
+          "plannedTopics": [
+            "Pipelines",
+            "Testing in CI"
+          ],
+          "title": "CI/CD"
+        },
+        {
+          "id": "aws-basics",
+          "plannedTopics": [
+            "Core AWS services",
+            "Deploying a Java app on AWS"
+          ],
+          "title": "AWS Basics"
+        }
+      ],
+      "status": "placeholder",
+      "title": "DevOps & Cloud"
+    },
+    {
+      "comingSoon": true,
+      "description": "Unit, integration, and end-to-end testing for Java applications.",
+      "domain": "Quality",
+      "id": "testing",
+      "sections": [
+        {
+          "id": "unit-testing",
+          "plannedTopics": [
+            "JUnit and Mockito",
+            "Test design"
+          ],
+          "title": "Unit Testing"
+        },
+        {
+          "id": "integration-testing",
+          "plannedTopics": [
+            "Spring Boot tests",
+            "Testcontainers basics"
+          ],
+          "title": "Integration Testing"
+        }
+      ],
+      "status": "placeholder",
+      "title": "Testing"
+    },
+    {
+      "comingSoon": true,
+      "description": "Behavioral interviews and project deep dives.",
+      "domain": "Career",
+      "id": "behavioral-projects",
+      "sections": [
+        {
+          "id": "behavioral",
+          "plannedTopics": [
+            "STAR answers",
+            "Common behavioral questions"
+          ],
+          "title": "Behavioral"
+        },
+        {
+          "id": "projects",
+          "plannedTopics": [
+            "Presenting a project",
+            "Architecture deep dives",
+            "Trade-offs and lessons"
+          ],
+          "title": "Projects"
+        }
+      ],
+      "status": "placeholder",
+      "title": "Behavioral & Projects"
+    }
+  ],
+  "paths": [
+    {
+      "description": "Start here if you are new to Java: JVM basics, OOP, Strings, Collections, exceptions, then Streams.",
+      "id": "beginner-roadmap",
+      "title": "Beginner Roadmap",
+      "topicIds": [
+        "jdk-jre-jvm",
+        "oop-principles",
+        "strings",
+        "collections-framework",
+        "exception-handling",
+        "streams-lambdas"
+      ]
+    },
+    {
+      "description": "Highest-importance topics to revise just before an interview, in a tight order.",
+      "id": "last-minute-revision",
+      "title": "Last-Minute Revision Path",
+      "topicIds": [
+        "collections-framework",
+        "streams-lambdas",
+        "concurrency-basics",
+        "spring-ioc-di",
+        "spring-boot-autoconfig",
+        "spring-data-jpa"
+      ]
+    },
+    {
+      "description": "A fast path through Spring Core, Boot, MVC, and Data JPA.",
+      "id": "spring-boot-crash",
+      "title": "Spring Boot Crash Path",
+      "topicIds": [
+        "spring-ioc-di",
+        "spring-boot-autoconfig",
+        "spring-mvc-rest",
+        "spring-data-jpa"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "concurrency-basics",
+      "title": "Multithreading and Concurrency Basics",
+      "track": "java-advanced",
+      "section": "concurrency",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "Concurrency",
+        "Threads",
+        "Executors",
+        "synchronized"
+      ],
+      "prerequisites": [
+        "collections-framework",
+        "streams-lambdas"
+      ],
+      "related": [
+        "garbage-collection",
+        "spring-ioc-di"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/concurrency/concurrency-basics.md",
+      "readingMinutes": 4,
+      "summary": "Threads, executors, synchronization, and the Java Memory Model — the concurrency fundamentals interviewers expect from experienced Java developers."
+    },
+    {
+      "id": "executors-completablefuture",
+      "title": "Executors and CompletableFuture",
+      "track": "java-advanced",
+      "section": "concurrency",
+      "order": 2,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "Concurrency",
+        "Executors",
+        "CompletableFuture",
+        "Thread Pools"
+      ],
+      "prerequisites": [
+        "concurrency-basics"
+      ],
+      "related": [
+        "streams-lambdas",
+        "garbage-collection"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/concurrency/executors-completablefuture.md",
+      "readingMinutes": 8,
+      "summary": "Executor services manage thread pools for you and CompletableFuture lets you compose asynchronous stages without blocking a thread waiting for each result."
+    },
+    {
+      "id": "java-memory-model",
+      "title": "Java Memory Model",
+      "track": "java-advanced",
+      "section": "concurrency",
+      "order": 3,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Concurrency",
+        "Java Memory Model",
+        "volatile",
+        "happens-before"
+      ],
+      "prerequisites": [
+        "concurrency-basics",
+        "executors-completablefuture"
+      ],
+      "related": [
+        "concurrency-basics",
+        "garbage-collection"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/concurrency/java-memory-model.md",
+      "readingMinutes": 9,
+      "summary": "The Java Memory Model defines when a write made by one thread becomes visible to another, and happens-before rules are the guarantees you program against."
+    },
+    {
+      "id": "jdbc-networking",
+      "title": "JDBC and Networking",
+      "track": "java-advanced",
+      "section": "jdbc-networking",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 3,
+      "tags": [
+        "JDBC",
+        "SQL",
+        "Networking",
+        "Sockets",
+        "HTTP"
+      ],
+      "prerequisites": [
+        "exception-handling"
+      ],
+      "related": [
+        "exception-handling",
+        "collections-framework"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/jdbc-networking/jdbc-networking.md",
+      "readingMinutes": 10,
+      "summary": "JDBC connects Java code to relational databases with SQL and prepared statements, while sockets and HTTP clients connect it to services over a network."
+    },
+    {
+      "id": "garbage-collection",
+      "title": "JVM Internals, Memory and Garbage Collection",
+      "track": "java-advanced",
+      "section": "jvm-memory",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "JVM",
+        "GC",
+        "Memory",
+        "Performance"
+      ],
+      "prerequisites": [
+        "jdk-jre-jvm",
+        "concurrency-basics"
+      ],
+      "related": [
+        "concurrency-basics",
+        "spring-boot-autoconfig"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/jvm-memory/garbage-collection.md",
+      "readingMinutes": 4,
+      "summary": "How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production."
+    },
+    {
+      "id": "design-patterns-solid",
+      "title": "Design Patterns and SOLID Principles",
+      "track": "java-advanced",
+      "section": "patterns-solid",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Design Patterns",
+        "SOLID",
+        "Architecture"
+      ],
+      "prerequisites": [
+        "oop-principles",
+        "collections-framework"
+      ],
+      "related": [
+        "spring-ioc-di",
+        "spring-mvc-rest"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/patterns-solid/design-patterns-solid.md",
+      "readingMinutes": 4,
+      "summary": "SOLID in plain language, plus the patterns interviewers actually ask about — Singleton, Factory, Builder, Strategy, Observer, and Decorator — with Java examples."
+    },
+    {
+      "id": "modern-java-features",
+      "title": "Modern Java Features",
+      "track": "java-advanced",
+      "section": "performance-modern",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "Java 21",
+        "Records",
+        "Sealed Classes",
+        "Pattern Matching",
+        "Virtual Threads"
+      ],
+      "prerequisites": [
+        "streams-lambdas",
+        "garbage-collection"
+      ],
+      "related": [
+        "streams-lambdas",
+        "concurrency-basics"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/performance-modern/modern-java-features.md",
+      "readingMinutes": 12,
+      "summary": "Records, sealed classes, pattern matching, virtual threads, and sequenced collections change how modern Java code is written, and knowing which version introduced each one matters in interviews."
+    },
+    {
+      "id": "performance-best-practices",
+      "title": "Performance Best Practices",
+      "track": "java-advanced",
+      "section": "performance-modern",
+      "order": 2,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Performance",
+        "Profiling",
+        "JVM",
+        "Optimization"
+      ],
+      "prerequisites": [
+        "garbage-collection",
+        "concurrency-basics"
+      ],
+      "related": [
+        "garbage-collection",
+        "concurrency-basics"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/performance-modern/performance-best-practices.md",
+      "readingMinutes": 10,
+      "summary": "Measure first with a profiler, then fix the real bottleneck, which is usually allocation, I/O, locking, or an algorithm rather than a micro-optimization."
+    },
+    {
+      "id": "reflection-serialization",
+      "title": "Reflection and Serialization",
+      "track": "java-advanced",
+      "section": "reflection-serialization",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 3,
+      "tags": [
+        "Reflection",
+        "Serialization",
+        "Java"
+      ],
+      "prerequisites": [
+        "oop-principles"
+      ],
+      "related": [
+        "oop-principles",
+        "exception-handling"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-advanced/reflection-serialization/reflection-serialization.md",
+      "readingMinutes": 8,
+      "summary": "Reflection lets code inspect and invoke classes at runtime and serialization turns an object graph into bytes that can be stored or sent elsewhere."
+    },
+    {
+      "id": "jdk-jre-jvm",
+      "title": "JDK, JRE, JVM and Compilation",
+      "track": "java-core",
+      "section": "basics",
+      "order": 1,
+      "difficulty": "Beginner",
+      "importance": 5,
+      "tags": [
+        "JVM",
+        "JDK",
+        "compilation"
+      ],
+      "prerequisites": [],
+      "related": [
+        "oop-principles",
+        "collections-framework"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/basics/jdk-jre-jvm.md",
+      "readingMinutes": 5,
+      "summary": "What the JDK, JRE, and JVM each contain, how Java source becomes running code, and why bytecode makes Java portable."
+    },
+    {
+      "id": "language-basics-syntax",
+      "title": "Language Basics and Syntax",
+      "track": "java-core",
+      "section": "basics",
+      "order": 2,
+      "difficulty": "Beginner",
+      "importance": 4,
+      "tags": [
+        "Syntax",
+        "Classes",
+        "Methods"
+      ],
+      "prerequisites": [
+        "jdk-jre-jvm"
+      ],
+      "related": [
+        "oop-principles"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/basics/language-basics-syntax.md",
+      "readingMinutes": 6,
+      "summary": "The building blocks of a Java program and the syntax rules that every program must follow."
+    },
+    {
+      "id": "variables-operators-control-flow",
+      "title": "Variables, Operators and Control Flow",
+      "track": "java-core",
+      "section": "basics",
+      "order": 3,
+      "difficulty": "Beginner",
+      "importance": 4,
+      "tags": [
+        "Variables",
+        "Operators",
+        "Control Flow"
+      ],
+      "prerequisites": [
+        "language-basics-syntax"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/basics/variables-operators-control-flow.md",
+      "readingMinutes": 8,
+      "summary": "How Java stores data in variables, combines values with operators, and directs execution with branches and loops."
+    },
+    {
+      "id": "collections-framework",
+      "title": "Collections Framework Overview",
+      "track": "java-core",
+      "section": "collections",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 5,
+      "tags": [
+        "Collections",
+        "List",
+        "Set",
+        "Map",
+        "HashMap"
+      ],
+      "prerequisites": [
+        "oop-principles",
+        "strings"
+      ],
+      "related": [
+        "streams-lambdas",
+        "concurrency-basics"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/collections/collections-framework.md",
+      "readingMinutes": 4,
+      "summary": "List, Set, Map, and Queue in one mental model, how to choose between them, and the HashMap internals interviewers probe."
+    },
+    {
+      "id": "collections-deep-dive",
+      "title": "Collections Deep Dive",
+      "track": "java-core",
+      "section": "collections",
+      "order": 2,
+      "difficulty": "Intermediate",
+      "importance": 5,
+      "tags": [
+        "Collections",
+        "List",
+        "Map",
+        "Set"
+      ],
+      "prerequisites": [
+        "collections-framework"
+      ],
+      "related": [
+        "streams-lambdas"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/collections/collections-deep-dive.md",
+      "readingMinutes": 9,
+      "summary": "How the main List, Set, Map, and Queue implementations work and how to choose between them."
+    },
+    {
+      "id": "strings",
+      "title": "String, StringBuilder and StringBuffer",
+      "track": "java-core",
+      "section": "core-apis",
+      "order": 1,
+      "difficulty": "Beginner",
+      "importance": 5,
+      "tags": [
+        "String",
+        "immutability",
+        "StringBuilder"
+      ],
+      "prerequisites": [
+        "oop-principles"
+      ],
+      "related": [
+        "collections-framework",
+        "exception-handling"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/core-apis/strings.md",
+      "readingMinutes": 4,
+      "summary": "Why String is immutable, how the string pool works, and when to use StringBuilder or StringBuffer instead."
+    },
+    {
+      "id": "wrapper-classes",
+      "title": "Wrapper Classes",
+      "track": "java-core",
+      "section": "core-apis",
+      "order": 2,
+      "difficulty": "Beginner",
+      "importance": 3,
+      "tags": [
+        "Wrappers",
+        "Autoboxing",
+        "Primitives"
+      ],
+      "prerequisites": [
+        "oop-principles"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/core-apis/wrapper-classes.md",
+      "readingMinutes": 6,
+      "summary": "The object form of each primitive type and how autoboxing moves between the two forms."
+    },
+    {
+      "id": "enums-annotations",
+      "title": "Enums and Annotations",
+      "track": "java-core",
+      "section": "core-apis",
+      "order": 3,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Enums",
+        "Annotations",
+        "Metadata"
+      ],
+      "prerequisites": [
+        "oop-principles"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/core-apis/enums-annotations.md",
+      "readingMinutes": 7,
+      "summary": "Type-safe fixed sets of values with enums and metadata with annotations."
+    },
+    {
+      "id": "date-time-regex",
+      "title": "Date and Time and Regular Expressions",
+      "track": "java-core",
+      "section": "core-apis",
+      "order": 4,
+      "difficulty": "Intermediate",
+      "importance": 3,
+      "tags": [
+        "Date Time",
+        "Regex",
+        "java.time"
+      ],
+      "prerequisites": [
+        "strings"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/core-apis/date-time-regex.md",
+      "readingMinutes": 8,
+      "summary": "The modern java.time API for dates and times plus pattern matching with regular expressions."
+    },
+    {
+      "id": "exception-handling",
+      "title": "Exception Handling and Generics Basics",
+      "track": "java-core",
+      "section": "exceptions-generics",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Exceptions",
+        "Generics",
+        "try-with-resources"
+      ],
+      "prerequisites": [
+        "oop-principles"
+      ],
+      "related": [
+        "collections-framework",
+        "streams-lambdas"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/exceptions-generics/exception-handling.md",
+      "readingMinutes": 4,
+      "summary": "Checked vs unchecked exceptions, try-with-resources, custom exceptions, and generics with wildcards — the safety nets interviewers check."
+    },
+    {
+      "id": "generics-deep-dive",
+      "title": "Generics Deep Dive",
+      "track": "java-core",
+      "section": "exceptions-generics",
+      "order": 2,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Generics",
+        "Wildcards",
+        "Type Safety"
+      ],
+      "prerequisites": [
+        "exception-handling"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/exceptions-generics/generics-deep-dive.md",
+      "readingMinutes": 8,
+      "summary": "Type parameters, bounds, and wildcards that make collections type-safe without casts."
+    },
+    {
+      "id": "streams-lambdas",
+      "title": "Lambdas, Functional Interfaces and Streams",
+      "track": "java-core",
+      "section": "functional",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 5,
+      "tags": [
+        "Streams",
+        "Lambdas",
+        "Functional Programming",
+        "Optional"
+      ],
+      "prerequisites": [
+        "collections-framework",
+        "oop-principles"
+      ],
+      "related": [
+        "exception-handling",
+        "concurrency-basics"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/functional/streams-lambdas.md",
+      "readingMinutes": 4,
+      "summary": "How lambdas and method references work, how Streams transform collections declaratively, and when to use Optional — without abusing it."
+    },
+    {
+      "id": "functional-interfaces-optional",
+      "title": "Functional Interfaces and Optional",
+      "track": "java-core",
+      "section": "functional",
+      "order": 2,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Functional Interfaces",
+        "Optional",
+        "Lambdas"
+      ],
+      "prerequisites": [
+        "streams-lambdas"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/functional/functional-interfaces-optional.md",
+      "readingMinutes": 8,
+      "summary": "The standard functional interfaces for passing behaviour and Optional for expressing possibly absent values."
+    },
+    {
+      "id": "file-io-nio",
+      "title": "File I/O and NIO",
+      "track": "java-core",
+      "section": "io",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 3,
+      "tags": [
+        "File I/O",
+        "NIO",
+        "Files"
+      ],
+      "prerequisites": [
+        "exception-handling"
+      ],
+      "related": [],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/io/file-io-nio.md",
+      "readingMinutes": 7,
+      "summary": "Reading and writing files with classic streams and the modern NIO Files API."
+    },
+    {
+      "id": "oop-principles",
+      "title": "OOP Principles, Constructors and Initialization",
+      "track": "java-core",
+      "section": "oop",
+      "order": 1,
+      "difficulty": "Beginner",
+      "importance": 5,
+      "tags": [
+        "OOP",
+        "constructors",
+        "inheritance"
+      ],
+      "prerequisites": [
+        "jdk-jre-jvm"
+      ],
+      "related": [
+        "strings",
+        "collections-framework"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/java-core/oop/oop-principles.md",
+      "readingMinutes": 4,
+      "summary": "Encapsulation, inheritance, polymorphism, and abstraction in plain language, plus how constructors and initialization actually run."
+    },
+    {
+      "id": "spring-data-jpa",
+      "title": "Spring Data JPA and Hibernate",
+      "track": "spring-boot",
+      "section": "data-jpa",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "JPA",
+        "Hibernate",
+        "Transactions",
+        "Pagination"
+      ],
+      "prerequisites": [
+        "spring-boot-autoconfig",
+        "spring-mvc-rest"
+      ],
+      "related": [
+        "spring-ioc-di",
+        "collections-framework"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/data-jpa/spring-data-jpa.md",
+      "readingMinutes": 4,
+      "summary": "Repositories, query methods, pagination, transactions, and the N+1 problem — the JPA knowledge that shows up in almost every Java backend interview."
+    },
+    {
+      "id": "spring-mvc-rest",
+      "title": "Spring MVC and REST APIs",
+      "track": "spring-boot",
+      "section": "mvc-rest",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 5,
+      "tags": [
+        "Spring MVC",
+        "REST",
+        "Validation",
+        "Exception Handling"
+      ],
+      "prerequisites": [
+        "spring-boot-autoconfig",
+        "spring-ioc-di"
+      ],
+      "related": [
+        "spring-data-jpa",
+        "design-patterns-solid"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/mvc-rest/spring-mvc-rest.md",
+      "readingMinutes": 4,
+      "summary": "Controllers, request mapping, validation, exception handling, and ResponseEntity — how to build clean, interview-ready REST APIs with Spring."
+    },
+    {
+      "id": "validation-exception-handling",
+      "title": "Validation and Exception Handling",
+      "track": "spring-boot",
+      "section": "mvc-rest",
+      "order": 2,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Spring MVC",
+        "REST",
+        "Validation",
+        "Exception Handling"
+      ],
+      "prerequisites": [
+        "spring-mvc-rest"
+      ],
+      "related": [
+        "spring-boot-autoconfig",
+        "spring-data-jpa"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/mvc-rest/validation-exception-handling.md",
+      "readingMinutes": 7,
+      "summary": "How to validate incoming REST payloads with Bean Validation and how to turn failures into consistent error responses."
+    },
+    {
+      "id": "security-jwt",
+      "title": "Spring Security and JWT",
+      "track": "spring-boot",
+      "section": "security",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Spring Security",
+        "JWT",
+        "Authentication",
+        "Authorization"
+      ],
+      "prerequisites": [
+        "spring-mvc-rest",
+        "spring-ioc-di"
+      ],
+      "related": [
+        "validation-exception-handling",
+        "spring-boot-autoconfig"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/security/security-jwt.md",
+      "readingMinutes": 9,
+      "summary": "How Spring Security authenticates requests with filters and how stateless JWT authentication replaces server-side sessions."
+    },
+    {
+      "id": "spring-boot-autoconfig",
+      "title": "Spring Boot — Auto-Configuration, Starters and Profiles",
+      "track": "spring-boot",
+      "section": "spring-boot-core",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 5,
+      "tags": [
+        "Spring Boot",
+        "Auto-configuration",
+        "Profiles"
+      ],
+      "prerequisites": [
+        "spring-ioc-di"
+      ],
+      "related": [
+        "spring-mvc-rest",
+        "spring-data-jpa"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/spring-boot-core/spring-boot-autoconfig.md",
+      "readingMinutes": 4,
+      "summary": "How Spring Boot decides what to configure for you, what starters actually do, and how profiles and externalized configuration keep environments separate."
+    },
+    {
+      "id": "configuration-profiles",
+      "title": "Configuration and Profiles",
+      "track": "spring-boot",
+      "section": "spring-boot-core",
+      "order": 2,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Spring Boot",
+        "Configuration",
+        "Profiles",
+        "YAML"
+      ],
+      "prerequisites": [
+        "spring-boot-autoconfig"
+      ],
+      "related": [
+        "spring-ioc-di",
+        "actuator-microservices-deployment"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/spring-boot-core/configuration-profiles.md",
+      "readingMinutes": 7,
+      "summary": "How Spring Boot reads configuration from properties, YAML, and environment variables, and how profiles keep environments apart."
+    },
+    {
+      "id": "spring-ioc-di",
+      "title": "Spring Core — IoC, Dependency Injection and Beans",
+      "track": "spring-boot",
+      "section": "spring-core",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 5,
+      "tags": [
+        "Spring",
+        "IoC",
+        "DI",
+        "Beans"
+      ],
+      "prerequisites": [
+        "oop-principles",
+        "design-patterns-solid"
+      ],
+      "related": [
+        "spring-boot-autoconfig",
+        "spring-mvc-rest"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/spring-core/spring-ioc-di.md",
+      "readingMinutes": 5,
+      "summary": "Inversion of Control in plain language, how Spring creates and wires beans, bean scopes and lifecycle, and why constructor injection is preferred."
+    },
+    {
+      "id": "bean-scopes-lifecycle",
+      "title": "Bean Scopes and Lifecycle",
+      "track": "spring-boot",
+      "section": "spring-core",
+      "order": 2,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Spring",
+        "Beans",
+        "Scopes",
+        "Lifecycle"
+      ],
+      "prerequisites": [
+        "spring-ioc-di"
+      ],
+      "related": [
+        "spring-boot-autoconfig",
+        "spring-mvc-rest"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/spring-core/bean-scopes-lifecycle.md",
+      "readingMinutes": 7,
+      "summary": "How long a Spring bean lives, how many instances exist, and which callbacks run when a bean is created and destroyed."
+    },
+    {
+      "id": "logging-testing-docs",
+      "title": "Logging, Testing and API Documentation",
+      "track": "spring-boot",
+      "section": "testing-ops",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Spring Boot",
+        "Logging",
+        "Testing",
+        "OpenAPI",
+        "Swagger"
+      ],
+      "prerequisites": [
+        "spring-mvc-rest"
+      ],
+      "related": [
+        "validation-exception-handling",
+        "actuator-microservices-deployment"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/testing-ops/logging-testing-docs.md",
+      "readingMinutes": 8,
+      "summary": "How to log usefully, test Spring Boot applications at the right level, and document REST APIs with OpenAPI."
+    },
+    {
+      "id": "actuator-microservices-deployment",
+      "title": "Actuator, Microservices and Deployment",
+      "track": "spring-boot",
+      "section": "testing-ops",
+      "order": 2,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Spring Boot",
+        "Actuator",
+        "Microservices",
+        "Docker",
+        "Deployment"
+      ],
+      "prerequisites": [
+        "spring-boot-autoconfig",
+        "spring-data-jpa"
+      ],
+      "related": [
+        "configuration-profiles",
+        "logging-testing-docs",
+        "security-jwt"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "file": "topics/spring-boot/testing-ops/actuator-microservices-deployment.md",
+      "readingMinutes": 9,
+      "summary": "How Actuator exposes production-ready endpoints, how microservices split a system, and how a Spring Boot application is containerized and deployed."
+    }
+  ],
+  "cheatsheets": [
+    {
+      "id": "collections-cheatsheet",
+      "title": "Collections Cheatsheet",
+      "track": "java-core",
+      "category": "Collections",
+      "status": "complete",
+      "file": "cheatsheets/collections-cheatsheet.md",
+      "readingMinutes": 2,
+      "summary": "Quick-reference tables for List, Set, Map, and HashMap vs ConcurrentHashMap."
+    },
+    {
+      "id": "spring-annotations-cheatsheet",
+      "title": "Spring Annotations Cheatsheet",
+      "track": "spring-boot",
+      "category": "Spring",
+      "status": "complete",
+      "file": "cheatsheets/spring-annotations-cheatsheet.md",
+      "readingMinutes": 2,
+      "summary": "@Component vs @Bean, injection, MVC, and transaction annotations at a glance."
+    }
+  ],
+  "interviewQuestions": [
+    {
+      "category": "Resume",
+      "detailedAnswer": "Lead with impact, not duties: for each role, state what you built, the stack, and a measurable outcome where honest (latency reduced, throughput handled, manual work automated). Put Java, Spring Boot, and React prominently if the role asks for them, and tailor the top third of the resume to the specific job description. Keep it to two pages for 4+ years unless a role explicitly asks for more, and make every bullet start with a strong verb. Copy-ready template: Role — Company (dates) | Stack: Java 17, Spring Boot, React, PostgreSQL | Built X that did Y, resulting in Z.",
+      "difficulty": "Easy",
+      "id": "iq-resume-tips",
+      "module": "bonus-resume",
+      "question": "How should a Java full stack developer structure a resume for a job switch?",
+      "relatedTopics": [
+        "spring-boot-autoconfig"
+      ],
+      "shortAnswer": "Lead with impact and stack, tailor the top third to the job, keep it concise, and start every bullet with a strong verb and a measurable outcome where honest.",
+      "title": "Resume structure for Java full stack developers",
+      "topicId": "spring-boot-autoconfig"
+    },
+    {
+      "category": "Revision",
+      "detailedAnswer": "JDK contains JRE, JRE contains JVM. Source compiles to bytecode with javac; the JVM loads, verifies, and executes bytecode, with JIT compilation for hot code. Portability comes from bytecode plus a platform-specific JVM.",
+      "difficulty": "Easy",
+      "id": "iq-rev-jvm",
+      "module": "module-0",
+      "question": "Module 0 revision: JDK, JRE, JVM in one minute",
+      "relatedTopics": [
+        "jdk-jre-jvm"
+      ],
+      "shortAnswer": "JDK ⊃ JRE ⊃ JVM; source → bytecode → JVM execution → JIT for hot code.",
+      "title": "Revision: JVM basics",
+      "topicId": "jdk-jre-jvm"
+    },
+    {
+      "category": "Revision",
+      "detailedAnswer": "List allows duplicates and is ordered; Set forbids duplicates; Map stores key-value pairs with unique keys. ArrayList gives fast random access; HashMap gives fast key lookup but no ordering guarantee; ConcurrentHashMap is the thread-safe map choice, with no null keys or values.",
+      "difficulty": "Easy",
+      "id": "iq-rev-collections",
+      "module": "module-0",
+      "question": "Module 0 revision: Collections in one minute",
+      "relatedTopics": [
+        "collections-framework"
+      ],
+      "shortAnswer": "List: ordered + duplicates. Set: unique. Map: key-value. ArrayList for access, HashMap for lookup, ConcurrentHashMap for shared maps.",
+      "title": "Revision: Collections",
+      "topicId": "collections-framework"
+    },
+    {
+      "category": "Java",
+      "detailedAnswer": "JDK is for development and includes the compiler and tools plus the JRE. JRE is for running Java and includes the JVM plus libraries. JVM is the engine that loads and executes bytecode, managing memory and garbage collection. Bytecode is platform-independent; the JVM is platform-specific, which is why the same bytecode runs on different operating systems with a JVM for each.",
+      "difficulty": "Easy",
+      "followUps": [
+        "Is Java compiled or interpreted?",
+        "What does the bytecode verifier do?"
+      ],
+      "id": "iq-jdk-jre-jvm",
+      "module": "module-1",
+      "question": "What is the difference between JDK, JRE, and JVM?",
+      "relatedTopics": [
+        "jdk-jre-jvm"
+      ],
+      "shortAnswer": "JDK is for developing (compiler + JRE), JRE is for running (JVM + libraries), and JVM is the engine that executes bytecode.",
+      "tips": [
+        "Draw the nesting: JDK contains JRE, JRE contains JVM.",
+        "Mention bytecode portability explicitly."
+      ],
+      "title": "JDK, JRE, JVM",
+      "topicId": "jdk-jre-jvm"
+    },
+    {
+      "category": "Java",
+      "detailedAnswer": "String is immutable: operations like toUpperCase or concat return a new String instead of changing the original. This makes strings safe to share, safe as map keys (hashCode can be cached), and thread-safe. String literals are interned in the string pool, so two equal literals may share one object — but you should still compare contents with equals, not ==, which compares references.",
+      "difficulty": "Easy",
+      "followUps": [
+        "When would you use StringBuilder instead?",
+        "Why is immutability important for HashMap keys?"
+      ],
+      "id": "iq-string-immutable",
+      "module": "module-1",
+      "question": "Why is String immutable in Java?",
+      "relatedTopics": [
+        "strings"
+      ],
+      "shortAnswer": "For security, thread safety, hashCode caching, and safe sharing — operations on a String return a new String instead of modifying it.",
+      "tips": [
+        "Give a concrete example: a string used as a map key must not change after insertion."
+      ],
+      "title": "String immutability",
+      "topicId": "strings"
+    },
+    {
+      "category": "Collections",
+      "detailedAnswer": "A HashMap stores entries in buckets chosen by the key's hash. In Java 8+, a bucket starts as a linked list and converts to a balanced tree when collisions grow (8 entries with at least 64 buckets), keeping worst-case lookup from degrading linearly. Equal keys must have equal hash codes, and a key's hash code must not change while it is in the map — hence immutable keys are preferred. HashMap allows one null key; ConcurrentHashMap allows neither null keys nor null values.",
+      "difficulty": "Medium",
+      "followUps": [
+        "What happens when two keys collide?",
+        "Why must equals and hashCode be consistent?"
+      ],
+      "id": "iq-hashmap-internals",
+      "module": "module-1",
+      "question": "How does HashMap work internally?",
+      "relatedTopics": [
+        "collections-framework"
+      ],
+      "shortAnswer": "Entries go into buckets by hash; buckets treeify under collision pressure in Java 8+, and keys must keep equals/hashCode consistent.",
+      "tips": [
+        "Mention treeification threshold and the immutable-key rule — interviewers listen for both."
+      ],
+      "title": "HashMap internals",
+      "topicId": "collections-framework"
+    },
+    {
+      "category": "Streams",
+      "detailedAnswer": "Intermediate operations (filter, map, sorted, distinct) are lazy and return a new stream; they do nothing until a terminal operation (collect, forEach, reduce, findFirst) runs. A stream is consumed by its terminal operation and cannot be reused — reusing it throws IllegalStateException. Short-circuiting terminals like findFirst or anyMatch can stop processing early.",
+      "difficulty": "Medium",
+      "followUps": [
+        "When would you avoid parallel streams?",
+        "What is the difference between map and flatMap?"
+      ],
+      "id": "iq-streams-intermediate-terminal",
+      "module": "module-1",
+      "question": "What is the difference between intermediate and terminal stream operations?",
+      "relatedTopics": [
+        "streams-lambdas"
+      ],
+      "shortAnswer": "Intermediate operations are lazy and return a stream; terminal operations trigger execution and consume the stream.",
+      "tips": [
+        "Name one example of each, and mention that reuse throws IllegalStateException."
+      ],
+      "title": "Stream operations",
+      "topicId": "streams-lambdas"
+    },
+    {
+      "category": "Spring Framework",
+      "detailedAnswer": "Inversion of Control means the Spring container creates objects (beans) and supplies their dependencies, instead of each class creating its own with new. Dependency Injection is how it does that, preferably through constructors. Constructor injection makes dependencies explicit, required, and final, and makes testing easy because you can pass a mock directly. Field injection hides dependencies and is discouraged in new code.",
+      "difficulty": "Easy",
+      "followUps": [
+        "What is the difference between @Component and @Bean?",
+        "What happens when a prototype bean is injected into a singleton?"
+      ],
+      "id": "iq-spring-ioc-di",
+      "module": "module-1",
+      "question": "What is Inversion of Control, and why is constructor injection preferred?",
+      "relatedTopics": [
+        "spring-ioc-di"
+      ],
+      "shortAnswer": "IoC means the container creates and wires beans; constructor injection is preferred because dependencies are explicit, required, final, and easy to test.",
+      "tips": [
+        "Contrast with field injection explicitly — interviewers expect that comparison."
+      ],
+      "title": "Spring IoC and DI",
+      "topicId": "spring-ioc-di"
+    },
+    {
+      "category": "Spring Boot",
+      "detailedAnswer": "Auto-configuration classes are guarded by conditions — for example @ConditionalOnClass (a class is on the classpath), @ConditionalOnMissingBean (no user bean of that type exists), and @ConditionalOnProperty. If you define your own bean of the same type, auto-configuration backs off for that bean. That is how Spring Boot provides sensible defaults that you can override. The --debug report shows which auto-configurations applied and why others did not.",
+      "difficulty": "Medium",
+      "followUps": [
+        "What is a starter?",
+        "How do you debug a missing auto-configured bean?"
+      ],
+      "id": "iq-spring-boot-autoconfig",
+      "module": "module-1",
+      "question": "How does Spring Boot auto-configuration work, and how do you override it?",
+      "relatedTopics": [
+        "spring-boot-autoconfig"
+      ],
+      "shortAnswer": "Auto-configuration applies conditionally (classpath, missing bean, property); defining your own bean of the same type makes it back off.",
+      "tips": [
+        "Mention @ConditionalOnMissingBean by name — it is the mechanism behind 'your bean wins'."
+      ],
+      "title": "Spring Boot auto-configuration",
+      "topicId": "spring-boot-autoconfig"
+    },
+    {
+      "category": "Spring Data JPA",
+      "detailedAnswer": "Loading N parent entities and then lazily loading a collection for each one produces 1 + N queries — the N+1 problem. Fix it with a fetch join (JOIN FETCH), an @EntityGraph, or a DTO projection that fetches exactly what is needed. Do not fix it by making everything EAGER, which loads data you may never use. Also, accessing a lazy collection after the transaction closes throws LazyInitializationException.",
+      "difficulty": "Hard",
+      "followUps": [
+        "What is the difference between lazy and eager loading?",
+        "Why does @Transactional not work on a private method?"
+      ],
+      "id": "iq-jpa-nplus1",
+      "module": "module-1",
+      "question": "What is the N+1 problem in JPA, and how do you fix it?",
+      "relatedTopics": [
+        "spring-data-jpa"
+      ],
+      "shortAnswer": "1 query for parents plus N queries for children; fix with JOIN FETCH, @EntityGraph, or a DTO projection — not blanket EAGER.",
+      "tips": [
+        "Name the fix and the anti-pattern (blanket EAGER) in the same answer."
+      ],
+      "title": "JPA N+1 problem",
+      "topicId": "spring-data-jpa"
+    },
+    {
+      "category": "Concurrency",
+      "detailedAnswer": "synchronized provides mutual exclusion and visibility: only one thread holds a given monitor at a time, and writes before releasing the lock are visible to the next thread acquiring it. volatile provides visibility only: writes are visible to other threads, but compound actions like count++ (read-modify-write) are still not atomic. For atomic single-variable updates, use AtomicInteger and friends, or a lock.",
+      "difficulty": "Medium",
+      "followUps": [
+        "Why is a plain counter unsafe across threads?",
+        "What is a happens-before relationship?"
+      ],
+      "id": "iq-synchronized-volatile",
+      "module": "module-1",
+      "question": "What is the difference between synchronized and volatile?",
+      "relatedTopics": [
+        "concurrency-basics"
+      ],
+      "shortAnswer": "synchronized gives exclusion plus visibility; volatile gives visibility only, not atomicity for compound actions.",
+      "tips": [
+        "Use count++ as the concrete counterexample for volatile."
+      ],
+      "title": "synchronized vs volatile",
+      "topicId": "concurrency-basics"
+    }
+  ],
+  "practiceItems": [
+    {
+      "answer": "String is immutable; operations return a new String.",
+      "answerIndex": 1,
+      "category": "Java",
+      "difficulty": "Easy",
+      "explanation": "String objects cannot be changed after creation. toUpperCase, concat, and replace all return new strings; the original is unchanged.",
+      "id": "mcq-string-immutable",
+      "options": [
+        "String can be modified in place with toUpperCase().",
+        "String is immutable; operations return a new String.",
+        "String is mutable, but only in the same package.",
+        "StringBuilder and String are the same type."
+      ],
+      "prompt": "Which statement about Java String is correct?",
+      "title": "String immutability",
+      "topicId": "strings",
+      "type": "mcq"
+    },
+    {
+      "answer": "Treeification under collision pressure in Java 8+.",
+      "answerIndex": 2,
+      "category": "Collections",
+      "difficulty": "Medium",
+      "explanation": "A HashMap bucket starts as a linked list and converts to a balanced tree when collisions grow (8 entries, at least 64 buckets), keeping lookup from degrading linearly.",
+      "id": "mcq-hashmap-tree",
+      "options": [
+        "HashMap resizes on every put.",
+        "HashMap sorts keys alphabetically.",
+        "A bucket converts to a tree under collision pressure in Java 8+.",
+        "HashMap uses a single global lock for all puts."
+      ],
+      "prompt": "What happens in a HashMap bucket when many keys collide?",
+      "title": "HashMap collision handling",
+      "topicId": "collections-framework",
+      "type": "mcq"
+    },
+    {
+      "answer": "Intermediate operations are lazy; terminal operations trigger execution.",
+      "answerIndex": 0,
+      "category": "Streams",
+      "difficulty": "Medium",
+      "explanation": "filter and map do nothing until a terminal operation like collect or forEach runs. A stream is then consumed and cannot be reused.",
+      "id": "mcq-stream-lazy",
+      "options": [
+        "Intermediate operations are lazy; terminal operations trigger execution.",
+        "Terminal operations are lazy; intermediate operations trigger execution.",
+        "Both kinds run immediately when called.",
+        "Streams can be reused after a terminal operation."
+      ],
+      "prompt": "Which statement about Stream operations is correct?",
+      "title": "Stream laziness",
+      "topicId": "streams-lambdas",
+      "type": "mcq"
+    },
+    {
+      "answer": "It gives visibility only, not atomicity for compound actions.",
+      "answerIndex": 1,
+      "category": "Concurrency",
+      "difficulty": "Medium",
+      "explanation": "volatile makes writes visible to other threads, but count++ is read-modify-write, so two threads can still lose an update. Use AtomicInteger or a lock for that.",
+      "id": "mcq-volatile",
+      "options": [
+        "volatile makes count++ atomic.",
+        "It gives visibility only, not atomicity for compound actions.",
+        "volatile also provides mutual exclusion.",
+        "volatile only works on static fields."
+      ],
+      "prompt": "What does volatile guarantee in Java?",
+      "title": "volatile semantics",
+      "topicId": "concurrency-basics",
+      "type": "mcq"
+    },
+    {
+      "answer": "Defining your own bean of the same type; auto-configuration backs off via @ConditionalOnMissingBean.",
+      "answerIndex": 3,
+      "category": "Spring Boot",
+      "difficulty": "Medium",
+      "explanation": "Auto-configuration is conditional. When you define a bean of the same type, @ConditionalOnMissingBean means the auto-configured bean is not created.",
+      "id": "mcq-spring-boot-override",
+      "options": [
+        "You cannot override auto-configuration.",
+        "You must exclude the whole auto-configuration class.",
+        "You must use a different bean name only.",
+        "Defining your own bean of the same type; auto-configuration backs off via @ConditionalOnMissingBean."
+      ],
+      "prompt": "How do you override a Spring Boot auto-configured bean?",
+      "title": "Overriding auto-configuration",
+      "topicId": "spring-boot-autoconfig",
+      "type": "mcq"
+    },
+    {
+      "answer": "1 + N queries: one for parents, one per child collection load.",
+      "answerIndex": 0,
+      "category": "Spring Data JPA",
+      "difficulty": "Hard",
+      "explanation": "Lazy loading a collection for each of N parents produces N extra queries. Fix with JOIN FETCH, @EntityGraph, or a DTO projection.",
+      "id": "mcq-jpa-nplus1",
+      "options": [
+        "1 + N queries: one for parents, one per child collection load.",
+        "N queries for parents and one for children.",
+        "A single query that is always slow.",
+        "An error thrown when a collection is empty."
+      ],
+      "prompt": "What is the N+1 problem in JPA?",
+      "title": "N+1 problem",
+      "topicId": "spring-data-jpa",
+      "type": "mcq"
+    },
+    {
+      "back": "JDK contains JRE, JRE contains JVM. Source compiles to bytecode; the JVM executes bytecode, with JIT for hot code.",
+      "category": "Java",
+      "difficulty": "Easy",
+      "front": "What do JDK, JRE, and JVM each contain, in one sentence?",
+      "id": "fc-jdk-jre-jvm",
+      "title": "JDK / JRE / JVM",
+      "topicId": "jdk-jre-jvm",
+      "type": "flashcard"
+    },
+    {
+      "back": "List: ordered, duplicates allowed. Set: no duplicates. Map: key-value pairs, unique keys. ArrayList: fast access. HashMap: fast lookup, no order guarantee.",
+      "category": "Collections",
+      "difficulty": "Easy",
+      "front": "List vs Set vs Map — and when to pick ArrayList vs HashMap?",
+      "id": "fc-collections",
+      "title": "Collections choice",
+      "topicId": "collections-framework",
+      "type": "flashcard"
+    },
+    {
+      "back": "Intermediate operations are lazy and return a stream; terminal operations trigger execution and consume the stream. A stream cannot be reused.",
+      "category": "Streams",
+      "difficulty": "Medium",
+      "front": "Intermediate vs terminal stream operations?",
+      "id": "fc-streams",
+      "title": "Stream operations",
+      "topicId": "streams-lambdas",
+      "type": "flashcard"
+    },
+    {
+      "back": "Constructor injection: dependencies are explicit, required, final, and easy to test. Field injection hides dependencies and is discouraged.",
+      "category": "Spring",
+      "difficulty": "Easy",
+      "front": "Why prefer constructor injection over field injection?",
+      "id": "fc-spring-di",
+      "title": "Constructor injection",
+      "topicId": "spring-ioc-di",
+      "type": "flashcard"
+    },
+    {
+      "description": "Given a list of integers, return a new list containing only the even numbers, squared, sorted ascending. Do not mutate the input list.",
+      "examples": [
+        "Input: [1, 2, 3, 4, 5] → Output: [4, 16]",
+        "Input: [] → Output: []"
+      ],
+      "hints": [
+        "Filter first, then map, then sort.",
+        "Use stream() and collect to a new list."
+      ],
+      "id": "code-even-squares",
+      "solution": "import java.util.*;\nimport java.util.stream.*;\n\npublic class EvenSquares {\n    public static List<Integer> evenSquares(List<Integer> input) {\n        return input.stream()\n            .filter(n -> n % 2 == 0)\n            .map(n -> n * n)\n            .sorted()\n            .collect(Collectors.toList());\n    }\n}",
+      "title": "Even numbers, squared, sorted",
+      "topicId": "streams-lambdas",
+      "type": "coding"
+    },
+    {
+      "description": "Reverse a string without using StringBuilder.reverse() or a library reverse method. Handle an empty string correctly.",
+      "examples": [
+        "Input: \"bean\" → Output: \"naeb\"",
+        "Input: \"\" → Output: \"\""
+      ],
+      "hints": [
+        "Build the result by iterating from the end.",
+        "A char array or StringBuilder append in reverse order works."
+      ],
+      "id": "code-reverse-string",
+      "solution": "public class Reverse {\n    public static String reverse(String s) {\n        if (s == null) return null;\n        StringBuilder sb = new StringBuilder(s.length());\n        for (int i = s.length() - 1; i >= 0; i--) {\n            sb.append(s.charAt(i));\n        }\n        return sb.toString();\n    }\n}",
+      "title": "Reverse a string",
+      "topicId": "strings",
+      "type": "coding"
+    },
+    {
+      "answerIndex": 1,
+      "category": "Java",
+      "code": "String a = \"hello\";\nString b = new String(\"hello\");\nSystem.out.println(a == b);\nSystem.out.println(a.equals(b));",
+      "difficulty": "Easy",
+      "explanation": "a is a pooled literal; b is a distinct object created with new. Reference equality (==) is false, content equality (equals) is true.",
+      "id": "out-string-equality",
+      "options": [
+        "true, true",
+        "false, true",
+        "true, false",
+        "false, false"
+      ],
+      "prompt": "What does this code print?",
+      "title": "String == vs equals output",
+      "topicId": "strings",
+      "type": "output"
+    },
+    {
+      "answerIndex": 2,
+      "category": "Streams",
+      "code": "import java.util.*;\nList<String> names = List.of(\"asha\", \"ravi\", \"anil\", \"meera\");\nList<String> result = names.stream()\n    .filter(n -> n.length() > 4)\n    .map(String::toUpperCase)\n    .sorted()\n    .collect(Collectors.toList());\nSystem.out.println(result);",
+      "difficulty": "Medium",
+      "explanation": "Only \"meera\" has length greater than 4 (5). It is uppercased to MEERA, sorted (single element), and collected into [MEERA].",
+      "id": "out-stream-filter",
+      "options": [
+        "[ASHA, RAVI]",
+        "[]",
+        "[MEERA]",
+        "[ANIL, MEERA]"
+      ],
+      "prompt": "What does this stream pipeline print?",
+      "title": "Stream filter/map output",
+      "topicId": "streams-lambdas",
+      "type": "output"
+    },
+    {
+      "description": "A REST endpoint returns 200 OK for every outcome, including validation failures and missing resources. Clients must parse the body to tell success from failure. How would you redesign the error handling, and what status codes would you use for validation failure, missing resource, and successful creation?",
+      "id": "scen-rest-errors",
+      "solution": "Centralise error handling in a @ControllerAdvice that returns a consistent JSON error body (code + message + field errors for validation). Use 400 for validation failures, 404 for a missing resource, 201 with a Location header for successful creation, and 200 only for successful reads. Return DTOs, not entities, and validate with @Valid at the boundary.",
+      "title": "Redesigning REST error handling",
+      "topicId": "spring-mvc-rest",
+      "type": "scenario"
+    },
+    {
+      "description": "A service loads 100 orders, then accesses each order's line items in a loop, and the database log shows 101 queries. Diagnose the problem and propose a fix that does not make every association eager.",
+      "id": "scen-nplus1",
+      "solution": "This is the N+1 problem: 1 query for orders plus 1 lazy query per order for line items. Fix it with a JOIN FETCH query, an @EntityGraph, or a DTO projection that fetches orders and items together. Do not switch associations to EAGER, which would load items even when they are not needed.",
+      "title": "Diagnosing 101 queries for 100 orders",
+      "topicId": "spring-data-jpa",
+      "type": "scenario"
+    }
+  ]
+}
