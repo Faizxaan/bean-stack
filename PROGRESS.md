@@ -88,6 +88,7 @@ This file is the resume point if a session is interrupted or its context is rese
 ## Completed — small UX change (2026-11-04, clickable topic arrows, PUSHED)
 
 - 2026-11-04, CONFIRMED PUSH: "Beanstack: clickable topic arrows — previous/next navigation", 5 files, manifest at `~/workspace/beanstack-manifest-6.txt`, commit SHA `e4be9bddd5263241ef959910d79373bfe5644569` on branch `main`, verified by re-reading the repo head.
+- 2026-11-05, CONFIRMED PUSH: "Beanstack: critic audit — navigation, robustness, tone, search MCQs", 34 files, manifest at `~/workspace/beanstack-manifest-7.txt`, commit SHA `5b899e8e864036c29b1f6ecd7621c2eda648530c` on branch `main`, verified by re-reading the repo head. Totals unchanged: 79 topics, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks, 6 paths; tests now 25 passed.
 
 - [x] Topic page: clickable left/right arrow navigation to the previous/next topic in the same track, using the existing `prevNextTopic` order. A labelled top prev/next bar is shown on every topic page; large fixed chevron buttons appear only on very wide screens (≥1400px) to avoid overlapping content. The existing bottom prev/next links are kept for mobile. Deliberately click-only, not keyboard arrow keys, per the original prompt (plain arrow keys conflict with scrolling/text selection).
 - [x] Topic page now scrolls to the top when the topic changes, so clicking next/previous from the bottom of a long topic does not leave the new topic scrolled to the bottom.
