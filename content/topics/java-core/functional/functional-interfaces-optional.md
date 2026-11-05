@@ -16,7 +16,7 @@ summary: The standard functional interfaces for passing behaviour and Optional f
 
 ## Overview
 
-A functional interface has exactly one abstract method, which makes it a target for a lambda expression or a method reference. The `java.util.function` package provides a standard set of these interfaces, so codebases do not each invent their own `Transformer` or `Checker` types.
+A functional interface is a contract with exactly one job: it declares a single abstract method (a method with no body yet, to be supplied by the caller), which makes it a target for a lambda expression — a short, anonymous function — or a method reference. Think of it as a job description with one task, such as "turn this string into a number": any function that does that one task fits. The `java.util.function` package provides a standard set of these interfaces, so codebases do not each invent their own `Transformer` or `Checker` types.
 
 `Optional` tackles a different but related problem: a method that may have no result currently signals that with null, and every caller must remember to check. `Optional` makes the possibility of absence explicit in the type, so the compiler and the reader both see it. Used well, it replaces scattered null checks with a small, composable API; used badly, it becomes a more verbose way to write the same null bugs.
 

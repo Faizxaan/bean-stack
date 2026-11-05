@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BookOpen, Coffee, Home, Library, Search, Settings, Target, Layers, GraduationCap, PenLine, FileText } from 'lucide-react'
-import { contentIndex } from '../lib/content'
-import { searchScore } from '../lib/utils'
+import { contentIndex, getTrack } from '../lib/content'
+import { searchScore, topicUrl } from '../lib/utils'
 
 const NAV = [
   { to: '/', label: 'Home', icon: Home },
@@ -42,7 +42,7 @@ export function Layout() {
     const scored: { label: string; detail: string; to: string; score: number }[] = []
     for (const t of contentIndex.topics) {
       const s = Math.max(searchScore(q, t.title), searchScore(q, t.summary), searchScore(q, t.tags.join(' ')))
-      if (s > 0) scored.push({ label: t.title, detail: `${t.track} · ${t.difficulty}`, to: `/learn/${t.track}/${t.section}/${t.id}`, score: s })
+      if (s > 0) scored.push({ label: t.title, detail: `${getTrack(t.track)?.title || t.track} · ${t.difficulty}`, to: topicUrl(t), score: s })
     }
     for (const qq of contentIndex.interviewQuestions) {
       const s = searchScore(q, qq.question + ' ' + qq.category)
@@ -51,6 +51,10 @@ export function Layout() {
     for (const c of contentIndex.cheatsheets) {
       const s = searchScore(q, c.title)
       if (s > 0) scored.push({ label: c.title, detail: 'Cheatsheet', to: `/cheatsheets/${c.id}`, score: s })
+    }
+    for (const item of contentIndex.practiceItems.filter(i => i.type === 'mcq')) {
+      const s = searchScore(q, (item.prompt || '') + ' ' + (item.title || ''))
+      if (s > 0) scored.push({ label: item.prompt || item.title, detail: 'Practice MCQ', to: '/practice?tab=mcq', score: s })
     }
     return scored.sort((a, b) => b.score - a.score).slice(0, 20)
   }, [query])
@@ -67,20 +71,20 @@ export function Layout() {
             </NavLink>
           ))}
         </nav>
-        <div style={{ marginTop: 20 }}>
+        <div className="sidebar-tracks" style={{ marginTop: 20 }}>
           <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--muted)' }}><Layers size={14} style={{ verticalAlign: 'middle' }} /> Tracks</h3>
           {contentIndex.tracks.map(track => {
             const isActive = track.id === activeTrackId
             return (
               <div key={track.id} style={{ marginBottom: 10 }}>
-                <Link to={`/learn/${track.id}`} className="nav-link" style={{ fontWeight: isActive ? 700 : 400 }}>
+                <NavLink to={`/learn/${track.id}`} className={({ isActive: navActive }) => `nav-link${navActive ? ' active' : ''}`} style={{ fontWeight: isActive ? 700 : 400 }}>
                   {track.title} {track.comingSoon && <span className="badge warn">Coming Soon</span>}
-                </Link>
+                </NavLink>
                 {isActive && track.sections.map(sec => (
                   <div key={sec.id} style={{ marginLeft: 12 }}>
                     <div style={{ fontSize: '0.85rem', fontWeight: 600, marginTop: 6 }}>{sec.title}</div>
                     {contentIndex.topics.filter(t => t.track === track.id && t.section === sec.id).map(t => (
-                      <Link key={t.id} to={`/learn/${t.track}/${t.section}/${t.id}`} className="nav-link" style={{ fontSize: '0.9rem', paddingLeft: 10 }}>{t.title}</Link>
+                      <NavLink key={t.id} to={topicUrl(t)} className={({ isActive: navActive }) => `nav-link${navActive ? ' active' : ''}`} style={{ fontSize: '0.9rem', paddingLeft: 10 }}>{t.title}</NavLink>
                     ))}
                     {contentIndex.topics.filter(t => t.track === track.id && t.section === sec.id).length === 0 && (
                       <div style={{ fontSize: '0.85rem', color: 'var(--muted)', paddingLeft: 10 }}>Planned — coming soon</div>
@@ -108,13 +112,16 @@ export function Layout() {
       {paletteOpen && (
         <div className="palette-backdrop" onClick={() => setPaletteOpen(false)} role="presentation">
           <div className="palette" role="dialog" aria-label="Search and command palette" onClick={e => e.stopPropagation()}>
-            <input autoFocus className="input" placeholder="Search topics, interview questions, cheatsheets…  ( / focuses search )" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && results[0]) { navigate(results[0].to); setPaletteOpen(false) } }} />
+            <input autoFocus className="input" placeholder="Search topics, interview questions, practice MCQs, cheatsheets…  ( / focuses search )" aria-label="Search topics, interview questions, practice MCQs, and cheatsheets" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && results[0]) { navigate(results[0].to); setPaletteOpen(false) } }} />
             <div style={{ marginTop: 10, display: 'grid', gap: 4 }}>
               {query.trim() === '' && (
                 <>
                   <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/learn'); setPaletteOpen(false) }}>Go to Learn</button>
                   <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/interview'); setPaletteOpen(false) }}>Go to Interview Prep</button>
                   <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/practice'); setPaletteOpen(false) }}>Go to Practice</button>
+                  <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/cheatsheets'); setPaletteOpen(false) }}>Go to Revision &amp; Cheatsheets</button>
+                  <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/library'); setPaletteOpen(false) }}>Go to My Library</button>
+                  <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/search'); setPaletteOpen(false) }}>Go to full Search page</button>
                   <button className="btn secondary" style={{ justifyContent: 'flex-start' }} onClick={() => { navigate('/'); setPaletteOpen(false) }}>Go to Home dashboard</button>
                 </>
               )}

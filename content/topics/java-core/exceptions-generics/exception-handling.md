@@ -16,7 +16,7 @@ summary: Checked vs unchecked exceptions, try-with-resources, custom exceptions,
 
 ## Overview
 
-Exceptions are Java's way of signalling that something went wrong without returning magic values. Checked exceptions must be declared or handled; unchecked exceptions (runtime exceptions and errors) do not have to be. Generics add compile-time type safety so a `List<String>` cannot accidentally hold an `Integer` — the compiler catches it instead of the runtime throwing a `ClassCastException`.
+Think of an exception as Java's way of raising its hand when something goes wrong — instead of returning a magic value like `-1` and hoping the caller notices. A checked exception is one the compiler forces you to deal with, by handling it or declaring it; an unchecked exception (a runtime exception or an error, typically a programming bug) does not have to be declared. Generics add compile-time type safety so a `List<String>` cannot accidentally hold an `Integer` — the compiler catches it instead of the runtime throwing a `ClassCastException`.
 
 ## Theory
 

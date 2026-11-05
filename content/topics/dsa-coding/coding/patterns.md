@@ -16,7 +16,7 @@ summary: "The reusable coding patterns behind most interview problems: two point
 
 ## Overview
 
-Interview problems look endless, but most of them are variations on a small set of patterns. Learning patterns is not about memorising solutions; it is about recognising the shape of a problem — sorted input plus a pair condition, a contiguous subarray with a constraint, a monotonic predicate — and knowing which technique that shape calls for. Once the pattern is identified, the solution is usually a short loop with a clear invariant, and the complexity analysis follows from the pattern rather than from the specific problem.
+Interview problems look endless, but most of them are variations on a small set of patterns. Learning patterns is not about memorising solutions; it is about recognising the shape of a problem — sorted input plus a pair condition, a contiguous subarray with a constraint, or a yes/no question whose answer flips only once as you move through a range — and knowing which technique that shape calls for. For example, if the input is sorted and you need two numbers that add to a target, two pointers starting at opposite ends and moving inward is the pattern, not a trick to memorise. Once the pattern is identified, the solution is usually a short loop with a rule that stays true at each step, and the complexity analysis follows from the pattern rather than from the specific problem.
 
 This topic covers the patterns that appear most often in Java interviews: two pointers, sliding window, fast and slow pointers, binary search (including binary search on the answer), prefix sums and hashmap counting, backtracking, greedy, and divide-and-conquer. Each pattern is described by its recognition signals, its template, and its complexity.
 

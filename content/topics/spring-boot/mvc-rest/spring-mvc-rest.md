@@ -16,7 +16,7 @@ summary: Controllers, request mapping, validation, exception handling, and Respo
 
 ## Overview
 
-Spring MVC maps HTTP requests to controller methods, converts JSON to Java objects (via Jackson) and back, validates input, and lets you control status codes and headers precisely with `ResponseEntity`. A good REST API is predictable: resources are nouns, methods have their standard meanings, errors are consistent, and validation failures return useful messages instead of stack traces.
+A REST API is a web service other programs talk to over HTTP, and Spring MVC is the part that routes each incoming request to the right method — think of a controller method as the waiter who takes a specific order. It converts JSON to Java objects (via Jackson, the translator between JSON text and Java objects) and back, validates input, and lets you control status codes and headers precisely with `ResponseEntity` (the envelope around your response, carrying both the body and the status). A good REST API is predictable: resources are nouns, methods have their standard meanings, errors are consistent, and validation failures return useful messages instead of stack traces.
 
 ## Theory
 

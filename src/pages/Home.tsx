@@ -15,7 +15,11 @@ export function Home() {
     return !st || isDue(st.dueAt)
   }).length
 
-  const continueTopic = data.recentlyViewed.map(id => getTopic(id)).find(Boolean)
+  // Resume target: the most recently viewed topic that is not finished yet;
+  // fall back to the most recently viewed topic (a completed topic revisits).
+  const viewedTopics = data.recentlyViewed.map(id => getTopic(id)).filter(Boolean)
+  const continueTopic = viewedTopics.find(t => t && data.progress[t.id] !== 'completed') || viewedTopics[0]
+  const continueTrack = continueTopic ? contentIndex.tracks.find(t => t.id === continueTopic.track) : undefined
   const todaysFocus = useMemo(() => {
     // Next topic on beginner path that is not completed, else highest-importance unstarted complete topic
     const path = contentIndex.paths.find(p => p.id === 'beginner-roadmap')
@@ -36,6 +40,20 @@ export function Home() {
         <p style={{ color: 'var(--muted)', margin: 0 }}>Learn Java, practice, revise, and track your progress — all in one place, stored only in this browser.</p>
       </div>
 
+      {continueTopic && (
+        <div className="card" style={{ borderColor: 'var(--accent)' }}>
+          <h2 style={{ marginTop: 0 }}>Continue where you left off</h2>
+          <p style={{ margin: '0 0 10px' }}>
+            <Link to={topicUrl(continueTopic)}><strong>{continueTopic.title}</strong></Link>
+            <span style={{ color: 'var(--muted)' }}> · {continueTrack?.title || continueTopic.track} · {continueTopic.readingMinutes} min{data.progress[continueTopic.id] === 'completed' ? ' · Completed — revisit to revise' : data.progress[continueTopic.id] === 'in-progress' ? ' · In progress' : ''}</span>
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <Link className="btn" to={topicUrl(continueTopic)}>Resume {continueTopic.title} <ArrowRight size={16} /></Link>
+            <Link className="btn secondary" to={`/learn/${continueTopic.track}`}>Back to {continueTrack?.title || 'track'}</Link>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-3">
         <div className="card"><div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Topics completed</div><div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{stats.completed} / {stats.total}</div><div className="progress-bar" style={{ marginTop: 8 }}><div style={{ width: `${stats.pct}%` }} /></div></div>
         <div className="card"><div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}><Flame size={14} /> Study streak</div><div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{streak} day{streak === 1 ? '' : 's'}</div><div style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{data.bookmarks.length} bookmarks · {data.favorites.length} favorites</div></div>
@@ -49,10 +67,9 @@ export function Home() {
             <>
               <Link to={topicUrl(todaysFocus)}><strong>{todaysFocus.title}</strong></Link>
               <p style={{ color: 'var(--muted)' }}>{todaysFocus.summary || 'A key Java topic on your path.'} · {todaysFocus.readingMinutes} min · {'★'.repeat(todaysFocus.importance)}</p>
-              <Link className="btn" to={topicUrl(todaysFocus)}>Continue learning <ArrowRight size={16} /></Link>
+              <Link className="btn" to={topicUrl(todaysFocus)}>{data.progress[todaysFocus.id] === 'in-progress' ? 'Continue learning' : 'Start learning'} <ArrowRight size={16} /></Link>
             </>
           ) : <p>All complete topics are done — great work. New content batches will add more topics here.</p>}
-          {continueTopic && <p style={{ marginTop: 12 }}>Continue: <Link to={topicUrl(continueTopic)}>{continueTopic.title}</Link></p>}
         </div>
         <div className="card">
           <h2 style={{ marginTop: 0 }}><Calendar size={18} /> Interview countdown</h2>
@@ -98,7 +115,7 @@ export function Home() {
           <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 12 }}>Tip: press <span className="kbd">Ctrl/Cmd+K</span> anywhere to search, or <span className="kbd">/</span> to focus search.</p>
         </div>
       </div>
-      <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Counts on this page are always derived from content — nothing is hardcoded. If a track shows no topics yet, its sections are planned placeholders, marked Coming Soon.</p>
+      <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Counts on this page are always derived from content — nothing is hardcoded.</p>
     </div>
   )
 }

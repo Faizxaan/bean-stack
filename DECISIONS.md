@@ -31,6 +31,16 @@ Recorded so a later session (or a reviewer) can see why things are the way they 
 - Java version target: current LTS Java (21 at time of writing, with 8/11/17/21 differences called out where interviews ask about them). Spring Boot: current stable, with auto-configuration imports path noted as in current Spring Boot.
 - Code examples in sample topics were written to be correct by construction (simple, deterministic programs). Full compile-checking of every snippet is a remaining verification step listed in PROGRESS.md; snippets that depend on Spring/Jakarta APIs are presented as framework code, not standalone-compilable programs, and are labelled as such by context.
 
+## Critic audit run (2026-11-04 — navigation, robustness, tone; NOT pushed)
+
+- **Topic URL segments are validated.** A topic id alone no longer renders at a wrong track/section address; a mismatched URL now shows the in-place not-found with a link to the topic's correct address.
+- **Search now really covers MCQs.** The original prompt promises search across topics/questions/MCQs/cheatsheets, but Search and the palette only covered the first three. Practice MCQs are now included (linking to `/practice?tab=mcq`); Search page track labels now use track titles, not raw ids, and its empty-query state gives guidance instead of a blank list.
+- **Trailing `## Version Differences` sections kept as-is.** 10 topics have one after Revision Summary. It does not break the required section order and carries genuinely useful version information; folding it into Revision Summary would lose its visibility.
+- **Duplicate `##` headings in one topic remain a known minor limitation.** Disambiguating DOM ids consistently across MarkdownView, TOC, and scroll-spy is riskier than the incidence justifies; no current topic is known to rely on duplicate headings.
+- **LocalStorage quota-failure UI not added.** Save failure still degrades to in-memory operation silently; a toast/banner component for it would be new UI machinery for an edge case that sanitisation/caps already make unlikely.
+- **Validator hardened** (duplicate section ids across tracks, duplicate cheatsheet/path ids, topic order uniqueness per track/section, lastUpdated presence/format, interview module/difficulty enums, practice type/difficulty enums, MCQ/output answerIndex range, flashcard front/back presence). Current content passes all new checks, so these are hardening, not live bug fixes.
+- **Import philosophy unchanged:** import stays reject-on-unknown-id with a clear recovery message, while local storage stays lenient-repair. Silently dropping unknown ids on import would hide data loss.
+
 ## Small UX changes (2026-11-04 — clickable topic arrows)
 
 - **Clickable left/right arrows, not keyboard arrow keys.** The original prompt forbids plain arrow keys for topic navigation (they conflict with scrolling and text selection). The new navigation is therefore click-only: a top prev/next bar with labelled arrows on every topic page, plus large fixed chevron buttons on very wide screens (≥1400px, where they cannot overlap the content). The existing bottom prev/next links are kept, so mobile users still have navigation. Arrows follow the existing `prevNextTopic` order — previous/next topic within the same track, not across tracks.

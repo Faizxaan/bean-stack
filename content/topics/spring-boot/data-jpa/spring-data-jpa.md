@@ -16,7 +16,7 @@ summary: Repositories, query methods, pagination, transactions, and the N+1 prob
 
 ## Overview
 
-Spring Data JPA removes boilerplate: you declare a repository interface, and Spring generates the implementation at runtime. Hibernate, as the JPA provider, maps entities to tables, manages the persistence context (first-level cache), and translates your queries to SQL. The power comes with traps — lazy loading, N+1 queries, and transaction boundaries — that interviewers love to probe.
+Without Spring Data JPA, every database table needs repetitive code to save, find, and delete rows. Spring Data JPA removes that boilerplate: you declare a repository interface — a short list of the data operations you want, such as "find users by email" — and Spring generates the implementation at runtime. Hibernate, as the JPA provider, maps entities (your Java classes) to tables, manages the persistence context (a short-lived cache of the objects loaded in the current unit of work), and translates your queries to SQL. The power comes with traps — lazy loading (related data fetched only when first touched), N+1 queries (one extra query per row instead of one query in total), and transaction boundaries — that interviewers love to probe.
 
 ## Theory
 

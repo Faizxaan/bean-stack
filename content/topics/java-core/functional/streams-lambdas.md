@@ -16,7 +16,7 @@ summary: How lambdas and method references work, how Streams transform collectio
 
 ## Overview
 
-Java 8 added functional programming to a traditionally object-oriented language. A lambda is a concise way to write an implementation of a functional interface — an interface with exactly one abstract method. Streams build on that: they let you describe what to do with data (filter, map, reduce) instead of writing loops that say how to do it step by step.
+Java 8 added functional programming to a traditionally object-oriented language. A lambda is a concise way to write an implementation of a functional interface — an interface with exactly one abstract method, that is, one job to fill in. Streams build on that: they let you describe what to do with data (filter, map, reduce) instead of writing loops that say how to do it step by step. Think of a stream as an assembly line: items pass through stations — filter out the unwanted, transform (map) the rest, then combine (reduce) them — instead of you moving each item by hand in a loop.
 
 Streams are not collections and not a replacement for every loop. They shine for declarative transformations and aggregations; they are a poor fit for code with side effects, checked exceptions inside lambdas, or logic that needs early exit with complex state.
 

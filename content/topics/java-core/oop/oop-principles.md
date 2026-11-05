@@ -16,7 +16,7 @@ summary: Encapsulation, inheritance, polymorphism, and abstraction in plain lang
 
 ## Overview
 
-Object-oriented programming organizes code around objects that combine data (fields) and behaviour (methods). Java's four pillars are encapsulation, inheritance, polymorphism, and abstraction. They are not just definitions to recite — each one solves a real maintenance problem: hiding complexity, reusing code safely, swapping implementations, and modelling only what matters.
+Object-oriented programming organizes code around objects that combine data (fields) and behaviour (methods). Java's four pillars are encapsulation, inheritance, polymorphism, and abstraction. In plain terms: encapsulation means hiding an object's inner workings behind methods, inheritance means building a new class on an existing one, polymorphism means the same method call can do different things for different objects, and abstraction means showing only the essential details. They are not just definitions to recite — each one solves a real maintenance problem: hiding complexity, reusing code safely, swapping implementations, and modelling only what matters.
 
 ## Theory
 

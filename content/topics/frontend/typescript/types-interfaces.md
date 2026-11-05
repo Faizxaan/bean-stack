@@ -16,7 +16,7 @@ summary: How TypeScript adds a static type layer to JavaScript — primitives, u
 
 ## Overview
 
-TypeScript is JavaScript with a static type system. Types are checked at compile time and then erased: the code that runs is plain JavaScript, and TypeScript adds no runtime checks. That one fact explains most of its behaviour. Done well, types catch errors before they ship, document intent, and make refactoring safe; done badly, they become `any` everywhere and add ceremony without safety.
+TypeScript is JavaScript with a static type system — types are rules about what kind of value each variable holds (a string, a number, an object shape), checked before the code runs. Think of it as a spell-checker for code: it flags mistakes while you write, then disappears, because types are checked at compile time and then erased: the code that runs is plain JavaScript, and TypeScript adds no runtime checks. That one fact explains most of its behaviour. Done well, types catch errors before they ship, document intent, and make refactoring safe; done badly, they become `any` everywhere and add ceremony without safety.
 
 ## Theory
 

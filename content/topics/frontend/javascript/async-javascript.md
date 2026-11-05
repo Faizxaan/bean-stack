@@ -16,7 +16,7 @@ summary: How JavaScript handles work that takes time — callbacks, promises, as
 
 ## Overview
 
-Almost everything interesting in a browser takes time: fetching data, reading a file, waiting for a timer, or animating. JavaScript handles this without threads in user code by being asynchronous: you start work, register what should happen when it finishes, and the program carries on. This topic explains callbacks, promises, and async/await, and the event loop that ties them together.
+Almost everything interesting in a browser takes time: fetching data, reading a file, waiting for a timer, or animating. JavaScript handles this without threads in user code by being asynchronous: you start work, register what should happen when it finishes, and the program carries on — like ordering food, taking a buzzer, and sitting down instead of standing at the counter blocking everyone behind you. A promise is that buzzer: an object representing a value that is not ready yet. This topic explains callbacks, promises, and async/await (a cleaner way to write promise code), and the event loop — the mechanism that checks for finished work and runs its callbacks — that ties them together.
 
 ## Theory
 

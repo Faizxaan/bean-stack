@@ -16,7 +16,7 @@ summary: How to log usefully, test Spring Boot applications at the right level, 
 
 ## Overview
 
-Three practices separate a hobby project from a production service: logs you can actually debug from, tests that catch regressions before users do, and API documentation that stays accurate. Spring Boot makes all three cheap — SLF4J with Logback for logging, a layered testing stack for tests, and springdoc-openapi for documentation — but each has traps that turn a helpful tool into noise.
+Three practices separate a hobby project from a production service: logs you can actually debug from, tests that catch regressions before users do, and API documentation that stays accurate. Spring Boot makes all three cheap — SLF4J (the logging interface your code calls) with Logback (the engine that actually writes the log lines) for logging, a layered testing stack for tests, and springdoc-openapi (which generates API documentation from your code and annotations) for documentation — but each has traps that turn a helpful tool into noise.
 
 ## Theory
 

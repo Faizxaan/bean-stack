@@ -16,7 +16,7 @@ summary: How web pages are structured as a document tree, how events flow throug
 
 ## Overview
 
-The Document Object Model (DOM) is the browser's live, tree-shaped representation of a page. JavaScript reads and changes that tree, and the browser re-renders what changed. Around the DOM sit the browser APIs: events, storage, fetch, timers, observers, and more. Understanding this layer matters even when a framework hides it, because performance problems, bugs, and interview questions all live here.
+The Document Object Model (DOM) is the browser's live, tree-shaped representation of a page — like a family tree of the page's elements, with the page itself at the top and headings, paragraphs, and buttons branching below it. JavaScript reads and changes that tree, and the browser re-renders what changed: change one paragraph's text in code, and only that paragraph is redrawn. Around the DOM sit the browser APIs: events, storage, fetch, timers, observers, and more. Understanding this layer matters even when a framework hides it, because performance problems, bugs, and interview questions all live here.
 
 ## Theory
 

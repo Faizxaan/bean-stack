@@ -1,34 +1,85 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Bookmark, Star, ArrowLeft, ArrowRight, Clock, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Bookmark, Star, ArrowLeft, ArrowRight, ArrowUp, Clock, ChevronDown, ChevronLeft, ChevronRight, Link2 } from 'lucide-react'
 import { contentIndex, extractSection, getTopic, getTrack, loadTopicBody, orderedTopics, prevNextTopic, stripFrontmatter, topicsForSection } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { MarkdownView } from '../components/MarkdownView'
-import { topicUrl } from '../lib/utils'
+import { progressStats, topicUrl } from '../lib/utils'
+
+// Shared breadcrumb: Home / Learn [/ Track [/ Topic]]. The current page is
+// plain text with aria-current, never a link to itself.
+function Breadcrumb({ items }: { items: { label: string; to?: string }[] }) {
+  return (
+    <nav aria-label="Breadcrumb" className="breadcrumb">
+      {items.map((item, i) => (
+        <span key={i} className="breadcrumb-item">
+          {i > 0 && <span aria-hidden="true" className="breadcrumb-sep"> / </span>}
+          {item.to ? <Link to={item.to}>{item.label}</Link> : <span aria-current="page" className="breadcrumb-current">{item.label}</span>}
+        </span>
+      ))}
+    </nav>
+  )
+}
+
+function userStatusLabel(status: string | undefined) {
+  if (status === 'completed') return '✓ Completed'
+  if (status === 'in-progress') return 'In progress'
+  return 'Not started'
+}
 
 export function LearnIndex() {
+  const { data } = useApp()
+  // Next uncompleted topic in a track, in track order — the resume target.
+  // Falls back to the first topic when the track is fully complete.
+  const nextUpForTrack = (trackId: string) => {
+    const list = orderedTopics(trackId)
+    return list.find(t => data.progress[t.id] !== 'completed') || list[0]
+  }
   return (
     <div>
+      <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Learn' }]} />
       <h1>Learn</h1>
-      <p style={{ color: 'var(--muted)' }}>Tracks, sections, and topics. Java is built out first; other tracks are polished placeholders with planned sections, marked Coming Soon.</p>
+      <p style={{ color: 'var(--muted)' }}>Tracks, sections, and topics — {contentIndex.tracks.length} tracks, {contentIndex.topics.length} topics. Progress below is your own, derived from your saved progress, not from the content.</p>
       <div className="grid grid-2">
-        {contentIndex.tracks.map(track => (
-          <div key={track.id} className="card">
-            <h2 style={{ marginTop: 0 }}><Link to={`/learn/${track.id}`}>{track.title}</Link> {track.comingSoon && <span className="badge warn">Coming Soon</span>}</h2>
-            <p style={{ color: 'var(--muted)' }}>{track.description}</p>
-            <ul>{track.sections.map(s => <li key={s.id}>{s.title}{s.description ? ` — ${s.description}` : ''}</li>)}</ul>
-            <Link className="btn secondary" to={`/learn/${track.id}`}>Open track →</Link>
-          </div>
-        ))}
+        {contentIndex.tracks.map(track => {
+          const topics = orderedTopics(track.id)
+          const s = progressStats(data.progress, topics.map(t => t.id))
+          const nextUp = nextUpForTrack(track.id)
+          return (
+            <div key={track.id} className="card">
+              <h2 style={{ marginTop: 0 }}><Link to={`/learn/${track.id}`}>{track.title}</Link> {track.comingSoon && <span className="badge warn">Coming Soon</span>}</h2>
+              <p style={{ color: 'var(--muted)' }}>{track.description}</p>
+              {topics.length > 0 && (
+                <div style={{ marginBottom: 10 }}>
+                  <div className="progress-bar"><div style={{ width: `${s.pct}%` }} /></div>
+                  <small>{s.completed}/{s.total} complete{s.inProgress > 0 ? ` · ${s.inProgress} in progress` : ''} · {s.pct}%</small>
+                </div>
+              )}
+              <ul>{track.sections.map(s2 => <li key={s2.id}>{s2.title}{s2.description ? ` — ${s2.description}` : ''}</li>)}</ul>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                <Link className="btn secondary" to={`/learn/${track.id}`}>Open track →</Link>
+                {nextUp && <Link className="btn" to={topicUrl(nextUp)}>{s.completed === 0 && s.inProgress === 0 ? 'Start: ' : s.completed === s.total ? 'Review: ' : 'Continue: '}{nextUp.title} →</Link>}
+              </div>
+            </div>
+          )
+        })}
       </div>
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ marginTop: 0 }}>Curated learning paths</h2>
-        {contentIndex.paths.map(p => (
-          <div key={p.id} style={{ marginBottom: 12 }}>
-            <strong>{p.title}</strong> — {p.description}
-            <ol>{p.topicIds.map(id => { const t = getTopic(id); return t ? <li key={id}><Link to={topicUrl(t)}>{t.title}</Link></li> : null })}</ol>
-          </div>
-        ))}
+        {contentIndex.paths.map(p => {
+          const s = progressStats(data.progress, p.topicIds)
+          const nextUp = p.topicIds.map(id => getTopic(id)).find(t => t && data.progress[t.id] !== 'completed')
+          return (
+            <div key={p.id} style={{ marginBottom: 20 }}>
+              <strong>{p.title}</strong> — {p.description}
+              <div style={{ marginTop: 6 }}>
+                <div className="progress-bar"><div style={{ width: `${s.pct}%` }} /></div>
+                <small>{s.completed}/{s.total} complete · {s.pct}%{nextUp ? <> · Next up: <Link to={topicUrl(nextUp)}>{nextUp.title}</Link></> : ' · All complete — nice work.'}</small>
+              </div>
+              <ol>{p.topicIds.map(id => { const t = getTopic(id); return t ? <li key={id}><Link to={topicUrl(t)}>{t.title}</Link>{data.progress[t.id] === 'completed' ? ' ✓' : ''}</li> : null })}</ol>
+            </div>
+          )
+        })}
         {contentIndex.paths.length === 0 && <p style={{ color: 'var(--muted)' }}>Learning paths are built from prerequisites and tags as content grows. Check back after the next content batch.</p>}
       </div>
     </div>
@@ -37,20 +88,35 @@ export function LearnIndex() {
 
 export function TrackPage() {
   const { trackId } = useParams()
+  const { data } = useApp()
   const track = trackId ? getTrack(trackId) : undefined
   if (!track) return <div><h1>Track not found</h1><p>This track does not exist. Use Learn to browse available tracks.</p><Link to="/learn">← Back to Learn</Link></div>
+  const allTopics = orderedTopics(track.id)
+  const stats = progressStats(data.progress, allTopics.map(t => t.id))
+  const nextUp = allTopics.find(t => data.progress[t.id] !== 'completed')
   return (
     <div>
+      <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Learn', to: '/learn' }, { label: track.title }]} />
       <p><Link to="/learn">← Learn</Link></p>
       <h1>{track.title} {track.comingSoon && <span className="badge warn">Coming Soon</span>}</h1>
       <p style={{ color: 'var(--muted)' }}>{track.description}</p>
+      {allTopics.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div className="progress-bar"><div style={{ width: `${stats.pct}%` }} /></div>
+          <p style={{ margin: '8px 0 0' }}>{stats.completed}/{stats.total} complete{stats.inProgress > 0 ? ` · ${stats.inProgress} in progress` : ''} · {stats.pct}%</p>
+          {nextUp
+            ? <Link className="btn" to={topicUrl(nextUp)}>{stats.completed === 0 && stats.inProgress === 0 ? 'Start learning: ' : 'Continue: '}{nextUp.title} →</Link>
+            : <p style={{ margin: '8px 0 0' }}>All topics complete — pick any topic below to revise, or <Link to="/learn">browse another track</Link>.</p>}
+        </div>
+      )}
       {track.comingSoon && <div className="card" style={{ background: 'var(--accent-soft)' }}><strong>Coming Soon</strong><p>This track is a polished placeholder. Its planned sections are below, and it can be filled later with content only — no component changes needed.</p></div>}
       <div className="grid" style={{ marginTop: 16 }}>
         {track.sections.map(sec => {
           const topics = topicsForSection(track.id, sec.id)
+          const secStats = progressStats(data.progress, topics.map(t => t.id))
           return (
             <div key={sec.id} className="card">
-              <h2 style={{ marginTop: 0 }}>{sec.title}</h2>
+              <h2 style={{ marginTop: 0 }}>{sec.title}{topics.length > 0 && <small style={{ color: 'var(--muted)', fontWeight: 400, marginLeft: 8 }}>{secStats.completed}/{secStats.total} complete</small>}</h2>
               {sec.description && <p style={{ color: 'var(--muted)' }}>{sec.description}</p>}
               {topics.length === 0 ? (
                 <div>
@@ -59,13 +125,21 @@ export function TrackPage() {
                   {(!sec.plannedTopics || sec.plannedTopics.length === 0) && <p style={{ color: 'var(--muted)' }}>Content for this section is planned and will appear here.</p>}
                 </div>
               ) : (
-                <ul>{topics.map(t => (
-                  <li key={t.id}><Link to={topicUrl(t)}>{t.title}</Link> — {t.difficulty} · {'★'.repeat(t.importance)} · {t.readingMinutes} min · <span className="badge">{t.status}</span></li>
-                ))}</ul>
+                <ul>{topics.map(t => {
+                  const st = data.progress[t.id]
+                  return (
+                    <li key={t.id}><Link to={topicUrl(t)}>{t.title}</Link> — {t.difficulty} · {'★'.repeat(t.importance)} · {t.readingMinutes} min · <span className="badge">{t.status}</span>{' '}<span style={{ color: st === 'completed' ? 'var(--accent)' : 'var(--muted)', fontSize: '0.9rem' }}>{userStatusLabel(st)}</span></li>
+                  )
+                })}</ul>
               )}
             </div>
           )
         })}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20, alignItems: 'center' }}>
+        <Link className="btn secondary" to="/learn">← Back to Learn</Link>
+        {nextUp && <Link className="btn" to={topicUrl(nextUp)}>Continue: {nextUp.title} →</Link>}
+        {!nextUp && allTopics.length > 0 && <Link className="btn secondary" to={topicUrl(allTopics[0])}>Revise from the first topic →</Link>}
       </div>
     </div>
   )
@@ -91,6 +165,47 @@ export function TopicPage() {
   const [error, setError] = useState<string | null>(null)
   const [revisionMode, setRevisionMode] = useState(false)
   const [activeHeading, setActiveHeading] = useState('')
+  const [copied, setCopied] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current) }, [])
+
+  // Back-to-top appears only after scrolling past the first screen of a
+  // long topic; it is a real button, not an anchor, so it never adds a hash.
+  useEffect(() => {
+    const onScrollTop = () => setShowBackToTop(window.scrollY > 600)
+    window.addEventListener('scroll', onScrollTop, { passive: true })
+    onScrollTop()
+    return () => window.removeEventListener('scroll', onScrollTop)
+  }, [])
+
+  const scrollToTop = () => {
+    const reduced = document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+  }
+
+  const copyTopicLink = async () => {
+    if (!topic) return
+    const url = `${window.location.origin}${topicUrl(topic)}`
+    let ok = false
+    try {
+      if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(url); ok = true }
+    } catch { /* fall through to textarea fallback */ }
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = url
+        ta.style.position = 'fixed'; ta.style.opacity = '0'
+        document.body.appendChild(ta); ta.select()
+        ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+      } catch { ok = false }
+    }
+    setCopied(ok ? 'copied' : 'failed')
+    if (copyTimer.current) clearTimeout(copyTimer.current)
+    copyTimer.current = setTimeout(() => setCopied('idle'), 2500)
+  }
 
   useEffect(() => {
     if (!topic) return
@@ -101,30 +216,10 @@ export function TopicPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicId])
 
-  const headings = useMemo(() => {
-    if (!body) return []
-    return body.split('\n').filter(l => l.startsWith('## ')).map(l => l.replace('## ', '').trim())
-  }, [body])
-
-  useEffect(() => {
-    const onScroll = () => {
-      // Simple scroll-spy: find last heading above viewport
-      const els = headings.map(h => document.getElementById(`heading-${h.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)).filter(Boolean) as HTMLElement[]
-      let current = ''
-      for (const el of els) if (el.getBoundingClientRect().top < 120) current = el.dataset.heading || ''
-      if (current) setActiveHeading(current)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [headings])
-
-  if (!topic) return <div><h1>Topic not found</h1><p>That topic does not exist in this content set. It may be a planned placeholder — check its track page.</p><Link to="/learn">← Back to Learn</Link></div>
-  const { prev, next } = prevNextTopic(topic)
-  const status = data.progress[topic.id] || 'not-started'
-  const isBookmarked = data.bookmarks.includes(topic.id)
-  const isFavorite = data.favorites.includes(topic.id)
-  const track = getTrack(topic.track)
-
+  // Revision body first: the TOC must list only the headings actually
+  // rendered. Previously it always listed the full body, so in Quick
+  // Revision Mode most TOC links pointed at headings that were not on
+  // the page and did nothing.
   const revisionBody = useMemo(() => {
     if (!body) return ''
     const keep = ['Overview', 'Key Concepts', 'Common Mistakes', 'Interview Questions', 'Revision Summary']
@@ -136,11 +231,37 @@ export function TopicPage() {
     return parts.join('\n\n') || body
   }, [body])
 
-  // Inject heading ids by rendering markdown with custom heading handling is complex;
-  // instead, TOC links scroll via text search fallback: we render headings as anchors in MarkdownView? Keep TOC as jump list that sets active on click.
+  const displayedBody = revisionMode ? revisionBody : (body || '')
+  const headings = useMemo(() => {
+    if (!displayedBody) return []
+    return displayedBody.split('\n').filter(l => l.startsWith('## ')).map(l => l.replace('## ', '').trim())
+  }, [displayedBody])
+
+  useEffect(() => {
+    const onScroll = () => {
+      // Simple scroll-spy: find last heading above viewport. The id must
+      // match MarkdownView exactly (bare slug, no 'heading-' prefix, dashes
+      // trimmed) — the old 'heading-' prefix matched no element, so the
+      // active TOC entry never updated on scroll, only on click.
+      const els = headings.map(h => document.getElementById(h.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''))).filter(Boolean) as HTMLElement[]
+      let current = ''
+      for (const el of els) if (el.getBoundingClientRect().top < 120) current = el.dataset.heading || ''
+      if (current) setActiveHeading(current)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [headings])
+
+  if (!topic) return <div><h1>Topic not found</h1><p>That topic does not exist in this content set. It may be a planned placeholder — check its track page.</p><Link to="/learn">← Back to Learn</Link></div>
+  if (topic.track !== trackId || topic.section !== sectionId) return <div><h1>Topic not found</h1><p>This topic exists, but not at this track/section address — the URL does not match the topic. Use the link below to reach it at its correct address.</p><p><Link to={topicUrl(topic)}>Go to {topic.title} →</Link></p><p><Link to="/learn">← Back to Learn</Link></p></div>
+  const { prev, next } = prevNextTopic(topic)
+  const status = data.progress[topic.id] || 'not-started'
+  const isBookmarked = data.bookmarks.includes(topic.id)
+  const isFavorite = data.favorites.includes(topic.id)
+  const track = getTrack(topic.track)
   return (
     <div>
-      <p style={{ color: 'var(--muted)' }}><Link to="/learn">Learn</Link> / <Link to={`/learn/${topic.track}`}>{track?.title || topic.track}</Link> / {topic.title}</p>
+      <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Learn', to: '/learn' }, { label: track?.title || topic.track, to: `/learn/${topic.track}` }, { label: topic.title }]} />
       {/* Clickable topic navigation: left arrow = previous topic in this track, right arrow = next topic.
           Deliberately click-only, not keyboard arrow keys, so it never conflicts with scrolling or text selection. */}
       <nav className="topic-nav-top" aria-label="Previous and next topic">
@@ -176,9 +297,10 @@ export function TopicPage() {
         <button className="btn secondary small" onClick={() => toggleList('bookmarks', topic.id)}><Bookmark size={15} /> {isBookmarked ? 'Bookmarked ✓' : 'Bookmark'}</button>
         <button className="btn secondary small" onClick={() => toggleList('favorites', topic.id)}><Star size={15} /> {isFavorite ? 'Favorite ✓' : 'Favorite'}</button>
         <button className="btn secondary small" onClick={() => setRevisionMode(!revisionMode)}>{revisionMode ? 'Full study view' : 'Quick Revision Mode'}</button>
+        <button className="btn secondary small" onClick={copyTopicLink} aria-live="polite"><Link2 size={15} /> {copied === 'copied' ? 'Link copied ✓' : copied === 'failed' ? 'Copy failed — copy the URL from the address bar' : 'Copy link'}</button>
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: 'minmax(0,1fr) 220px', gap: 20 }}>
+      <div className="topic-layout">
         <div>
           {error && <div className="card" role="alert">Could not load this topic: {error}</div>}
           {!body && !error && <div><div className="skeleton" style={{ height: 24, marginBottom: 10 }} /><div className="skeleton" /><div className="skeleton" style={{ marginTop: 8 }} /></div>}
@@ -194,9 +316,15 @@ export function TopicPage() {
             <p><strong>Related:</strong> {topic.related.length ? topic.related.map(id => { const t = getTopic(id); return t ? <span key={id} style={{ marginRight: 8 }}><Link to={topicUrl(t)}>{t.title}</Link></span> : id }) : 'None listed yet.'}</p>
           </Section>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
+          <div className="topic-nav-bottom">
             {prev ? <Link to={topicUrl(prev)}><ArrowLeft size={15} /> {prev.title}</Link> : <span />}
             {next ? <Link to={topicUrl(next)}>{next.title} <ArrowRight size={15} /></Link> : <span />}
+          </div>
+          <div className="topic-bottom-actions">
+            <Link className="btn secondary small" to={`/learn/${topic.track}`}>← Back to {track?.title || 'track'}</Link>
+            <button className="btn secondary small" onClick={scrollToTop}><ArrowUp size={15} /> Back to top</button>
+            {next && <Link className="btn" to={topicUrl(next)}>Next: {next.title} →</Link>}
+            {!next && <Link className="btn secondary" to="/learn">Browse another track →</Link>}
           </div>
         </div>
         <aside className="toc" aria-label="Table of contents">
@@ -212,6 +340,9 @@ export function TopicPage() {
           </div>
         </aside>
       </div>
+      {showBackToTop && (
+        <button className="back-to-top" onClick={scrollToTop} aria-label="Back to top"><ArrowUp size={18} /> Back to top</button>
+      )}
     </div>
   )
 }

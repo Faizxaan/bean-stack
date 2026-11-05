@@ -41,14 +41,14 @@ export function InterviewIndex() {
       <h1>Interview Preparation</h1>
       <p style={{ color: 'var(--muted)' }}>Browse by module or by topic/technology. Each question has a short answer, a detailed answer, follow-ups, tips, and common mistakes. In self-test mode, answers stay hidden until you reveal them.</p>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-        <button className="btn secondary" onClick={() => setBrowseBy('module')}>By Module {browseBy === 'module' ? '✓' : ''}</button>
-        <button className="btn secondary" onClick={() => setBrowseBy('topic')}>By Topic / Technology {browseBy === 'topic' ? '✓' : ''}</button>
+        <button className="btn secondary" aria-pressed={browseBy === 'module'} onClick={() => setBrowseBy('module')}>By Module {browseBy === 'module' ? '✓' : ''}</button>
+        <button className="btn secondary" aria-pressed={browseBy === 'topic'} onClick={() => setBrowseBy('topic')}>By Topic / Technology {browseBy === 'topic' ? '✓' : ''}</button>
         <select className="select" style={{ width: 'auto' }} value={filterModule} onChange={e => setFilterModule(e.target.value)} aria-label="Filter by module"><option value="all">All modules</option>{MODULES.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}</select>
         <select className="select" style={{ width: 'auto' }} value={filterCategory} onChange={e => setFilterCategory(e.target.value)} aria-label="Filter by category"><option value="all">All categories</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}</select>
         <select className="select" style={{ width: 'auto' }} value={filterDifficulty} onChange={e => setFilterDifficulty(e.target.value)} aria-label="Filter by difficulty"><option value="all">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
       </div>
 
-      {filtered.length === 0 && <div className="card"><p>No interview questions match those filters yet. Interview content is generated in batches — Module 1 and core categories come first, then later modules. Try clearing a filter, or browse Learn for topics.</p></div>}
+      {filtered.length === 0 && <div className="card"><p>No interview questions match those filters. Try clearing the filters, or browse Learn for topics.</p><button className="btn secondary" onClick={() => { setFilterModule('all'); setFilterCategory('all'); setFilterDifficulty('all') }}>Clear all filters</button></div>}
 
       {browseBy === 'module' ? (
         MODULES.map(mod => {
@@ -68,8 +68,8 @@ export function InterviewIndex() {
         [...byTopic.entries()].map(([topicId, qs]) => {
           const topic = getTopic(topicId)
           return (
-            <div key={topicId} className="card" style={{ marginBottom: 12 }}>
-              <h3 style={{ marginTop: 0 }}>{topic ? topic.title : 'General'}</h3>
+            <div key={topicId} className="card" style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
+              <h3 style={{ marginTop: 0 }}>{topic ? topic.title : topicId === 'general' ? 'General' : 'Topic no longer available'}</h3>
               <ul>{qs.map(q => <li key={q.id}><Link to={`/interview/question/${q.id}`}>{q.question}</Link> — {q.category} · {q.difficulty}</li>)}</ul>
             </div>
           )
@@ -85,13 +85,15 @@ export function InterviewQuestionPage() {
   const { data, toggleList, setInterviewReview } = useApp()
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
-  if (!q) return <div><h1>Question not found</h1><p>That question id does not exist in the current interview content. It may be planned for a later batch.</p><Link to="/interview">← Back to Interview Prep</Link></div>
+  const [copyFailed, setCopyFailed] = useState(false)
+  if (!q) return <div><h1>Question not found</h1><p>That question id does not exist in the current interview content. It may have been removed, or planned for a later batch — your other data is unaffected.</p><p><Link to="/interview">← Back to Interview Prep</Link> · <Link to="/search">Search questions</Link> · <Link to="/learn">Browse Learn</Link></p></div>
   const topic = q.topicId ? getTopic(q.topicId) : undefined
   const copy = async () => {
-    try { await navigator.clipboard.writeText(`${q.question}\n\n${q.shortAnswer}`); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { setCopied(false) }
+    setCopyFailed(false)
+    try { await navigator.clipboard.writeText(`${q.question}\n\n${q.shortAnswer}`); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { setCopied(false); setCopyFailed(true) }
   }
   return (
-    <div>
+    <div style={{ overflowWrap: 'break-word' }}>
       <p><Link to="/interview">← Interview Prep</Link></p>
       <h1>{q.question}</h1>
       <p style={{ color: 'var(--muted)' }}>{q.category} · {q.difficulty} · {MODULES.find(m => m.id === q.module)?.title || q.module}</p>
@@ -99,6 +101,7 @@ export function InterviewQuestionPage() {
         <button className="btn secondary small" onClick={() => setRevealed(!revealed)}>{revealed ? <><EyeOff size={15} /> Hide answer (self-test)</> : <><Eye size={15} /> Reveal answer</>}</button>
         <button className="btn secondary small" onClick={() => toggleList('questionBookmarks', q.id)}><Bookmark size={15} /> {data.questionBookmarks.includes(q.id) ? 'Bookmarked ✓' : 'Bookmark question'}</button>
         <button className="btn secondary small" onClick={copy}><Copy size={15} /> {copied ? 'Copied!' : 'Copy question + answer'}</button>
+        {copyFailed && <span role="alert" style={{ color: 'var(--danger)', alignSelf: 'center' }}>Copy failed (clipboard blocked) — select the text manually instead.</span>}
         <button className="btn secondary small" onClick={() => setInterviewReview(q.id, 'confident')}>Mark Confident {data.interviewReview[q.id] === 'confident' ? '✓' : ''}</button>
         <button className="btn secondary small" onClick={() => setInterviewReview(q.id, 'needs-review')}>Needs review {data.interviewReview[q.id] === 'needs-review' ? '✓' : ''}</button>
       </div>

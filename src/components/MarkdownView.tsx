@@ -23,6 +23,11 @@ export function MarkdownView({ markdown }: { markdown: string }) {
             const id = slug(children)
             return <h2 id={id} data-heading={String(children ?? '')}>{children}</h2>
           },
+          // Tables otherwise overflow narrow screens: the wrapper scrolls
+          // horizontally instead of squeezing or clipping the table.
+          table: ({ children }) => (
+            <div className="table-scroll"><table>{children}</table></div>
+          ),
         }}
       >{markdown}</ReactMarkdown>
     </div>

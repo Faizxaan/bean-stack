@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-04T13:18:46.287Z",
+  "generatedAt": "2026-11-04T15:01:39.820Z",
   "tracks": [
     {
       "comingSoon": false,
@@ -1504,7 +1504,7 @@
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/java-advanced/concurrency/concurrency-basics.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "Threads, executors, synchronization, and the Java Memory Model — the concurrency fundamentals interviewers expect from experienced Java developers."
     },
     {
@@ -1826,7 +1826,7 @@
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/java-core/collections/collections-framework.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "List, Set, Map, and Queue in one mental model, how to choose between them, and the HashMap internals interviewers probe."
     },
     {
@@ -2024,7 +2024,7 @@
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/java-core/functional/streams-lambdas.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "How lambdas and method references work, how Streams transform collections declaratively, and when to use Optional — without abusing it."
     },
     {
@@ -2124,7 +2124,7 @@
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/spring-boot/data-jpa/spring-data-jpa.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "Repositories, query methods, pagination, transactions, and the N+1 problem — the JPA knowledge that shows up in almost every Java backend interview."
     },
     {
@@ -2152,7 +2152,7 @@
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/spring-boot/mvc-rest/spring-mvc-rest.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "Controllers, request mapping, validation, exception handling, and ResponseEntity — how to build clean, interview-ready REST APIs with Spring."
     },
     {

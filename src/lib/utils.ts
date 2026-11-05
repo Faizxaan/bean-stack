@@ -1,4 +1,19 @@
-import type { PracticeAttempt, TopicMeta, UserData } from '../types'
+import { EMPTY_USER_DATA, type PracticeAttempt, type ProgressStatus, type TopicMeta, type UserData } from '../types'
+
+export const MAX_NOTE_LENGTH = 10000
+export const MAX_PRACTICE_ATTEMPTS = 5000
+export const MAX_ACTIVITY_DATES = 730
+const MAX_IMPORT_ERRORS_SHOWN = 20
+
+// Local (not UTC) calendar date, YYYY-MM-DD. The old code used
+// toISOString(), so a user east of UTC studying after midnight local
+// time recorded the *previous* day and could silently lose a streak.
+export function localDateString(d = new Date()): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
 
 export function readingMinutesFromText(text: string): number {
   const words = text.replace(/```[\s\S]*?```/g, ' ').replace(/[#>*`\[\]()!-]/g, ' ').split(/\s+/).filter(Boolean).length
@@ -14,9 +29,13 @@ export function progressStats(progress: Record<string, string>, topicIds: string
 }
 
 export function accuracyByTopic(attempts: PracticeAttempt[], items: { id: string; topicId?: string }[]) {
+  if (!Array.isArray(attempts) || !Array.isArray(items)) return []
   const byTopic = new Map<string, { correct: number; total: number }>()
   const itemTopic = new Map(items.map(i => [i.id, i.topicId || 'general']))
   for (const a of attempts) {
+    // Attempts pointing at a removed/unknown item must not inflate a
+    // phantom "general" bucket; they are dropped, not counted.
+    if (!a || typeof a.itemId !== 'string' || !itemTopic.has(a.itemId)) continue
     const t = itemTopic.get(a.itemId) || 'general'
     const cur = byTopic.get(t) || { correct: 0, total: 0 }
     cur.total += 1
@@ -30,14 +49,27 @@ export function weakTopics(attempts: PracticeAttempt[], items: { id: string; top
   return accuracyByTopic(attempts, items).filter(x => x.total >= 2 && x.pct < 70).sort((a, b) => a.pct - b.pct)
 }
 
+export function isValidCalendarDate(s: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (!m) return false
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  return d.getFullYear() === Number(m[1]) && d.getMonth() === Number(m[2]) - 1 && d.getDate() === Number(m[3])
+}
+
 export function studyStreak(activityDates: string[]): number {
-  const set = new Set(activityDates)
+  if (!Array.isArray(activityDates)) return 0
+  // Only real calendar dates count; garbage strings (and impossible
+  // dates like 2026-13-40, which a bare format regex would accept)
+  // can never extend (or crash) the streak.
+  const set = new Set(activityDates.filter(d => typeof d === 'string' && isValidCalendarDate(d)))
   let streak = 0
   const d = new Date()
-  // If today has no activity yet, streak counts up to yesterday
-  const fmt = (x: Date) => x.toISOString().slice(0, 10)
-  if (!set.has(fmt(d))) d.setDate(d.getDate() - 1)
-  while (set.has(fmt(d))) {
+  d.setHours(0, 0, 0, 0)
+  // If today has no activity yet, streak counts up to yesterday.
+  // A future-dated entry (clock skew / hand-edited storage) is ignored:
+  // the walk starts at today/yesterday, never in the future.
+  if (!set.has(localDateString(d))) d.setDate(d.getDate() - 1)
+  while (set.has(localDateString(d))) {
     streak += 1
     d.setDate(d.getDate() - 1)
   }
@@ -46,48 +78,232 @@ export function studyStreak(activityDates: string[]): number {
 
 // Leitner: box 1 = 1 day, 2 = 3 days, 3 = 7 days, 4 = 14 days, 5 = 30 days
 export const LEITNER_INTERVALS = [0, 1, 3, 7, 14, 30]
+export function clampFlashcardBox(box: unknown): number {
+  if (typeof box !== 'number' || !Number.isFinite(box)) return 1
+  return Math.min(5, Math.max(1, Math.floor(box)))
+}
 export function nextDueDate(box: number, from = new Date()): string {
-  const days = LEITNER_INTERVALS[Math.min(Math.max(box, 1), 5)] || 1
+  const days = LEITNER_INTERVALS[clampFlashcardBox(box)] || 1
   const d = new Date(from)
   d.setDate(d.getDate() + days)
   return d.toISOString()
 }
 export function isDue(dueAt: string, now = new Date()): boolean {
-  return new Date(dueAt).getTime() <= now.getTime()
+  // A corrupt/missing due date must surface the card for review,
+  // never hide it forever (the old NaN <= now === false behaviour).
+  const t = new Date(dueAt).getTime()
+  if (Number.isNaN(t)) return true
+  return t <= now.getTime()
+}
+
+// Normalise for search: case, accents and stray whitespace/punctuation
+// spacing must not change whether a match is found. "cafe" matches
+// "café", "  java   spring " matches like "java spring".
+export function normalizeSearchQuery(text: string): string {
+  return (text || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 export function searchScore(query: string, haystack: string): number {
-  const q = query.toLowerCase().trim()
+  const q = normalizeSearchQuery(query)
   if (!q) return 0
-  const h = haystack.toLowerCase()
+  const h = normalizeSearchQuery(haystack)
+  if (!h) return 0
   if (h === q) return 100
   if (h.startsWith(q)) return 80
   if (h.includes(q)) return 50
-  const words = q.split(/\s+/)
+  const words = q.split(' ')
   const matched = words.filter(w => h.includes(w)).length
   return words.length ? Math.round((matched / words.length) * 40) : 0
 }
 
-export function validateImport(data: unknown, knownTopicIds: Set<string>, knownQuestionIds: Set<string>): { ok: boolean; errors: string[] } {
-  const errors: string[] = []
-  if (!data || typeof data !== 'object') return { ok: false, errors: ['Imported data is not an object'] }
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return !!v && typeof v === 'object' && !Array.isArray(v)
+}
+
+const VALID_PROGRESS: ProgressStatus[] = ['not-started', 'in-progress', 'completed']
+const VALID_THEMES = ['light', 'dark', 'system'] as const
+const VALID_FONT_SIZES = ['small', 'medium', 'large'] as const
+const VALID_WIDTHS = ['narrow', 'wide'] as const
+
+export function sanitizeSettings(value: unknown): UserData['settings'] {
+  const d = EMPTY_USER_DATA.settings
+  if (!isPlainObject(value)) return { ...d }
+  return {
+    theme: (VALID_THEMES as readonly string[]).includes(value.theme as string) ? (value.theme as UserData['settings']['theme']) : d.theme,
+    fontSize: (VALID_FONT_SIZES as readonly string[]).includes(value.fontSize as string) ? (value.fontSize as UserData['settings']['fontSize']) : d.fontSize,
+    width: (VALID_WIDTHS as readonly string[]).includes(value.width as string) ? (value.width as UserData['settings']['width']) : d.width,
+    reducedMotion: typeof value.reducedMotion === 'boolean' ? value.reducedMotion : d.reducedMotion,
+  }
+}
+
+export function filterKnownIds(ids: unknown, known: Set<string>): string[] {
+  if (!Array.isArray(ids)) return []
+  const out: string[] = []
+  for (const id of ids) {
+    if (typeof id === 'string' && known.has(id) && !out.includes(id)) out.push(id)
+  }
+  return out
+}
+
+export interface KnownIdSets {
+  topics: Set<string>
+  questions: Set<string>
+  practice: Set<string>
+}
+
+function parseableDate(v: unknown): v is string {
+  return typeof v === 'string' && !Number.isNaN(new Date(v).getTime())
+}
+
+// Lenient repair for LocalStorage (our own data, possibly corrupt,
+// hand-edited, or from an older schema): drop what cannot be trusted,
+// clamp what can, never throw, never return a half-shaped object.
+// Import is deliberately stricter — see validateImport.
+export function sanitizeUserData(data: unknown, known: KnownIdSets): UserData {
+  const base: UserData = { ...EMPTY_USER_DATA, settings: { ...EMPTY_USER_DATA.settings } }
+  if (!isPlainObject(data)) return base
   const d = data as Record<string, unknown>
-  if (d.schemaVersion !== 1 && d.schemaVersion !== undefined) errors.push(`Unsupported schema version: ${String(d.schemaVersion)}`)
+
+  if (isPlainObject(d.progress)) {
+    for (const [id, v] of Object.entries(d.progress)) {
+      if (known.topics.has(id) && (VALID_PROGRESS as string[]).includes(v as string)) base.progress[id] = v as ProgressStatus
+    }
+  }
+  base.bookmarks = filterKnownIds(d.bookmarks, known.topics)
+  base.favorites = filterKnownIds(d.favorites, known.topics)
+  base.questionBookmarks = filterKnownIds(d.questionBookmarks, known.questions)
+  base.flashcardBookmarks = filterKnownIds(d.flashcardBookmarks, known.practice)
+  if (isPlainObject(d.notes)) {
+    for (const [id, v] of Object.entries(d.notes)) {
+      if (known.topics.has(id) && typeof v === 'string' && v.trim()) base.notes[id] = v.slice(0, MAX_NOTE_LENGTH)
+    }
+  }
+  if (Array.isArray(d.practiceAttempts)) {
+    const kept = d.practiceAttempts.filter(a =>
+      isPlainObject(a) && typeof a.itemId === 'string' && typeof a.correct === 'boolean' &&
+      (known.practice.size === 0 || known.practice.has(a.itemId)),
+    ) as PracticeAttempt[]
+    base.practiceAttempts = kept.slice(-MAX_PRACTICE_ATTEMPTS)
+  }
+  if (isPlainObject(d.flashcardStates)) {
+    for (const [id, v] of Object.entries(d.flashcardStates)) {
+      if (known.practice.size > 0 && !known.practice.has(id)) continue
+      if (!isPlainObject(v)) continue
+      const box = clampFlashcardBox(v.box)
+      base.flashcardStates[id] = {
+        box,
+        // An unreadable due date means "due now", not "due in a box
+        // interval" — otherwise a corrupt card could hide for 30 days.
+        dueAt: parseableDate(v.dueAt) ? (v.dueAt as string) : new Date().toISOString(),
+        lastReviewedAt: parseableDate(v.lastReviewedAt) ? (v.lastReviewedAt as string) : undefined,
+      }
+    }
+  }
+  if (isPlainObject(d.interviewReview)) {
+    for (const [id, v] of Object.entries(d.interviewReview)) {
+      if (known.questions.has(id) && (v === 'confident' || v === 'needs-review')) base.interviewReview[id] = v
+    }
+  }
+  base.recentlyViewed = filterKnownIds(d.recentlyViewed, known.topics).slice(0, 20)
+  if (Array.isArray(d.activityDates)) {
+    const dates = d.activityDates.filter(x => typeof x === 'string' && isValidCalendarDate(x))
+    base.activityDates = [...new Set(dates)].slice(-MAX_ACTIVITY_DATES)
+  }
+  base.interviewDate = parseableDate(d.interviewDate) ? (d.interviewDate as string) : null
+  base.lastExportedAt = parseableDate(d.lastExportedAt) ? (d.lastExportedAt as string) : null
+  base.settings = sanitizeSettings(d.settings)
+  return base
+}
+
+export function validateImport(
+  data: unknown,
+  knownTopicIds: Set<string>,
+  knownQuestionIds: Set<string>,
+  knownPracticeIds: Set<string> = new Set(),
+): { ok: boolean; errors: string[]; warnings: string[] } {
+  const errors: string[] = []
+  const warnings: string[] = []
+  if (!isPlainObject(data)) return { ok: false, errors: ['Imported data is not an object (it must be a JSON object, not an array or plain text)'], warnings }
+  const d = data as Record<string, unknown>
+  if (d.schemaVersion !== 1 && d.schemaVersion !== undefined) errors.push(`Unsupported schema version: ${String(d.schemaVersion)} — this file was made for a different version of Beanstack`)
   const checkIds = (label: string, list: unknown, known: Set<string>) => {
     if (list === undefined) return
     if (!Array.isArray(list)) { errors.push(`${label} must be an array`); return }
-    for (const id of list) if (typeof id === 'string' && !known.has(id)) errors.push(`${label} references unknown id: ${id}`)
+    const seen = new Set<string>()
+    for (const id of list) {
+      if (typeof id !== 'string') { errors.push(`${label} contains a non-string entry`); continue }
+      if (seen.has(id)) warnings.push(`${label} contains a duplicate id (${id}) — duplicates will be removed on import`)
+      seen.add(id)
+      if (known.size > 0 && !known.has(id)) errors.push(`${label} references unknown id: ${id}`)
+    }
   }
-  if (d.progress && typeof d.progress === 'object') {
-    for (const id of Object.keys(d.progress as Record<string, unknown>)) if (!knownTopicIds.has(id)) errors.push(`progress references unknown topic: ${id}`)
+  if (d.progress !== undefined) {
+    if (!isPlainObject(d.progress)) errors.push('progress must be an object')
+    else for (const [id, v] of Object.entries(d.progress)) {
+      if (!knownTopicIds.has(id)) errors.push(`progress references unknown topic: ${id}`)
+      else if (!(VALID_PROGRESS as string[]).includes(v as string)) errors.push(`progress for ${id} has an invalid status: ${String(v)}`)
+    }
   }
   checkIds('bookmarks', d.bookmarks, knownTopicIds)
   checkIds('favorites', d.favorites, knownTopicIds)
   checkIds('questionBookmarks', d.questionBookmarks, knownQuestionIds)
-  if (d.notes && typeof d.notes === 'object') {
-    for (const id of Object.keys(d.notes as Record<string, unknown>)) if (!knownTopicIds.has(id)) errors.push(`notes references unknown topic: ${id}`)
+  checkIds('flashcardBookmarks', d.flashcardBookmarks, knownPracticeIds)
+  checkIds('recentlyViewed', d.recentlyViewed, knownTopicIds)
+  if (d.notes !== undefined) {
+    if (!isPlainObject(d.notes)) errors.push('notes must be an object')
+    else for (const [id, v] of Object.entries(d.notes)) {
+      if (!knownTopicIds.has(id)) errors.push(`notes references unknown topic: ${id}`)
+      else if (typeof v !== 'string') errors.push(`notes for ${id} is not text`)
+      else if (v.length > MAX_NOTE_LENGTH) warnings.push(`Note for ${id} is very long (${v.length} characters) — it will be trimmed to ${MAX_NOTE_LENGTH} characters on import`)
+    }
   }
-  return { ok: errors.length === 0, errors }
+  if (d.practiceAttempts !== undefined) {
+    if (!Array.isArray(d.practiceAttempts)) errors.push('practiceAttempts must be an array')
+    else for (const a of d.practiceAttempts) {
+      if (!isPlainObject(a) || typeof a.itemId !== 'string' || typeof a.correct !== 'boolean') { errors.push('practiceAttempts contains a malformed entry (needs itemId and correct)'); continue }
+      if (knownPracticeIds.size > 0 && !knownPracticeIds.has(a.itemId)) errors.push(`practiceAttempts references unknown practice item: ${a.itemId}`)
+    }
+  }
+  if (d.flashcardStates !== undefined) {
+    if (!isPlainObject(d.flashcardStates)) errors.push('flashcardStates must be an object')
+    else for (const [id, v] of Object.entries(d.flashcardStates)) {
+      if (knownPracticeIds.size > 0 && !knownPracticeIds.has(id)) errors.push(`flashcardStates references unknown practice item: ${id}`)
+      else if (!isPlainObject(v) || typeof v.box !== 'number' || v.box < 1 || v.box > 5 || !parseableDate(v.dueAt)) errors.push(`flashcardStates for ${id} is malformed (box must be 1–5 with a valid due date)`)
+    }
+  }
+  if (d.interviewReview !== undefined) {
+    if (!isPlainObject(d.interviewReview)) errors.push('interviewReview must be an object')
+    else for (const [id, v] of Object.entries(d.interviewReview)) {
+      if (!knownQuestionIds.has(id)) errors.push(`interviewReview references unknown question: ${id}`)
+      else if (v !== 'confident' && v !== 'needs-review') errors.push(`interviewReview for ${id} has an invalid value: ${String(v)}`)
+    }
+  }
+  if (d.activityDates !== undefined) {
+    if (!Array.isArray(d.activityDates)) errors.push('activityDates must be an array')
+    else for (const x of d.activityDates) if (typeof x !== 'string' || !isValidCalendarDate(x)) errors.push(`activityDates contains an invalid date: ${String(x)}`)
+  }
+  if (d.settings !== undefined) {
+    if (!isPlainObject(d.settings)) errors.push('settings must be an object')
+    else {
+      const s = d.settings
+      if (s.theme !== undefined && !(VALID_THEMES as readonly string[]).includes(s.theme as string)) errors.push(`settings.theme is invalid: ${String(s.theme)}`)
+      if (s.fontSize !== undefined && !(VALID_FONT_SIZES as readonly string[]).includes(s.fontSize as string)) errors.push(`settings.fontSize is invalid: ${String(s.fontSize)}`)
+      if (s.width !== undefined && !(VALID_WIDTHS as readonly string[]).includes(s.width as string)) errors.push(`settings.width is invalid: ${String(s.width)}`)
+      if (s.reducedMotion !== undefined && typeof s.reducedMotion !== 'boolean') errors.push('settings.reducedMotion must be true or false')
+    }
+  }
+  if (d.interviewDate !== undefined && d.interviewDate !== null && !parseableDate(d.interviewDate)) errors.push('interviewDate is not a valid date')
+  if (d.lastExportedAt !== undefined && d.lastExportedAt !== null && !parseableDate(d.lastExportedAt)) errors.push('lastExportedAt is not a valid date')
+  return { ok: errors.length === 0, errors, warnings }
+}
+
+export function truncateImportErrors(errors: string[]): { shown: string[]; hidden: number } {
+  return { shown: errors.slice(0, MAX_IMPORT_ERRORS_SHOWN), hidden: Math.max(0, errors.length - MAX_IMPORT_ERRORS_SHOWN) }
 }
 
 export function safeJsonParse<T>(text: string | null, fallback: T): T {
@@ -96,7 +312,7 @@ export function safeJsonParse<T>(text: string | null, fallback: T): T {
 }
 
 export function todayIso(): string {
-  return new Date().toISOString().slice(0, 10)
+  return localDateString()
 }
 
 export function topicUrl(topic: TopicMeta): string {
@@ -105,7 +321,9 @@ export function topicUrl(topic: TopicMeta): string {
 
 export function formatDate(iso: string | null): string {
   if (!iso) return '—'
-  try { return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) } catch { return iso }
+  const t = new Date(iso).getTime()
+  if (Number.isNaN(t)) return '—'
+  try { return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) } catch { return '—' }
 }
 
 export type { UserData }

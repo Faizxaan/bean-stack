@@ -16,7 +16,7 @@ summary: "How Java applications really talk to SQL databases: JDBC, connection p
 
 ## Overview
 
-A Java developer rarely writes raw SQL all day, but the database is never far away. JDBC is the low-level API, connection pools such as HikariCP lend connections cheaply, and JPA with Hibernate maps objects to tables so most queries are derived or written in JPQL. The catch is that every abstraction leaks: an innocent-looking loop over entities can fire hundreds of queries, a lazy collection can explode outside a transaction, and a missing transaction boundary can leave half-written data.
+A Java developer rarely writes raw SQL all day, but the database is never far away. JDBC is the standard low-level way Java talks to a database, connection pools such as HikariCP keep a set of ready database connections to lend out cheaply instead of opening a new one each time, and JPA with Hibernate maps objects to tables so most queries are derived or written in JPQL (a query language over your entity classes, rather than over raw tables). The catch is that every abstraction leaks: an innocent-looking loop over entities can fire hundreds of queries, a lazy collection can explode outside a transaction, and a missing transaction boundary can leave half-written data.
 
 This topic connects the SQL you already know to the Java stack that runs it, so you can spot those leaks, fix them, and explain them in interviews.
 

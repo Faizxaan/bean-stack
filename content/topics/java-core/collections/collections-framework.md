@@ -16,7 +16,7 @@ summary: List, Set, Map, and Queue in one mental model, how to choose between th
 
 ## Overview
 
-The Collections Framework is a set of interfaces and implementations for storing groups of objects. The key is to think in interfaces first — `List`, `Set`, `Map`, `Queue` — and choose an implementation based on the behaviour you need: ordering, uniqueness, lookup speed, or thread safety.
+Think of the Collections Framework as Java's toolbox for holding groups of things: a shopping list, a set of unique tags, or a phone book that looks up a name to find a number. An interface is the promise about what a container does — a `List` keeps order, a `Set` forbids duplicates, a `Map` pairs keys with values, a `Queue` serves in order — and an implementation is the particular container that keeps that promise. The key is to think in interfaces first, and choose an implementation based on the behaviour you need: ordering, uniqueness, lookup speed, or thread safety.
 
 ## Theory
 
