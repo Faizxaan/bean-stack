@@ -1,1 +1,818 @@
-[{"category":"Java","detailedAnswer":"JDK is for development and includes the compiler and tools plus the JRE. JRE is for running Java and includes the JVM plus libraries. JVM is the engine that loads and executes bytecode, managing memory and garbage collection. Bytecode is platform-independent; the JVM is platform-specific, which is why the same bytecode runs on different operating systems with a JVM for each.","difficulty":"Easy","followUps":["Is Java compiled or interpreted?","What does the bytecode verifier do?"],"id":"iq-jdk-jre-jvm","module":"module-1","question":"What is the difference between JDK, JRE, and JVM?","relatedTopics":["jdk-jre-jvm"],"shortAnswer":"JDK is for developing (compiler + JRE), JRE is for running (JVM + libraries), and JVM is the engine that executes bytecode.","tips":["Draw the nesting: JDK contains JRE, JRE contains JVM.","Mention bytecode portability explicitly."],"title":"JDK, JRE, JVM","topicId":"jdk-jre-jvm"},{"category":"Java","detailedAnswer":"String is immutable: operations like toUpperCase or concat return a new String instead of changing the original. This makes strings safe to share, safe as map keys (hashCode can be cached), and thread-safe. String literals are interned in the string pool, so two equal literals may share one object — but you should still compare contents with equals, not ==, which compares references.","difficulty":"Easy","followUps":["When would you use StringBuilder instead?","Why is immutability important for HashMap keys?"],"id":"iq-string-immutable","module":"module-1","question":"Why is String immutable in Java?","relatedTopics":["strings"],"shortAnswer":"For security, thread safety, hashCode caching, and safe sharing — operations on a String return a new String instead of modifying it.","tips":["Give a concrete example: a string used as a map key must not change after insertion."],"title":"String immutability","topicId":"strings"},{"category":"Collections","detailedAnswer":"A HashMap stores entries in buckets chosen by the key's hash. In Java 8+, a bucket starts as a linked list and converts to a balanced tree when collisions grow (8 entries with at least 64 buckets), keeping worst-case lookup from degrading linearly. Equal keys must have equal hash codes, and a key's hash code must not change while it is in the map — hence immutable keys are preferred. HashMap allows one null key; ConcurrentHashMap allows neither null keys nor null values.","difficulty":"Medium","followUps":["What happens when two keys collide?","Why must equals and hashCode be consistent?"],"id":"iq-hashmap-internals","module":"module-1","question":"How does HashMap work internally?","relatedTopics":["collections-framework"],"shortAnswer":"Entries go into buckets by hash; buckets treeify under collision pressure in Java 8+, and keys must keep equals/hashCode consistent.","tips":["Mention treeification threshold and the immutable-key rule — interviewers listen for both."],"title":"HashMap internals","topicId":"collections-framework"},{"category":"Streams","detailedAnswer":"Intermediate operations (filter, map, sorted, distinct) are lazy and return a new stream; they do nothing until a terminal operation (collect, forEach, reduce, findFirst) runs. A stream is consumed by its terminal operation and cannot be reused — reusing it throws IllegalStateException. Short-circuiting terminals like findFirst or anyMatch can stop processing early.","difficulty":"Medium","followUps":["When would you avoid parallel streams?","What is the difference between map and flatMap?"],"id":"iq-streams-intermediate-terminal","module":"module-1","question":"What is the difference between intermediate and terminal stream operations?","relatedTopics":["streams-lambdas"],"shortAnswer":"Intermediate operations are lazy and return a stream; terminal operations trigger execution and consume the stream.","tips":["Name one example of each, and mention that reuse throws IllegalStateException."],"title":"Stream operations","topicId":"streams-lambdas"},{"category":"Spring Framework","detailedAnswer":"Inversion of Control means the Spring container creates objects (beans) and supplies their dependencies, instead of each class creating its own with new. Dependency Injection is how it does that, preferably through constructors. Constructor injection makes dependencies explicit, required, and final, and makes testing easy because you can pass a mock directly. Field injection hides dependencies and is discouraged in new code.","difficulty":"Easy","followUps":["What is the difference between @Component and @Bean?","What happens when a prototype bean is injected into a singleton?"],"id":"iq-spring-ioc-di","module":"module-1","question":"What is Inversion of Control, and why is constructor injection preferred?","relatedTopics":["spring-ioc-di"],"shortAnswer":"IoC means the container creates and wires beans; constructor injection is preferred because dependencies are explicit, required, final, and easy to test.","tips":["Contrast with field injection explicitly — interviewers expect that comparison."],"title":"Spring IoC and DI","topicId":"spring-ioc-di"},{"category":"Spring Boot","detailedAnswer":"Auto-configuration classes are guarded by conditions — for example @ConditionalOnClass (a class is on the classpath), @ConditionalOnMissingBean (no user bean of that type exists), and @ConditionalOnProperty. If you define your own bean of the same type, auto-configuration backs off for that bean. That is how Spring Boot provides sensible defaults that you can override. The --debug report shows which auto-configurations applied and why others did not.","difficulty":"Medium","followUps":["What is a starter?","How do you debug a missing auto-configured bean?"],"id":"iq-spring-boot-autoconfig","module":"module-1","question":"How does Spring Boot auto-configuration work, and how do you override it?","relatedTopics":["spring-boot-autoconfig"],"shortAnswer":"Auto-configuration applies conditionally (classpath, missing bean, property); defining your own bean of the same type makes it back off.","tips":["Mention @ConditionalOnMissingBean by name — it is the mechanism behind 'your bean wins'."],"title":"Spring Boot auto-configuration","topicId":"spring-boot-autoconfig"},{"category":"Spring Data JPA","detailedAnswer":"Loading N parent entities and then lazily loading a collection for each one produces 1 + N queries — the N+1 problem. Fix it with a fetch join (JOIN FETCH), an @EntityGraph, or a DTO projection that fetches exactly what is needed. Do not fix it by making everything EAGER, which loads data you may never use. Also, accessing a lazy collection after the transaction closes throws LazyInitializationException.","difficulty":"Hard","followUps":["What is the difference between lazy and eager loading?","Why does @Transactional not work on a private method?"],"id":"iq-jpa-nplus1","module":"module-1","question":"What is the N+1 problem in JPA, and how do you fix it?","relatedTopics":["spring-data-jpa"],"shortAnswer":"1 query for parents plus N queries for children; fix with JOIN FETCH, @EntityGraph, or a DTO projection — not blanket EAGER.","tips":["Name the fix and the anti-pattern (blanket EAGER) in the same answer."],"title":"JPA N+1 problem","topicId":"spring-data-jpa"},{"category":"Concurrency","detailedAnswer":"synchronized provides mutual exclusion and visibility: only one thread holds a given monitor at a time, and writes before releasing the lock are visible to the next thread acquiring it. volatile provides visibility only: writes are visible to other threads, but compound actions like count++ (read-modify-write) are still not atomic. For atomic single-variable updates, use AtomicInteger and friends, or a lock.","difficulty":"Medium","followUps":["Why is a plain counter unsafe across threads?","What is a happens-before relationship?"],"id":"iq-synchronized-volatile","module":"module-1","question":"What is the difference between synchronized and volatile?","relatedTopics":["concurrency-basics"],"shortAnswer":"synchronized gives exclusion plus visibility; volatile gives visibility only, not atomicity for compound actions.","tips":["Use count++ as the concrete counterexample for volatile."],"title":"synchronized vs volatile","topicId":"concurrency-basics"}]
+[
+  {
+    "category": "Java",
+    "detailedAnswer": "JDK is for development and includes the compiler and tools plus the JRE. JRE is for running Java and includes the JVM plus libraries. JVM is the engine that loads and executes bytecode, managing memory and garbage collection. Bytecode is platform-independent; the JVM is platform-specific, which is why the same bytecode runs on different operating systems with a JVM for each.",
+    "difficulty": "Easy",
+    "followUps": [
+      "Is Java compiled or interpreted?",
+      "What does the bytecode verifier do?"
+    ],
+    "id": "iq-jdk-jre-jvm",
+    "module": "module-1",
+    "question": "What is the difference between JDK, JRE, and JVM?",
+    "relatedTopics": [
+      "jdk-jre-jvm"
+    ],
+    "shortAnswer": "JDK is for developing (compiler + JRE), JRE is for running (JVM + libraries), and JVM is the engine that executes bytecode.",
+    "tips": [
+      "Draw the nesting: JDK contains JRE, JRE contains JVM.",
+      "Mention bytecode portability explicitly."
+    ],
+    "title": "JDK, JRE, JVM",
+    "topicId": "jdk-jre-jvm"
+  },
+  {
+    "category": "Java",
+    "detailedAnswer": "String is immutable: operations like toUpperCase or concat return a new String instead of changing the original. This makes strings safe to share, safe as map keys (hashCode can be cached), and thread-safe. String literals are interned in the string pool, so two equal literals may share one object — but you should still compare contents with equals, not ==, which compares references.",
+    "difficulty": "Easy",
+    "followUps": [
+      "When would you use StringBuilder instead?",
+      "Why is immutability important for HashMap keys?"
+    ],
+    "id": "iq-string-immutable",
+    "module": "module-1",
+    "question": "Why is String immutable in Java?",
+    "relatedTopics": [
+      "strings"
+    ],
+    "shortAnswer": "For security, thread safety, hashCode caching, and safe sharing — operations on a String return a new String instead of modifying it.",
+    "tips": [
+      "Give a concrete example: a string used as a map key must not change after insertion."
+    ],
+    "title": "String immutability",
+    "topicId": "strings"
+  },
+  {
+    "category": "Collections",
+    "detailedAnswer": "A HashMap stores entries in buckets chosen by the key's hash. In Java 8+, a bucket starts as a linked list and converts to a balanced tree when collisions grow (8 entries with at least 64 buckets), keeping worst-case lookup from degrading linearly. Equal keys must have equal hash codes, and a key's hash code must not change while it is in the map — hence immutable keys are preferred. HashMap allows one null key; ConcurrentHashMap allows neither null keys nor null values.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What happens when two keys collide?",
+      "Why must equals and hashCode be consistent?"
+    ],
+    "id": "iq-hashmap-internals",
+    "module": "module-1",
+    "question": "How does HashMap work internally?",
+    "relatedTopics": [
+      "collections-framework"
+    ],
+    "shortAnswer": "Entries go into buckets by hash; buckets treeify under collision pressure in Java 8+, and keys must keep equals/hashCode consistent.",
+    "tips": [
+      "Mention treeification threshold and the immutable-key rule — interviewers listen for both."
+    ],
+    "title": "HashMap internals",
+    "topicId": "collections-framework"
+  },
+  {
+    "category": "Streams",
+    "detailedAnswer": "Intermediate operations (filter, map, sorted, distinct) are lazy and return a new stream; they do nothing until a terminal operation (collect, forEach, reduce, findFirst) runs. A stream is consumed by its terminal operation and cannot be reused — reusing it throws IllegalStateException. Short-circuiting terminals like findFirst or anyMatch can stop processing early.",
+    "difficulty": "Medium",
+    "followUps": [
+      "When would you avoid parallel streams?",
+      "What is the difference between map and flatMap?"
+    ],
+    "id": "iq-streams-intermediate-terminal",
+    "module": "module-1",
+    "question": "What is the difference between intermediate and terminal stream operations?",
+    "relatedTopics": [
+      "streams-lambdas"
+    ],
+    "shortAnswer": "Intermediate operations are lazy and return a stream; terminal operations trigger execution and consume the stream.",
+    "tips": [
+      "Name one example of each, and mention that reuse throws IllegalStateException."
+    ],
+    "title": "Stream operations",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Spring Framework",
+    "detailedAnswer": "Inversion of Control means the Spring container creates objects (beans) and supplies their dependencies, instead of each class creating its own with new. Dependency Injection is how it does that, preferably through constructors. Constructor injection makes dependencies explicit, required, and final, and makes testing easy because you can pass a mock directly. Field injection hides dependencies and is discouraged in new code.",
+    "difficulty": "Easy",
+    "followUps": [
+      "What is the difference between @Component and @Bean?",
+      "What happens when a prototype bean is injected into a singleton?"
+    ],
+    "id": "iq-spring-ioc-di",
+    "module": "module-1",
+    "question": "What is Inversion of Control, and why is constructor injection preferred?",
+    "relatedTopics": [
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "IoC means the container creates and wires beans; constructor injection is preferred because dependencies are explicit, required, final, and easy to test.",
+    "tips": [
+      "Contrast with field injection explicitly — interviewers expect that comparison."
+    ],
+    "title": "Spring IoC and DI",
+    "topicId": "spring-ioc-di"
+  },
+  {
+    "category": "Spring Boot",
+    "detailedAnswer": "Auto-configuration classes are guarded by conditions — for example @ConditionalOnClass (a class is on the classpath), @ConditionalOnMissingBean (no user bean of that type exists), and @ConditionalOnProperty. If you define your own bean of the same type, auto-configuration backs off for that bean. That is how Spring Boot provides sensible defaults that you can override. The --debug report shows which auto-configurations applied and why others did not.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What is a starter?",
+      "How do you debug a missing auto-configured bean?"
+    ],
+    "id": "iq-spring-boot-autoconfig",
+    "module": "module-1",
+    "question": "How does Spring Boot auto-configuration work, and how do you override it?",
+    "relatedTopics": [
+      "spring-boot-autoconfig"
+    ],
+    "shortAnswer": "Auto-configuration applies conditionally (classpath, missing bean, property); defining your own bean of the same type makes it back off.",
+    "tips": [
+      "Mention @ConditionalOnMissingBean by name — it is the mechanism behind 'your bean wins'."
+    ],
+    "title": "Spring Boot auto-configuration",
+    "topicId": "spring-boot-autoconfig"
+  },
+  {
+    "category": "Spring Data JPA",
+    "detailedAnswer": "Loading N parent entities and then lazily loading a collection for each one produces 1 + N queries — the N+1 problem. Fix it with a fetch join (JOIN FETCH), an @EntityGraph, or a DTO projection that fetches exactly what is needed. Do not fix it by making everything EAGER, which loads data you may never use. Also, accessing a lazy collection after the transaction closes throws LazyInitializationException.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What is the difference between lazy and eager loading?",
+      "Why does @Transactional not work on a private method?"
+    ],
+    "id": "iq-jpa-nplus1",
+    "module": "module-1",
+    "question": "What is the N+1 problem in JPA, and how do you fix it?",
+    "relatedTopics": [
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "1 query for parents plus N queries for children; fix with JOIN FETCH, @EntityGraph, or a DTO projection — not blanket EAGER.",
+    "tips": [
+      "Name the fix and the anti-pattern (blanket EAGER) in the same answer."
+    ],
+    "title": "JPA N+1 problem",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Concurrency",
+    "detailedAnswer": "synchronized provides mutual exclusion and visibility: only one thread holds a given monitor at a time, and writes before releasing the lock are visible to the next thread acquiring it. volatile provides visibility only: writes are visible to other threads, but compound actions like count++ (read-modify-write) are still not atomic. For atomic single-variable updates, use AtomicInteger and friends, or a lock.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why is a plain counter unsafe across threads?",
+      "What is a happens-before relationship?"
+    ],
+    "id": "iq-synchronized-volatile",
+    "module": "module-1",
+    "question": "What is the difference between synchronized and volatile?",
+    "relatedTopics": [
+      "concurrency-basics"
+    ],
+    "shortAnswer": "synchronized gives exclusion plus visibility; volatile gives visibility only, not atomicity for compound actions.",
+    "tips": [
+      "Use count++ as the concrete counterexample for volatile."
+    ],
+    "title": "synchronized vs volatile",
+    "topicId": "concurrency-basics"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Reaching for StringBuilder.reverse() when the question forbids built-in helpers.",
+      "Forgetting that strings are immutable, so you must build a new string rather than editing in place.",
+      "Off-by-one errors: using right = chars.length instead of chars.length - 1."
+    ],
+    "detailedAnswer": "Because a String cannot be changed in place, convert it to a char array and swap characters from the two ends moving towards the middle. When the two pointers meet, the array holds the reversed text, and you build a new String from it.\n\n```java\npublic String reverse(String input) {\n    char[] chars = input.toCharArray();\n    int left = 0, right = chars.length - 1;\n    while (left < right) {\n        char temp = chars[left];\n        chars[left] = chars[right];\n        chars[right] = temp;\n        left++;\n        right--;\n    }\n    return new String(chars);\n}\n```\n\nThis runs in O(n) time and O(n) extra space for the char array. In real code you would just use new StringBuilder(input).reverse().toString(), but interviewers ask for the manual version to check that you can work with indexes and swapping. Mention the empty-string and single-character cases: both return unchanged, with no special handling needed.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How would you reverse only the words in a sentence, keeping the word order?",
+      "What changes if the string can contain characters outside the basic multilingual plane, like emoji?"
+    ],
+    "id": "iq-m1src-reverse-string",
+    "module": "module-1",
+    "question": "Write a Java method that reverses a string without using any built-in reverse helper.",
+    "relatedTopics": [
+      "dsa-arrays-strings"
+    ],
+    "shortAnswer": "Turn the string into a char array, swap characters from both ends towards the middle with two pointers, then build a new String from the array.",
+    "tips": [
+      "Say the time and space cost out loud: O(n) time, O(n) space for the array.",
+      "Name the real-world shortcut (StringBuilder.reverse) even though the question forbids it — it shows you know both."
+    ],
+    "title": "Coding: reverse a string",
+    "topicId": "strings"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Counting 'Java' and 'java' as different words because the case was not normalised.",
+      "Using containsKey plus get in two lookups instead of getOrDefault or merge.",
+      "Forgetting that splitting an empty string returns an array with one empty string."
+    ],
+    "detailedAnswer": "Split the sentence into words, then count each word in a HashMap. getOrDefault keeps the counting to one line: look up the current count (0 if the word is new), add one, and store it back.\n\n```java\npublic Map<String, Integer> countWords(String sentence) {\n    Map<String, Integer> counts = new HashMap<>();\n    for (String word : sentence.toLowerCase().split(\"\\\\s+\")) {\n        counts.put(word, counts.getOrDefault(word, 0) + 1);\n    }\n    return counts;\n}\n```\n\nFor the sentence \"java is fun and java is powerful\", this returns {java=2, is=2, fun=1, and=1, powerful=1}. Lowercasing first stops 'Java' and 'java' being counted separately. Note the limits: punctuation stays attached to words ('fun,' is not 'fun'), so a stricter version would strip punctuation first, and the map does not preserve the order words first appeared in — use a LinkedHashMap if order matters.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How would you find the most frequent word from the map?",
+      "How would you do the same counting with a stream and Collectors.groupingBy?"
+    ],
+    "id": "iq-m1src-count-words-hashmap",
+    "module": "module-1",
+    "question": "Write a Java method that counts how many times each word appears in a sentence, using a HashMap.",
+    "relatedTopics": [
+      "streams-lambdas"
+    ],
+    "shortAnswer": "Split the sentence into words and count each one in a HashMap with getOrDefault(word, 0) + 1.",
+    "tips": [
+      "Mention the O(n) time cost and why a map is the right structure: one pass, constant-time lookups.",
+      "Volunteer the LinkedHashMap variant if the interviewer asks about keeping word order."
+    ],
+    "title": "Coding: count words with a HashMap",
+    "topicId": "collections-framework"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Comparing with == on strings instead of comparing characters.",
+      "Reversing the whole string first and then comparing — it works, but it uses extra memory for no reason.",
+      "Forgetting case: 'Madam' fails a plain comparison unless you normalise case first."
+    ],
+    "detailedAnswer": "A palindrome reads the same forwards and backwards, so compare characters from both ends moving towards the middle. The first mismatch means it is not a palindrome; if the pointers meet with no mismatch, it is one.\n\n```java\npublic boolean isPalindrome(String input) {\n    int left = 0, right = input.length() - 1;\n    while (left < right) {\n        if (input.charAt(left) != input.charAt(right)) {\n            return false;\n        }\n        left++;\n        right--;\n    }\n    return true;\n}\n```\n\nThis is O(n) time and O(1) extra space. For a case-insensitive check, compare Character.toLowerCase on each side instead of the raw characters. The same two-pointer idea works for a number: convert it to a string first, or reverse its digits arithmetically and compare with the original — but watch out for overflow and for negative numbers, which are never palindromes because of the minus sign.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How would you check a sentence palindrome that ignores spaces and punctuation, like 'A man, a plan, a canal: Panama'?",
+      "How would you test a number for being a palindrome without converting it to a string?"
+    ],
+    "id": "iq-m1src-palindrome",
+    "module": "module-1",
+    "question": "Write a Java method that checks whether a string is a palindrome.",
+    "relatedTopics": [
+      "dsa-arrays-strings"
+    ],
+    "shortAnswer": "Compare characters from both ends towards the middle; the first mismatch means it is not a palindrome.",
+    "tips": [
+      "State the complexity: O(n) time, O(1) extra space — better than reversing and comparing.",
+      "Mention the case-insensitive variant before the interviewer asks."
+    ],
+    "title": "Coding: palindrome check",
+    "topicId": "strings"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Sorting the array first: correct, but O(n log n) when one pass is enough.",
+      "Treating the second element of a sorted array as the answer, which fails when the largest value appears twice.",
+      "Using Integer.MIN_VALUE as a sentinel for 'not found yet' — it breaks if the array genuinely contains that value."
+    ],
+    "detailedAnswer": "Walk the array once, keeping track of the largest value seen and the second-largest distinct value. When a number beats the largest, the old largest becomes the second-largest; when it sits between the two, it becomes the new second-largest. Duplicates of the largest are ignored, so [9, 9, 7] gives 7, not 9.\n\n```java\npublic int secondHighest(int[] nums) {\n    Integer first = null, second = null;\n    for (int n : nums) {\n        if (first == null || n > first) {\n            second = first;\n            first = n;\n        } else if (n != first && (second == null || n > second)) {\n            second = n;\n        }\n    }\n    if (second == null) {\n        throw new IllegalArgumentException(\"Need at least two distinct numbers\");\n    }\n    return second;\n}\n```\n\nThis is O(n) time and O(1) space. The null-based tracking avoids sentinel-value bugs. If the input is guaranteed to have two distinct values you can drop the exception, but naming the edge case (fewer than two distinct numbers) is exactly what interviewers want to hear.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How would you find the third-highest distinct number?",
+      "How would you solve it with a stream, and what does that cost compared with the single pass?"
+    ],
+    "id": "iq-m1src-second-highest",
+    "module": "module-1",
+    "question": "Write a Java method that finds the second-highest distinct number in an array, in a single pass.",
+    "relatedTopics": [
+      "collections-framework"
+    ],
+    "shortAnswer": "One pass tracking the largest and second-largest distinct values; duplicates of the largest are ignored, and fewer than two distinct values is an error.",
+    "tips": [
+      "Walk through [9, 9, 7] by hand — it proves you handled the duplicate-largest trap.",
+      "Say why you did not sort: O(n) beats O(n log n) here."
+    ],
+    "title": "Coding: second-highest number",
+    "topicId": "dsa-arrays-strings"
+  },
+  {
+    "category": "Streams",
+    "commonMistakes": [
+      "Writing a manual loop with a map and if-else when groupingBy does the same thing in one line.",
+      "Forgetting that groupingBy returns a Map, so you cannot call stream operations on the result directly.",
+      "Using groupingBy without a downstream collector when you only need counts — groupingBy(key, counting()) is the idiomatic form."
+    ],
+    "detailedAnswer": "Collectors.groupingBy sorts stream elements into buckets by a key you choose, and returns a Map from key to list. Add a downstream collector to transform each bucket — counting() turns each list into a count, and mapping() or summingInt() can summarise it another way.\n\n```java\n// How many employees are in each department?\nMap<String, Long> byDepartment = employees.stream()\n    .collect(Collectors.groupingBy(Employee::department, Collectors.counting()));\n\n// Group words by their length\nMap<Integer, List<String>> byLength = words.stream()\n    .collect(Collectors.groupingBy(String::length));\n```\n\nThe plain one-argument form groups into lists; the two-argument form applies the downstream collector to each group. groupingBy is an eager terminal operation — it consumes the whole stream and builds the map — and the default map is a HashMap, so groups come back in no particular order. If you need sorted keys, pass a TreeMap supplier with the three-argument overload.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How would you find the department with the most employees from the grouped map?",
+      "What is the difference between groupingBy and partitioningBy?"
+    ],
+    "id": "iq-m1src-streams-groupingby",
+    "module": "module-1",
+    "question": "How does Collectors.groupingBy work, and how would you use it to count items per group?",
+    "relatedTopics": [
+      "collections-framework"
+    ],
+    "shortAnswer": "groupingBy buckets stream elements into a Map by a key function; a downstream collector like counting() summarises each bucket instead of keeping a list.",
+    "tips": [
+      "Give two examples: grouping into lists and grouping with counting() — interviewers often ask for the second.",
+      "Mention that the result map is a HashMap by default, so group order is not guaranteed."
+    ],
+    "title": "Streams: groupingBy",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Streams",
+    "commonMistakes": [
+      "Using map on a list of lists and ending up with Stream<List<String>> instead of Stream<String>.",
+      "Forgetting that flatMap needs a function returning a stream — List::stream is the usual one.",
+      "Calling flatMap on a stream of arrays without Arrays.stream."
+    ],
+    "detailedAnswer": "map transforms each element one-to-one, so mapping a list of lists gives you a stream of lists. flatMap transforms each element into a stream and then flattens all those streams into one, which is what you want when each element itself holds several items.\n\n```java\nList<List<String>> nested = List.of(\n    List.of(\"a\", \"b\"), List.of(\"b\", \"c\"), List.of(\"d\"));\n\nList<String> flat = nested.stream()\n    .flatMap(List::stream)\n    .distinct()\n    .collect(Collectors.toList());\n// [a, b, c, d]\n```\n\nThe same pattern flattens other nested shapes: Optional::stream flattens a stream of Optionals, dropping empty ones, and Arrays::stream flattens a stream of arrays. A useful way to remember it: use map when one input gives one output, and flatMap when one input gives zero or more outputs.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How would you flatten a stream of Optionals and drop the empty ones?",
+      "What is the difference between flatMap and map followed by reduce?"
+    ],
+    "id": "iq-m1src-streams-flatmap",
+    "module": "module-1",
+    "question": "What is flatMap, and how would you use it to flatten a list of lists into a single list?",
+    "relatedTopics": [
+      "collections-framework"
+    ],
+    "shortAnswer": "flatMap turns each element into a stream and flattens them into one stream — use List::stream to flatten a list of lists, unlike map, which would give a stream of lists.",
+    "tips": [
+      "Use the 'one input, many outputs' rule of thumb — it answers most flatMap follow-ups.",
+      "Show distinct() in the example: it proves the flattened result is a plain list you can keep processing."
+    ],
+    "title": "Streams: flatMap",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Using == to compare string contents — it sometimes appears to work because of the string pool, then fails on strings built at runtime.",
+      "Overriding equals without overriding hashCode, which breaks HashMap and HashSet behaviour.",
+      "Comparing objects with equals without a null check, risking a NullPointerException — use Objects.equals instead."
+    ],
+    "detailedAnswer": "== compares references: are these two variables pointing at the same object? equals compares contents: do these two objects hold the same value? For strings, \"java\" == \"java\" can be true because both literals share one pooled object, but new String(\"java\") == \"java\" is false even though equals returns true — which is why you should always use equals for content.\n\nThe two are linked by a contract: if two objects are equal by equals, they must return the same hashCode. That is why you override both together. If you override equals but not hashCode, two equal objects can land in different HashMap buckets and a lookup will miss. For null safety, Objects.equals(a, b) handles nulls on either side. For primitives there is no equals, so == is correct — the confusion only applies to objects.",
+    "difficulty": "Easy",
+    "followUps": [
+      "Why must equals and hashCode be consistent?",
+      "What does the string pool have to do with == sometimes working on strings?"
+    ],
+    "id": "iq-m1src-equals-vs-double-equals",
+    "module": "module-1",
+    "question": "What is the difference between == and equals() in Java?",
+    "relatedTopics": [
+      "strings",
+      "collections-framework"
+    ],
+    "shortAnswer": "== compares object references (identity); equals() compares contents (value). For objects, use equals() — and keep it consistent with hashCode().",
+    "tips": [
+      "Give the string-pool trap as your example: literal == literal can be true, but new String == literal is false.",
+      "Mention Objects.equals for null safety — it is a small detail interviewers like."
+    ],
+    "title": "== vs equals()",
+    "topicId": "oop-principles"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Using StringBuffer everywhere 'to be safe' — the synchronisation costs speed and is pointless in single-threaded code.",
+      "Concatenating strings in a loop with +, which builds a throwaway String on every iteration.",
+      "Sharing one StringBuilder across threads without synchronisation."
+    ],
+    "detailedAnswer": "String is immutable: every 'change' creates a new object. StringBuilder and StringBuffer are both mutable alternatives for building strings piece by piece, and they differ in exactly one way: StringBuffer synchronises every method, so it is thread-safe but slower; StringBuilder has no synchronisation, so it is faster but not safe to share across threads.\n\nIn practice, use StringBuilder — almost all string building happens inside one method on one thread, where thread safety buys nothing. Use StringBuffer only when several threads genuinely append to the same buffer, which is rare. And never build a string in a loop with + : each + creates a new intermediate String, turning an O(n) job into O(n^2) copying, while a single StringBuilder appends in place.",
+    "difficulty": "Easy",
+    "followUps": [
+      "Why is String immutable in the first place?",
+      "What happens if two threads append to the same StringBuilder?"
+    ],
+    "id": "iq-m1src-stringbuilder-vs-stringbuffer",
+    "module": "module-1",
+    "question": "What is the difference between StringBuilder and StringBuffer, and when should you use each?",
+    "relatedTopics": [
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Both are mutable string builders; StringBuffer is synchronised (thread-safe, slower) and StringBuilder is not (faster). Use StringBuilder unless threads truly share the buffer.",
+    "tips": [
+      "Lead with the one real difference — synchronisation — then the rule of thumb.",
+      "Mention the loop-concatenation trap: + in a loop is the classic reason this question comes up."
+    ],
+    "title": "StringBuilder vs StringBuffer",
+    "topicId": "strings"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Saying final means 'constant' — it means the reference or value cannot be reassigned, but the object it points to can still change.",
+      "Thinking a final method can be overridden, or a final class extended.",
+      "Declaring every field final without thinking — final fields must be assigned exactly once, in the constructor or at declaration."
+    ],
+    "detailedAnswer": "final means 'cannot be reassigned or changed further', and what that blocks depends on where it sits. A final variable cannot be assigned a second time. A final method cannot be overridden in a subclass. A final class cannot be extended at all — String is final for exactly this reason, so nobody can subclass it and break its guarantees.\n\nTwo subtleties matter. First, final on a reference only freezes the reference: a final List can still have elements added to it, because the list object itself is mutable. True immutability needs a final class, final fields, and no methods that leak mutable state. Second, a final field must be assigned exactly once — at declaration or in every constructor — and a local variable used inside a lambda must be final or effectively final (never reassigned after it is set).",
+    "difficulty": "Easy",
+    "followUps": [
+      "What is the difference between final, finally, and finalize()?",
+      "How do you make a class truly immutable?"
+    ],
+    "id": "iq-m1src-final-keyword",
+    "module": "module-1",
+    "question": "What does the final keyword do in Java, for variables, methods, and classes?",
+    "relatedTopics": [
+      "oop-principles"
+    ],
+    "shortAnswer": "final blocks reassignment (variables), overriding (methods), and subclassing (classes). It freezes the reference, not the object it points to.",
+    "tips": [
+      "Use the final List example — it shows you understand the reference-vs-object distinction.",
+      "Volunteer the effectively-final rule for lambdas; it connects final to modern Java."
+    ],
+    "title": "The final keyword",
+    "topicId": "language-basics-syntax"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Saying interfaces are 'just abstract classes with no code' — since Java 8 they can carry default and static methods.",
+      "Using an abstract class when the goal is a capability shared across unrelated classes — that is what interfaces are for.",
+      "Forgetting that a class can implement many interfaces but extend only one class."
+    ],
+    "detailedAnswer": "Both define a contract that other classes fulfil, but they differ in what they can carry and how they combine. An abstract class can hold state (fields), constructors, and concrete methods, and a class can extend only one of them. An interface historically held only method signatures and constants; since Java 8 it can also hold default and static methods, and since Java 9 private methods — but still no instance fields or constructors — and a class can implement as many interfaces as it likes.\n\nChoose an abstract class when the types share code and state and form one family — for example, an abstract PaymentProcessor with shared logging and a template method. Choose an interface when you are describing a capability that unrelated classes can share — for example, Payable implemented by an Invoice, a Subscription, and a Refund. When in doubt at 0–3 years, prefer the interface: it keeps your options open, and you can always add a default method later.",
+    "difficulty": "Easy",
+    "followUps": [
+      "When would you use a default method in an interface?",
+      "Can an interface extend another interface, and can it have fields?"
+    ],
+    "id": "iq-m1src-abstract-vs-interface",
+    "module": "module-1",
+    "question": "What is the difference between an abstract class and an interface, and when would you use each?",
+    "relatedTopics": [
+      "design-patterns-solid"
+    ],
+    "shortAnswer": "An abstract class can hold state, constructors, and shared code but allows single inheritance; an interface defines a capability, allows multiple implementation, and since Java 8 can carry default methods.",
+    "tips": [
+      "Give one concrete pair of examples (a family vs a capability) — it beats a list of differences.",
+      "Mention default methods explicitly so the answer does not sound pre-Java-8."
+    ],
+    "title": "Abstract class vs interface",
+    "topicId": "oop-principles"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Saying overriding is decided at compile time — it is decided at runtime from the actual object type.",
+      "Changing the parameter list in an override and accidentally overloading instead.",
+      "Narrowing the return type to an unrelated type, or making the overriding method more restrictive in visibility."
+    ],
+    "detailedAnswer": "Overloading is several methods with the same name but different parameter lists in one class. Which one runs is decided by the compiler from the argument types — it is compile-time polymorphism. Overriding is a subclass replacing a parent method with the same name and the same parameters. Which version runs is decided at runtime from the actual object type — it is runtime polymorphism.\n\nThe rules differ too. An overload can change the return type and visibility freely, as long as the parameters differ; changing only the return type is not an overload and does not compile. An override must keep the same signature, may return a subtype (covariant return), cannot reduce visibility, and cannot throw new checked exceptions. Always write @Override on an overriding method: if you mistype the name or parameters, the compiler tells you instead of silently creating an overload.",
+    "difficulty": "Easy",
+    "followUps": [
+      "Can you overload a method by changing only its return type?",
+      "Can a static method be overridden?"
+    ],
+    "id": "iq-m1src-overloading-vs-overriding",
+    "module": "module-1",
+    "question": "What is the difference between method overloading and method overriding?",
+    "relatedTopics": [
+      "oop-principles"
+    ],
+    "shortAnswer": "Overloading is same name, different parameters, resolved at compile time; overriding is a subclass replacing a parent method with the same signature, resolved at runtime.",
+    "tips": [
+      "Say 'compile time vs runtime' first — that is the one line interviewers remember.",
+      "Mention @Override as a safety net against accidental overloading."
+    ],
+    "title": "Method overloading vs overriding",
+    "topicId": "oop-principles"
+  },
+  {
+    "category": "Spring Framework",
+    "commonMistakes": [
+      "Assuming every bean is a singleton by design — singleton is just the default scope, not a guarantee of thread safety.",
+      "Expecting a prototype bean injected into a singleton to be fresh on every call — it is created once, at injection time.",
+      "Using request or session scope in a non-web application, where no request exists."
+    ],
+    "detailedAnswer": "Scope controls how many instances of a bean the container creates and how long each lives. Singleton (the default) means one shared instance per container — the right choice for stateless services. Prototype means a new instance every time the bean is requested — the right choice for stateful, short-lived objects. In web applications there are also request (one per HTTP request), session (one per user session), and application scopes.\n\nTwo points catch people out. First, singleton beans must be thread-safe, because every request shares the one instance — keep them stateless or synchronise the mutable parts. Second, injecting a prototype bean into a singleton does not give you a fresh prototype per call: the container creates the prototype once, when it wires the singleton. To get a new one per use, inject an ObjectProvider or a Provider and call get() each time.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you get a fresh prototype bean inside a singleton?",
+      "Are singleton beans thread-safe?"
+    ],
+    "id": "iq-m1src-bean-scopes",
+    "module": "module-1",
+    "question": "What bean scopes does Spring provide, and which one is the default?",
+    "relatedTopics": [
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "Singleton is the default (one shared instance); prototype gives a new instance per request, and web apps add request, session, and application scopes. Singletons must be thread-safe.",
+    "tips": [
+      "Name the prototype-in-singleton trap — it is the most common follow-up to this question.",
+      "State the default first, then the others; interviewers check you know singleton is a default, not a law."
+    ],
+    "title": "Spring bean scopes",
+    "topicId": "bean-scopes-lifecycle"
+  },
+  {
+    "category": "Spring Framework",
+    "commonMistakes": [
+      "Saying BeanFactory and ApplicationContext are interchangeable — for most apps you want the ApplicationContext.",
+      "Manually creating a BeanFactory in application code instead of letting Spring Boot build an ApplicationContext.",
+      "Expecting lazy loading from an ApplicationContext, which eagerly creates singleton beans by default."
+    ],
+    "detailedAnswer": "Both are IoC containers, but BeanFactory is the basic one and ApplicationContext builds on top of it. BeanFactory creates beans lazily — only when first requested — and offers just the core wiring. ApplicationContext eagerly creates singleton beans at startup, and adds the features real applications need: event publishing, internationalisation, resource loading, and integration with AOP and the web layer.\n\nIn practice, always use an ApplicationContext (Spring Boot creates an AnnotationConfigApplicationContext for you). Eager startup is a feature, not a cost: a misconfigured bean fails fast at startup instead of failing on the first user request. Reach for a plain BeanFactory only in a constrained environment, such as a tiny embedded tool where startup time and memory matter more than the extra features.",
+    "difficulty": "Easy",
+    "followUps": [
+      "Which container does Spring Boot use?",
+      "Why is eager bean creation at startup a good thing?"
+    ],
+    "id": "iq-m1src-beanfactory-vs-applicationcontext",
+    "module": "module-1",
+    "question": "What is the difference between BeanFactory and ApplicationContext in Spring?",
+    "relatedTopics": [
+      "bean-scopes-lifecycle"
+    ],
+    "shortAnswer": "BeanFactory is the basic, lazy container; ApplicationContext extends it with eager singleton creation plus events, messages, resource loading, and AOP/web integration. Use ApplicationContext.",
+    "tips": [
+      "Frame eager startup as fail-fast — it turns a drawback into a design reason.",
+      "Name the concrete Boot container type if you can: AnnotationConfigApplicationContext."
+    ],
+    "title": "BeanFactory vs ApplicationContext",
+    "topicId": "spring-ioc-di"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Treating @SpringBootApplication as magic — it is three annotations combined, and you should know which three.",
+      "Putting the main class in the wrong package so component scan misses your controllers.",
+      "Adding @ComponentScan with a broad base package that picks up beans from another module by accident."
+    ],
+    "detailedAnswer": "@SpringBootApplication is a convenience annotation that combines three others. @Configuration marks the class as a source of bean definitions. @EnableAutoConfiguration tells Spring Boot to configure beans automatically based on what is on the classpath. @ComponentScan tells Spring to find @Component, @Service, @Repository, and @Controller classes in the current package and below.\n\nThe scan base matters: by default it is the package of the class carrying the annotation, so put your main class in the root package of your project (for example com.example.shop) so that com.example.shop.web and com.example.shop.service are all scanned. If a bean is not found at startup, a misplaced main class is the first thing to check. You can narrow or widen the scan with the scanBasePackages attribute, but the usual fix is to move the main class, not to add scanning config.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How does @EnableAutoConfiguration decide which beans to create?",
+      "What happens if two scanned classes define beans with the same name?"
+    ],
+    "id": "iq-m1src-springbootapplication",
+    "module": "module-1",
+    "question": "What does the @SpringBootApplication annotation do internally?",
+    "relatedTopics": [
+      "spring-boot-autoconfig"
+    ],
+    "shortAnswer": "It combines @Configuration, @EnableAutoConfiguration, and @ComponentScan — so the class defines beans, triggers auto-configuration, and scans its own package downwards for components.",
+    "tips": [
+      "List the three annotations by name, then explain the package-placement consequence.",
+      "Mention the misplaced-main-class debugging tip — it shows real experience."
+    ],
+    "title": "@SpringBootApplication internals",
+    "topicId": "spring-boot-autoconfig"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Adding individual library versions by hand instead of letting the starter and its parent manage versions.",
+      "Including two starters that pull in conflicting versions of the same library without checking the dependency tree.",
+      "Treating a starter as a framework feature rather than a bundle of dependencies — it adds jars, not code."
+    ],
+    "detailedAnswer": "A starter is a pre-packaged bundle of dependencies for one job, with versions chosen to work together. spring-boot-starter-web brings Spring MVC, Jackson, validation, and an embedded Tomcat; spring-boot-starter-data-jpa brings Hibernate and Spring Data JPA; spring-boot-starter-test brings JUnit, Mockito, and AssertJ. You add one dependency instead of hunting down five compatible ones.\n\nVersions come from the spring-boot-starter-parent (or the BOM): you declare the starter without a version and Boot supplies a tested one. That is why a starter keeps your build consistent — every starter in the same Boot release is tested against the same library versions. If you do hit a conflict, mvn dependency:tree shows which starter pulled in the unwanted version, and you override it with a property such as <jackson.version> or an exclusion.",
+    "difficulty": "Easy",
+    "followUps": [
+      "What is the difference between spring-boot-starter-parent and spring-boot-dependencies?",
+      "How do you find which starter is pulling in a conflicting library version?"
+    ],
+    "id": "iq-m1src-spring-boot-starters",
+    "module": "module-1",
+    "question": "What are Spring Boot starters, and how do they simplify dependency management?",
+    "relatedTopics": [
+      "spring-boot-autoconfig"
+    ],
+    "shortAnswer": "Starters are tested bundles of dependencies for one job (web, JPA, test); the starter parent supplies compatible versions, so you declare one dependency instead of many.",
+    "tips": [
+      "Name three starters and what each pulls in — concrete examples beat a definition.",
+      "Mention mvn dependency:tree as the conflict-finding tool."
+    ],
+    "title": "Spring Boot starters",
+    "topicId": "spring-boot-autoconfig"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Enabling every actuator endpoint in production, including env and heapdump, without security.",
+      "Assuming Actuator is on by default — only health and info are exposed over HTTP out of the box.",
+      "Checking only that the app starts, instead of checking /actuator/health in a deployment probe."
+    ],
+    "detailedAnswer": "Actuator adds production-ready endpoints to your app for health, metrics, and inspection. The most used are /actuator/health (is the app and its database up?), /actuator/info (build and version details), /actuator/metrics (JVM, HTTP, and custom counters), and /actuator/env and /actuator/beans for debugging. Add spring-boot-starter-actuator, and in recent Boot versions health and info are the only endpoints exposed over HTTP by default — the rest need management.endpoints.web.exposure.include to be switched on.\n\nTwo habits matter. First, wire /actuator/health into your deployment: a load balancer or Kubernetes liveness probe should call it rather than just checking the port is open. Second, treat the detailed endpoints as sensitive: env can leak secrets and heapdump can leak memory contents, so expose them only on an internal port or behind authentication, never on the public internet.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you add a custom health indicator?",
+      "How would you secure actuator endpoints in production?"
+    ],
+    "id": "iq-m1src-spring-boot-actuator",
+    "module": "module-1",
+    "question": "What is Spring Boot Actuator, and which endpoints would you use in production?",
+    "relatedTopics": [
+      "actuator-microservices-deployment"
+    ],
+    "shortAnswer": "Actuator exposes health, info, metrics, and inspection endpoints; use /actuator/health in deployment probes, and keep detailed endpoints like env behind authentication.",
+    "tips": [
+      "Name the exact endpoints and the default-exposure rule (only health and info).",
+      "Mention the security warning — interviewers ask about it for actuator specifically."
+    ],
+    "title": "Spring Boot Actuator",
+    "topicId": "spring-boot-autoconfig"
+  },
+  {
+    "category": "Spring MVC",
+    "commonMistakes": [
+      "Calling DispatcherServlet 'the controller' — it is the front controller that routes to your controllers.",
+      "Forgetting that @RestController methods skip view resolution and write straight to the response body.",
+      "Describing the flow without naming HandlerMapping or ViewResolver — interviewers listen for both."
+    ],
+    "detailedAnswer": "DispatcherServlet is the front controller: every HTTP request enters through it, and it coordinates the rest. First it asks a HandlerMapping which controller method handles this URL. Then it calls that method (through a HandlerAdapter), passing in request data bound to method arguments. The controller returns either a view name plus a model, or — for a @RestController — a body object. In the view case, a ViewResolver turns the name into a template (such as a Thymeleaf page) and renders it with the model; in the REST case, a message converter serialises the object to JSON and writes it to the response.\n\nSo the short version is: DispatcherServlet → HandlerMapping → controller → (ViewResolver → view, or message converter → JSON). Exceptions anywhere in that chain can be handled centrally with @ControllerAdvice. If a request returns 404, the usual suspects are a wrong mapping, a controller outside the component-scan package, or a missing annotation — all of which sit on this path.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What is the difference between a filter and an interceptor in this flow?",
+      "Where does @ControllerAdvice fit into the request lifecycle?"
+    ],
+    "id": "iq-m1src-dispatcherservlet-flow",
+    "module": "module-1",
+    "question": "Describe the lifecycle of a request in Spring MVC, starting at the DispatcherServlet.",
+    "relatedTopics": [
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "DispatcherServlet receives every request, HandlerMapping picks the controller method, the controller returns a view name or a body object, and a ViewResolver or a JSON message converter produces the response.",
+    "tips": [
+      "Recite the chain as an arrow sequence — it is easy to follow and hard to get wrong.",
+      "Mention the 404 debugging angle: wrong mapping or a controller outside component scan."
+    ],
+    "title": "DispatcherServlet request flow",
+    "topicId": "spring-mvc-rest"
+  },
+  {
+    "category": "Spring MVC",
+    "commonMistakes": [
+      "Returning a plain string from a @Controller method and expecting JSON — it is treated as a view name.",
+      "Putting @ResponseBody on every method instead of using @RestController on the class.",
+      "Using @Controller for a REST API and wondering why the response is a 404 for a 'view' that does not exist."
+    ],
+    "detailedAnswer": "@Controller marks a class as a web controller whose methods usually return view names: return \"home\" and Spring resolves a template called home. @RestController is @Controller plus @ResponseBody on every method, so return values are serialised (usually to JSON by Jackson) and written straight to the response body instead of being treated as view names.\n\nUse @Controller for server-rendered pages (Thymeleaf, JSP) and @RestController for REST APIs. The two are easy to confuse because they look identical — the difference is entirely in what happens to the return value. A common interview trap is a @Controller method returning a string like \"success\": Spring looks for a view named success and returns a 404 or an error page, while the same method in a @RestController would return the text success as the response body.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How do you return a specific HTTP status code from a @RestController method?",
+      "When would you use ResponseEntity instead of returning an object directly?"
+    ],
+    "id": "iq-m1src-controller-vs-restcontroller",
+    "module": "module-1",
+    "question": "What is the difference between @Controller and @RestController?",
+    "relatedTopics": [
+      "validation-exception-handling"
+    ],
+    "shortAnswer": "@Controller methods return view names to be rendered; @RestController adds @ResponseBody to every method, so return values are serialised to JSON and written to the response body.",
+    "tips": [
+      "Use the 'return \"success\"' trap as your example — it makes the difference concrete.",
+      "Say which one you use for APIs and which for pages; interviewers want the rule, not just the definition."
+    ],
+    "title": "@Controller vs @RestController",
+    "topicId": "spring-mvc-rest"
+  },
+  {
+    "category": "Spring Data JPA",
+    "commonMistakes": [
+      "Extending JpaRepository when you only need basic CRUD — CrudRepository is the simpler, sufficient choice.",
+      "Calling save() in a loop for thousands of rows instead of saveAll with batching.",
+      "Expecting findById to throw when nothing is found — it returns an empty Optional."
+    ],
+    "detailedAnswer": "CrudRepository is the base repository interface with the basic operations: save, findById, findAll, deleteById, existsById, and count. JpaRepository extends PagingAndSortingRepository, which extends CrudRepository, so it has everything CrudRepository has plus JPA-specific operations: flush, saveAndFlush, deleteAllInBatch, deleteInBatch, and getReferenceById, plus paging and sorting through Pageable and Sort.\n\nFor a 0–3 year interview, the rule is simple: reach for JpaRepository when you need paging, sorting, or batch deletes; CrudRepository is enough for plain CRUD. Both give you derived query methods for free — findByEmail(String email) becomes a query from the method name alone — and both let you add @Query methods for anything the naming rules cannot express. One habit to build early: findById returns Optional, so handle the empty case with orElseThrow instead of calling get() blindly.",
+    "difficulty": "Easy",
+    "followUps": [
+      "How do you write a custom query with @Query?",
+      "What is the difference between deleteAll and deleteAllInBatch?"
+    ],
+    "id": "iq-m1src-crud-vs-jpa-repository",
+    "module": "module-1",
+    "question": "What is the difference between CrudRepository and JpaRepository?",
+    "relatedTopics": [
+      "db-sql-fundamentals"
+    ],
+    "shortAnswer": "JpaRepository extends CrudRepository (via PagingAndSortingRepository) and adds paging, sorting, flush, and batch-delete operations; use it when you need those, CrudRepository for plain CRUD.",
+    "tips": [
+      "Draw the hierarchy: CrudRepository → PagingAndSortingRepository → JpaRepository.",
+      "Mention the Optional return of findById — it is the detail that shows you have used it."
+    ],
+    "title": "CrudRepository vs JpaRepository",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Spring Data JPA",
+    "commonMistakes": [
+      "Putting @Transactional on a private method or calling it from within the same class — Spring's proxy never sees the call, so no transaction starts.",
+      "Expecting a rollback for a checked exception — by default Spring rolls back only on unchecked exceptions.",
+      "Making every method @Transactional 'just in case', which hides real transaction boundaries and hurts performance."
+    ],
+    "detailedAnswer": "@Transactional marks a method (usually on a service) as one database transaction: either all of its writes commit together, or none of them do. If the method throws an unchecked exception (a RuntimeException), Spring rolls the transaction back; if it returns normally, Spring commits. That is the behaviour you want for a transfer that debits one account and credits another — a failure halfway must not leave the money debited but not credited.\n\nThree rules decide whether it works. First, it only applies when the call goes through Spring's proxy, so annotate public service methods and call them from another bean — a private method, or a self-call inside the same class, runs with no transaction at all. Second, checked exceptions do not trigger rollback unless you set rollbackFor. Third, keep the transaction short and at the service layer, not the repository layer: a long transaction holds database locks and connections while your code does unrelated work.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does @Transactional not work on a private method?",
+      "How do you make a transaction roll back for a checked exception?"
+    ],
+    "id": "iq-m1src-transactional-basics",
+    "module": "module-1",
+    "question": "What does @Transactional do, and when does Spring roll a transaction back?",
+    "relatedTopics": [
+      "db-joins-indexes-transactions"
+    ],
+    "shortAnswer": "@Transactional runs a method inside one database transaction; it commits on success and rolls back on unchecked exceptions. It only works through Spring's proxy, so it needs a public method called from another bean.",
+    "tips": [
+      "Lead with the money-transfer example — atomicity is easiest to explain with it.",
+      "Name the self-invocation trap: it is the most asked @Transactional follow-up."
+    ],
+    "title": "@Transactional basics",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "SQL",
+    "commonMistakes": [
+      "Saying a unique key cannot be null — it can, in most databases, and MySQL even allows several nulls in one.",
+      "Putting two primary keys on one table instead of one composite primary key.",
+      "Choosing a natural key (like an email) as the primary key when it can change — a surrogate id is usually safer."
+    ],
+    "detailedAnswer": "Both enforce uniqueness, but they differ in three ways. A table can have only one primary key, and it can never contain null; a table can have many unique keys, and a unique column can usually contain null (MySQL allows multiple nulls in a unique column). A primary key identifies each row — it is the table's identity — while a unique key is an extra rule saying 'this value must not repeat'.\n\nIn practice: give every table a primary key (usually an auto-increment id), and add unique keys for business values that must be one-per-row, such as an email address. In MySQL's InnoDB, the primary key also decides how rows are physically stored (the clustered index), so lookups by primary key are the fastest access path, while unique keys get a secondary index.\n\n```sql\nCREATE TABLE employees (\n  id INT PRIMARY KEY,\n  email VARCHAR(255) UNIQUE NOT NULL\n);\n```",
+    "difficulty": "Easy",
+    "followUps": [
+      "Can a primary key be made of more than one column?",
+      "What is a foreign key, and how is it different from a unique key?"
+    ],
+    "id": "iq-m1src-primary-vs-unique-key",
+    "module": "module-1",
+    "question": "What is the difference between a primary key and a unique key?",
+    "relatedTopics": [
+      "db-joins-indexes-transactions"
+    ],
+    "shortAnswer": "One primary key per table, never null, identifies each row; many unique keys allowed, usually nullable, enforcing no repeats on a business value like an email.",
+    "tips": [
+      "Give the three differences as a list: count, nulls, purpose.",
+      "Mention the InnoDB clustered-index point — it shows you know why the primary key matters for performance."
+    ],
+    "title": "Primary key vs unique key",
+    "topicId": "db-sql-fundamentals"
+  },
+  {
+    "category": "SQL",
+    "commonMistakes": [
+      "Using HAVING without GROUP BY to filter rows — that is WHERE's job.",
+      "Putting an aggregate condition in WHERE, which fails because WHERE runs before grouping.",
+      "Forgetting that WHERE cannot see column aliases defined in the SELECT list in most databases."
+    ],
+    "detailedAnswer": "WHERE filters individual rows before any grouping happens; HAVING filters groups after GROUP BY has run. That ordering decides what each clause can express: WHERE can test plain columns but not aggregates, while HAVING can test aggregates such as AVG(salary) > 50000 but cannot cheaply test individual rows.\n\n```sql\nSELECT department, AVG(salary) AS avg_salary\nFROM employees\nWHERE status = 'active'\nGROUP BY department\nHAVING AVG(salary) > 50000;\n```\n\nHere WHERE first drops inactive employees, then GROUP BY forms one group per department, then HAVING keeps only departments whose average salary is above 50,000. A quick way to remember it: WHERE is a row filter, HAVING is a group filter — and any condition that mentions an aggregate function belongs in HAVING.",
+    "difficulty": "Easy",
+    "followUps": [
+      "Can you use HAVING without GROUP BY?",
+      "Why does putting AVG(salary) > 50000 in the WHERE clause fail?"
+    ],
+    "id": "iq-m1src-where-vs-having",
+    "module": "module-1",
+    "question": "What is the difference between WHERE and HAVING in SQL?",
+    "relatedTopics": [
+      "db-joins-indexes-transactions"
+    ],
+    "shortAnswer": "WHERE filters rows before grouping and cannot use aggregates; HAVING filters groups after GROUP BY and can test aggregates like AVG(salary).",
+    "tips": [
+      "Walk through one query showing both clauses in order — it proves you know the execution sequence.",
+      "Use the memory hook: WHERE is a row filter, HAVING is a group filter."
+    ],
+    "title": "WHERE vs HAVING",
+    "topicId": "db-sql-fundamentals"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Letting every client call services directly and duplicating auth, rate limiting, and routing in each client.",
+      "Treating the gateway as the place for business logic — it should route and protect, not implement features.",
+      "Forgetting the gateway is a single point of failure unless it is itself deployed redundantly."
+    ],
+    "detailedAnswer": "An API Gateway is the single front door for all client traffic. Instead of clients calling dozens of services directly, they call the gateway, which routes each request to the right service, and handles the jobs that are the same for every service: authentication, rate limiting, request logging, CORS, and sometimes response aggregation (combining calls to several services into one response for a mobile client).\n\nThat centralisation is the benefit and the risk. It simplifies clients — one base URL, one auth flow — and lets teams change a service's address or version without touching every client. But the gateway is now on the critical path for everything, so it must be fast, stateless, and run with several instances behind a load balancer; if it goes down, every service becomes unreachable even though the services themselves are healthy.",
+    "difficulty": "Easy",
+    "followUps": [
+      "What is the difference between an API Gateway and a service registry?",
+      "How does a gateway differ from a load balancer?"
+    ],
+    "id": "iq-m1src-api-gateway",
+    "module": "module-1",
+    "question": "What is the role of an API Gateway in a microservices architecture?",
+    "relatedTopics": [
+      "actuator-microservices-deployment"
+    ],
+    "shortAnswer": "The gateway is the single entry point: it routes requests to the right service and centralises auth, rate limiting, and logging — but it must be redundant, since it is on the critical path.",
+    "tips": [
+      "List the cross-cutting jobs (auth, rate limiting, logging) — that is what the gateway is for.",
+      "Name the trade-off in the same breath: single point of failure unless deployed redundantly."
+    ],
+    "title": "API Gateway in microservices",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Scenario-based",
+    "commonMistakes": [
+      "Running mvn install when you only meant to compile — it runs tests, packages, and writes to the local repository.",
+      "Using -DskipTests when you meant -Dmaven.test.skip: skipTests still compiles tests, maven.test.skip skips compiling them too.",
+      "Deleting the target folder by hand instead of running mvn clean, which is the repeatable way to get a fresh build."
+    ],
+    "detailedAnswer": "Maven builds run through lifecycle phases in a fixed order: validate → compile → test → package → verify → install → deploy. Running mvn install executes every phase up to install: it compiles the code, runs the tests, packages the jar, and copies it into your local repository (~/.m2) so other local projects can use it. Running mvn clean first deletes the target directory, so nothing stale survives from the previous build — mvn clean install is the standard 'fresh build' command.\n\nIn this scenario, start by reading the failure, not re-running blindly. If a test fails, the build stops at the test phase and later phases never run — that is by design. Fix the failing test or the code it caught; only skip tests deliberately with -DskipTests (tests are compiled but not run) when you need a package urgently and understand the risk, and never skip them in CI. If the failure is a missing dependency, check the pom.xml: a dependency declared with the wrong scope (for example, test scope on a library used in main code) compiles in one place and fails in another. And if the build works for a teammate but not for you, delete target with mvn clean and check for a stale artifact in your local repository.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What is the difference between mvn package and mvn install?",
+      "What does -DskipTests do differently from -Dmaven.test.skip?"
+    ],
+    "id": "iq-m1src-maven-clean-install",
+    "module": "module-1",
+    "question": "Scenario: your teammate's Maven build works, but yours fails — and a full mvn clean install is the first thing you are told to run. What does that command actually do, and how do you diagnose the failure?",
+    "relatedTopics": [],
+    "shortAnswer": "mvn clean install deletes target, then runs every phase up to install (compile, test, package, install to ~/.m2). A test failure stops the build by design — read the failure, fix the cause, and only skip tests deliberately.",
+    "tips": [
+      "Recite the phase order — validate, compile, test, package, verify, install, deploy.",
+      "Name the two skip flags and their difference; it is the classic follow-up."
+    ],
+    "title": "Scenario: diagnosing a failing Maven build",
+    "topicId": "dv-cicd-pipelines"
+  }
+]

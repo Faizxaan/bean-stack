@@ -1,1 +1,965 @@
-[{"category":"Java","detailedAnswer":"Checked exceptions must be declared or handled, and they are meant for recoverable conditions such as a missing file or a failed network call, while unchecked exceptions usually signal programming errors such as a null dereference or an illegal argument. Overusing checked exceptions leaks implementation details through every caller, so many modern codebases wrap them in a meaningful unchecked exception at a boundary. Try-with-resources guarantees that each resource is closed in reverse order of opening, even when an exception occurs, and any exception thrown during close is added as a suppressed exception rather than hiding the original failure. Always close resources you open, log the original exception with context, and avoid catching Exception just to swallow it.","difficulty":"Medium","followUps":["When would you wrap a checked exception instead of declaring it?","How do you inspect a suppressed exception?"],"id":"iq-m2-checked-unchecked-exceptions","module":"module-2","question":"When should you use a checked exception versus an unchecked exception, and how does try-with-resources change exception handling?","relatedTopics":["file-io-nio"],"shortAnswer":"Checked for recoverable conditions, unchecked for programming errors; try-with-resources closes resources reliably and preserves the original exception, adding close failures as suppressed exceptions.","tips":["Name a concrete recoverable case and a concrete programming-error case.","Mention suppressed exceptions — it shows you have debugged real resource code."],"title":"Checked vs unchecked exceptions","topicId":"exception-handling"},{"category":"Collections","detailedAnswer":"HashMap is not thread-safe and its iterators are fail-fast, so a concurrent modification during iteration usually throws ConcurrentModificationException, whereas ConcurrentHashMap iterators are weakly consistent and tolerate concurrent updates without throwing. ConcurrentHashMap also forbids null keys and null values, because a null return from get would be ambiguous when another thread could have removed the entry. Its atomic methods such as computeIfAbsent, merge, and putIfAbsent let you update a shared map without external locking, but the mapping function must be short and side-effect free, since it may be retried. For counters or grouped results, combine it with atomic values such as LongAdder or a concurrent collection rather than synchronizing the whole map.","difficulty":"Medium","followUps":["Why does ConcurrentHashMap forbid null keys and values?","When is computeIfAbsent unsafe?"],"id":"iq-m2-concurrenthashmap","module":"module-2","question":"How does ConcurrentHashMap differ from a synchronized HashMap, and when would you choose it?","relatedTopics":["collections-framework","concurrency-basics"],"shortAnswer":"ConcurrentHashMap is lock-striped, thread-safe, weakly consistent for iteration, and forbids nulls; a synchronized HashMap serializes all access and still fails fast on concurrent iteration.","tips":["Contrast fail-fast with weakly consistent iteration explicitly.","Warn that computeIfAbsent functions must be short and side-effect free."],"title":"ConcurrentHashMap vs synchronized HashMap","topicId":"collections-deep-dive"},{"category":"Streams","detailedAnswer":"Parallel streams split work across the common ForkJoinPool, which helps only for large, CPU-bound, splittable workloads with independent, non-blocking operations. They hurt when the source is small, the work is I/O-bound, the operations block, or the pipeline uses stateful operations such as sorted or distinct that force coordination, and they can starve other tasks sharing the common pool. Stateful lambda side effects, such as appending to a shared list, break correctness in parallel pipelines, so collect results with a proper collector instead. A good answer names the workload, checks its size, avoids blocking calls, and measures before and after rather than assuming parallelism is faster.","difficulty":"Medium","followUps":["Why should you not do blocking I/O inside a parallel stream?","How do you collect results safely from a parallel stream?"],"id":"iq-m2-parallel-streams","module":"module-2","question":"When does a parallel stream help, and when does it make performance worse?","relatedTopics":["streams-lambdas","concurrency-basics"],"shortAnswer":"Parallel streams help only for large CPU-bound work over a splittable source; they hurt for small, blocking, or I/O-bound work and can starve the shared common pool.","tips":["Give the three conditions: large, CPU-bound, splittable.","Mention that the common ForkJoinPool is shared, so a slow stream affects the whole application."],"title":"Parallel streams: help or harm","topicId":"streams-lambdas"},{"category":"Concurrency","detailedAnswer":"CompletableFuture chains such as thenApply, thenCompose, and thenCombine let you express dependent and independent async steps without blocking, while exceptionally and handle let you recover or translate failures at a defined point in the chain. The most common production failure is submitting many futures to an unbounded or too-small pool, so dependent stages queue up and the whole pipeline stalls even though no thread has deadlocked. Always supply an explicit executor for blocking or long-running stages, bound the pool and its queue, set timeouts with orTimeout, and decide where exceptions are observed, because an unobserved future failure is silently lost. For fan-out work, combine futures with allOf and then inspect each result individually rather than assuming success.","difficulty":"Hard","followUps":["What happens when a CompletableFuture exception is never observed?","Why should blocking stages not use the common ForkJoinPool?"],"id":"iq-m2-completablefuture-chains","module":"module-2","question":"How do you chain CompletableFuture stages safely in production, and what usually goes wrong?","relatedTopics":["concurrency-basics"],"shortAnswer":"Chain with thenApply, thenCompose, and thenCombine, handle failures explicitly, use a dedicated bounded executor for blocking stages, and apply timeouts.","tips":["Name the thread-pool exhaustion failure mode, not just the API methods.","Mention orTimeout and explicit exception handling in the same answer."],"title":"CompletableFuture in production","topicId":"executors-completablefuture"},{"category":"JVM","detailedAnswer":"Most modern collectors divide the heap into young and old generations, because most objects die young: short-lived objects are collected cheaply in the young generation, while survivors are promoted to the old generation, which is collected less often but more expensively. G1 divides the heap into regions and targets a pause-time goal by collecting the regions with the most garbage first, whereas the Parallel collector prioritizes throughput and accepts longer pauses. Frequent full garbage collections, long promotion failures, or a steadily growing old generation usually point to a leak, an undersized heap, or objects that live longer than expected. Tune by measuring pause times and allocation rates first, then adjust heap size and collector choice, rather than guessing flags.","difficulty":"Medium","followUps":["How do you tell a leak apart from a heap that is simply too small?","When would you prefer throughput over low pause time?"],"id":"iq-m2-gc-generations","module":"module-2","question":"How do generational garbage collectors work, and how do you choose between G1 and Parallel GC?","relatedTopics":["jdk-jre-jvm","performance-best-practices"],"shortAnswer":"Young objects are collected cheaply and survivors are promoted; G1 targets pause time with region-based collection, Parallel targets throughput with longer pauses.","tips":["Explain the generational hypothesis before naming collectors.","Tie the choice to a measurable goal: pause time versus throughput."],"title":"Generational GC and collector choice","topicId":"garbage-collection"},{"category":"Spring Framework","detailedAnswer":"Singleton is the default scope, so the container creates one instance per application context, while prototype creates a new instance on every request for the bean. The classic trap is injecting a prototype bean into a singleton: the injection happens once, so the singleton keeps the same prototype instance forever. Fix it by injecting a provider, such as ObjectProvider or Provider, and asking for a fresh instance on each use, or by using a scoped proxy. Request and session scopes only exist in a web context, and relying on them in a service layer makes the service untestable outside a request, so keep scope decisions at the edge where they belong.","difficulty":"Medium","followUps":["How do you get a fresh prototype instance inside a singleton?","Why is request scope a poor fit for a service bean?"],"id":"iq-m2-bean-scopes-prototype","module":"module-2","question":"What goes wrong when a prototype bean is injected into a singleton, and how do you fix it?","relatedTopics":["spring-ioc-di"],"shortAnswer":"The singleton captures one prototype instance at injection time; inject ObjectProvider or Provider and request a fresh instance per use, or use a scoped proxy.","tips":["State the trap first, then the fix — interviewers want both.","Mention that prototype beans are not destroyed by the container."],"title":"Prototype beans in singletons","topicId":"bean-scopes-lifecycle"},{"category":"Spring Boot","detailedAnswer":"Spring Boot resolves configuration from many sources in a defined precedence order, roughly: command-line arguments and environment variables beat application properties files, which beat packaged defaults, and profile-specific files such as application-prod.properties beat the base application.properties within the same source type. Binding properties into a validated @ConfigurationProperties class is safer than scattering @Value annotations, because it groups related settings, supports relaxed binding and type conversion, and fails fast on invalid values when validation is enabled. Secrets should come from environment variables or a secret store, never from a committed properties file, and profile-specific behaviour should be expressed as configuration, not as if-statements scattered through code. When a value surprises you, check the active profiles and the effective property source order before assuming the code is wrong.","difficulty":"Medium","followUps":["Where should secrets live, and why not in application.properties?","How do you fail fast on invalid configuration?"],"id":"iq-m2-profiles-configuration","module":"module-2","question":"How does Spring Boot decide which configuration value wins, and how should you structure configuration for multiple environments?","relatedTopics":["spring-boot-autoconfig"],"shortAnswer":"Higher-precedence sources such as command-line arguments and environment variables beat properties files, and profile-specific files beat the base file; bind settings into validated @ConfigurationProperties classes.","tips":["Recite the precedence order in one sentence.","Recommend @ConfigurationProperties over scattered @Value."],"title":"Profiles and configuration precedence","topicId":"configuration-profiles"},{"category":"Spring MVC","detailedAnswer":"A @RestControllerAdvice class centralizes exception handling across controllers, mapping each exception type to a consistent error body and HTTP status, so controllers stay focused on happy-path logic. Bean Validation annotations such as @NotNull, @Size, and @Pattern on a request DTO, triggered by @Valid, reject bad input before business logic runs, and validation failures arrive as a MethodArgumentNotValidException you can translate in the same advice class. Return ResponseEntity when the status or headers vary, such as 201 Created with a Location header after creating a resource, and keep error bodies stable with fields for a code, a message, and request context. Never leak stack traces or internal exception messages to clients, and never use exceptions for ordinary control flow.","difficulty":"Medium","followUps":["Where does validation run relative to controller logic?","What should a stable API error body contain?"],"id":"iq-m2-rest-exception-handling","module":"module-2","question":"How do you design consistent error handling and validation for a Spring MVC REST API?","relatedTopics":["spring-mvc-rest"],"shortAnswer":"Validate DTOs with Bean Validation, translate exceptions centrally in @RestControllerAdvice into stable error bodies, and use ResponseEntity when status or headers vary.","tips":["Pair validation and exception translation — they belong together in the answer.","Mention 201 with a Location header as the ResponseEntity example."],"title":"REST error handling and validation","topicId":"validation-exception-handling"},{"category":"Spring Data JPA","detailedAnswer":"Derived query methods are readable for simple lookups, but they grow unwieldy for complex conditions, so use @Query for explicit JPQL or native SQL, and projections or DTO queries when you only need a few columns. Pagination with Pageable is convenient, but offset pagination degrades on large tables because the database still scans skipped rows, so keyset pagination on an ordered unique key is better for infinite-scroll or export workloads. Keep transaction boundaries at the service layer, not the repository, so a unit of work that touches several repositories commits or rolls back together, and avoid lazy-loading collections inside a controller after the transaction has closed. Count queries for Page results can also be expensive, so use Slice or a separate count only when the total is actually displayed.","difficulty":"Medium","followUps":["When is keyset pagination better than offset pagination?","Why should transactions live at the service layer?"],"id":"iq-m2-jpa-queries-pagination","module":"module-2","question":"How do you choose between derived queries, @Query, and pagination strategies in Spring Data JPA?","relatedTopics":["spring-data-jpa"],"shortAnswer":"Derived queries for simple lookups, @Query for complex or selective queries, offset pagination for small result sets, and keyset pagination for large or scrolling workloads.","tips":["Name the offset-pagination cost: skipped rows are still scanned.","Put transactions at the service layer, not the repository."],"title":"JPA queries and pagination","topicId":"spring-data-jpa"},{"category":"Microservices","detailedAnswer":"A microservice deployment typically needs service discovery so instances can find each other as they scale, centralized configuration so behaviour changes without redeploying, and a resilience layer with timeouts, retries with backoff, and circuit breakers. Timeouts bound how long you wait, retries help only for transient and idempotent failures, and a circuit breaker stops calling a failing dependency so it can recover instead of being overwhelmed by retries. Retrying a non-idempotent operation, such as a payment, without an idempotency key can duplicate its effect, so retry policy and idempotency must be designed together. Health endpoints and distributed tracing are what let you find the failing service in the first place, so treat observability as part of the design, not an afterthought.","difficulty":"Medium","followUps":["When is a retry dangerous rather than helpful?","How do a timeout, a retry, and a circuit breaker complement each other?"],"id":"iq-m2-microservices-resilience","module":"module-2","question":"What resilience patterns does a microservice need, and when does each one apply?","relatedTopics":["actuator-microservices-deployment","spring-mvc-rest"],"shortAnswer":"Service discovery, centralized configuration, timeouts to bound waits, retries only for transient idempotent failures, and circuit breakers to stop overwhelming a failing dependency.","tips":["Distinguish retries from circuit breakers by their purpose.","Flag non-idempotent retries, such as payments, as the classic mistake."],"title":"Microservice resilience patterns","topicId":"actuator-microservices-deployment"},{"category":"SQL","detailedAnswer":"An inner join returns only rows with a match on both sides, a left join keeps every row from the left table and fills unmatched right-side columns with null, and a full outer join keeps unmatched rows from both sides. To find duplicates, group by the candidate columns and keep only groups whose count is greater than one; to find orphan rows, use a left join and filter for null on the right side, or an anti-join with NOT EXISTS. Indexes speed up filtered and joined columns, but every index slows writes and costs storage, so index the columns your queries actually filter and join on, and verify with an execution plan rather than guessing. A common mistake is joining on a column with a different type or collation, which silently prevents index use.","difficulty":"Medium","followUps":["How would you find customers with no orders?","Why can adding an index make some queries slower?"],"id":"iq-m2-sql-joins-duplicates","module":"module-2","question":"How do join types differ, and how would you find duplicate and orphan rows in SQL?","relatedTopics":["spring-data-jpa"],"shortAnswer":"Inner keeps only matches, left keeps all left rows with nulls for misses, full outer keeps both sides; find duplicates with GROUP BY and HAVING COUNT greater than one, orphans with a left join filtered to null.","tips":["Give the orphan-row query pattern, not just the join definitions.","Mention checking the execution plan before adding indexes."],"title":"SQL joins, duplicates, and orphans","topicId":"jdbc-networking"},{"category":"Coding","detailedAnswer":"The task is to group words that are anagrams of each other, for example listen and silent. The idiomatic approach is a single pass over the input: for each word, build a canonical key by sorting its characters or by counting character frequencies, then append the word to the list stored under that key in a hash map. Sorting gives a key in time proportional to word length times log word length, while a frequency count gives a linear-time key and is preferable for long words. At the end, return the map values as the groups. A common mistake is comparing words pairwise, which is quadratic, or using the unsorted word itself as the key, which never groups anything.","difficulty":"Medium","followUps":["How would you improve the key for very long words?","How does the complexity change if the alphabet is tiny, such as lowercase letters only?"],"id":"iq-m2-coding-group-anagrams","module":"module-2","question":"Coding task: group a list of words into sets of anagrams. What is your approach and its complexity?","relatedTopics":["collections-framework","strings"],"shortAnswer":"Build a canonical key per word, by sorted characters or character counts, and collect words into a hash map keyed by that key; each word is processed once.","tips":["State the key idea first — the rest of the solution follows from it.","Compare sorting versus counting keys to show you considered trade-offs."],"title":"Coding: group anagrams","topicId":"collections-framework"},{"category":"Scenario-based","detailedAnswer":"Start by reproducing the slowness with a realistic request and measuring where time goes: check application metrics for thread-pool saturation, database connection-pool waits, and cache hit rates, and enable slow-query logging before changing anything. The usual culprits, in order, are an N+1 query pattern introduced by a new feature, a missing index on a newly filtered column, an unbounded result set being serialized, and a downstream call without a timeout. Fix the query or add the index, page or limit the result, add a timeout and a cache only where the data tolerates staleness, and verify with the same measurement you started from. A common mistake is adding caching or scaling instances first, which hides the bad query and spreads its cost across more machines.","difficulty":"Hard","followUps":["How do you confirm an N+1 problem rather than guessing?","When is adding a cache the wrong fix?"],"id":"iq-m2-scenario-slow-api","module":"module-2","question":"Scenario: a REST endpoint that used to respond in 200ms now takes 5 seconds under load, with no recent deployment. How do you investigate and fix it?","relatedTopics":["performance-best-practices","spring-data-jpa"],"shortAnswer":"Measure first — thread pool, connection pool, slow queries, cache hit rate — then fix the usual causes in order: N+1 queries, missing index, unbounded results, or a timeout-less downstream call.","tips":["Lead with measurement, not with a fix.","Name the trap: scaling out before finding the bad query."],"title":"Scenario: suddenly slow API","topicId":"performance-best-practices"},{"category":"Java","detailedAnswer":"The Java Memory Model defines happens-before relationships that guarantee when one thread's writes become visible to another: unlocking a monitor happens before a later lock of the same monitor, writing a volatile variable happens before a later read of it, and starting a thread happens before anything in that thread. Double-checked locking was broken before Java 5 because the instance reference could become visible before the constructor finished, letting another thread observe a partially constructed object. Declaring the field volatile fixes it, because the volatile write of the reference happens after construction and is visible only after the object is fully initialized. In practice, prefer an enum singleton, a static holder class, or dependency injection over hand-rolled double-checked locking, and never rely on timing or sleep to order visibility.","difficulty":"Hard","followUps":["Why was double-checked locking broken before Java 5?","What is a safe alternative to double-checked locking?"],"id":"iq-m2-java-memory-model-dcl","module":"module-2","question":"Why did double-checked locking need volatile, and what does happens-before guarantee?","relatedTopics":["concurrency-basics"],"shortAnswer":"Happens-before guarantees visibility between ordered actions; without volatile, another thread could see a partially constructed singleton, so volatile orders the reference publication after construction.","tips":["Explain the partially constructed object problem concretely.","Recommend the enum singleton or static holder as the practical alternative."],"title":"Java Memory Model and double-checked locking","topicId":"java-memory-model"}]
+[
+  {
+    "category": "Java",
+    "detailedAnswer": "Checked exceptions must be declared or handled, and they are meant for recoverable conditions such as a missing file or a failed network call, while unchecked exceptions usually signal programming errors such as a null dereference or an illegal argument. Overusing checked exceptions leaks implementation details through every caller, so many modern codebases wrap them in a meaningful unchecked exception at a boundary. Try-with-resources guarantees that each resource is closed in reverse order of opening, even when an exception occurs, and any exception thrown during close is added as a suppressed exception rather than hiding the original failure. Always close resources you open, log the original exception with context, and avoid catching Exception just to swallow it.",
+    "difficulty": "Medium",
+    "followUps": [
+      "When would you wrap a checked exception instead of declaring it?",
+      "How do you inspect a suppressed exception?"
+    ],
+    "id": "iq-m2-checked-unchecked-exceptions",
+    "module": "module-2",
+    "question": "When should you use a checked exception versus an unchecked exception, and how does try-with-resources change exception handling?",
+    "relatedTopics": [
+      "file-io-nio"
+    ],
+    "shortAnswer": "Checked for recoverable conditions, unchecked for programming errors; try-with-resources closes resources reliably and preserves the original exception, adding close failures as suppressed exceptions.",
+    "tips": [
+      "Name a concrete recoverable case and a concrete programming-error case.",
+      "Mention suppressed exceptions — it shows you have debugged real resource code."
+    ],
+    "title": "Checked vs unchecked exceptions",
+    "topicId": "exception-handling"
+  },
+  {
+    "category": "Collections",
+    "detailedAnswer": "HashMap is not thread-safe and its iterators are fail-fast, so a concurrent modification during iteration usually throws ConcurrentModificationException, whereas ConcurrentHashMap iterators are weakly consistent and tolerate concurrent updates without throwing. ConcurrentHashMap also forbids null keys and null values, because a null return from get would be ambiguous when another thread could have removed the entry. Its atomic methods such as computeIfAbsent, merge, and putIfAbsent let you update a shared map without external locking, but the mapping function must be short and side-effect free, since it may be retried. For counters or grouped results, combine it with atomic values such as LongAdder or a concurrent collection rather than synchronizing the whole map.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does ConcurrentHashMap forbid null keys and values?",
+      "When is computeIfAbsent unsafe?"
+    ],
+    "id": "iq-m2-concurrenthashmap",
+    "module": "module-2",
+    "question": "How does ConcurrentHashMap differ from a synchronized HashMap, and when would you choose it?",
+    "relatedTopics": [
+      "collections-framework",
+      "concurrency-basics"
+    ],
+    "shortAnswer": "ConcurrentHashMap is lock-striped, thread-safe, weakly consistent for iteration, and forbids nulls; a synchronized HashMap serializes all access and still fails fast on concurrent iteration.",
+    "tips": [
+      "Contrast fail-fast with weakly consistent iteration explicitly.",
+      "Warn that computeIfAbsent functions must be short and side-effect free."
+    ],
+    "title": "ConcurrentHashMap vs synchronized HashMap",
+    "topicId": "collections-deep-dive"
+  },
+  {
+    "category": "Streams",
+    "detailedAnswer": "Parallel streams split work across the common ForkJoinPool, which helps only for large, CPU-bound, splittable workloads with independent, non-blocking operations. They hurt when the source is small, the work is I/O-bound, the operations block, or the pipeline uses stateful operations such as sorted or distinct that force coordination, and they can starve other tasks sharing the common pool. Stateful lambda side effects, such as appending to a shared list, break correctness in parallel pipelines, so collect results with a proper collector instead. A good answer names the workload, checks its size, avoids blocking calls, and measures before and after rather than assuming parallelism is faster.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why should you not do blocking I/O inside a parallel stream?",
+      "How do you collect results safely from a parallel stream?"
+    ],
+    "id": "iq-m2-parallel-streams",
+    "module": "module-2",
+    "question": "When does a parallel stream help, and when does it make performance worse?",
+    "relatedTopics": [
+      "streams-lambdas",
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Parallel streams help only for large CPU-bound work over a splittable source; they hurt for small, blocking, or I/O-bound work and can starve the shared common pool.",
+    "tips": [
+      "Give the three conditions: large, CPU-bound, splittable.",
+      "Mention that the common ForkJoinPool is shared, so a slow stream affects the whole application."
+    ],
+    "title": "Parallel streams: help or harm",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Concurrency",
+    "detailedAnswer": "CompletableFuture chains such as thenApply, thenCompose, and thenCombine let you express dependent and independent async steps without blocking, while exceptionally and handle let you recover or translate failures at a defined point in the chain. The most common production failure is submitting many futures to an unbounded or too-small pool, so dependent stages queue up and the whole pipeline stalls even though no thread has deadlocked. Always supply an explicit executor for blocking or long-running stages, bound the pool and its queue, set timeouts with orTimeout, and decide where exceptions are observed, because an unobserved future failure is silently lost. For fan-out work, combine futures with allOf and then inspect each result individually rather than assuming success.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What happens when a CompletableFuture exception is never observed?",
+      "Why should blocking stages not use the common ForkJoinPool?"
+    ],
+    "id": "iq-m2-completablefuture-chains",
+    "module": "module-2",
+    "question": "How do you chain CompletableFuture stages safely in production, and what usually goes wrong?",
+    "relatedTopics": [
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Chain with thenApply, thenCompose, and thenCombine, handle failures explicitly, use a dedicated bounded executor for blocking stages, and apply timeouts.",
+    "tips": [
+      "Name the thread-pool exhaustion failure mode, not just the API methods.",
+      "Mention orTimeout and explicit exception handling in the same answer."
+    ],
+    "title": "CompletableFuture in production",
+    "topicId": "executors-completablefuture"
+  },
+  {
+    "category": "JVM",
+    "detailedAnswer": "Most modern collectors divide the heap into young and old generations, because most objects die young: short-lived objects are collected cheaply in the young generation, while survivors are promoted to the old generation, which is collected less often but more expensively. G1 divides the heap into regions and targets a pause-time goal by collecting the regions with the most garbage first, whereas the Parallel collector prioritizes throughput and accepts longer pauses. Frequent full garbage collections, long promotion failures, or a steadily growing old generation usually point to a leak, an undersized heap, or objects that live longer than expected. Tune by measuring pause times and allocation rates first, then adjust heap size and collector choice, rather than guessing flags.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you tell a leak apart from a heap that is simply too small?",
+      "When would you prefer throughput over low pause time?"
+    ],
+    "id": "iq-m2-gc-generations",
+    "module": "module-2",
+    "question": "How do generational garbage collectors work, and how do you choose between G1 and Parallel GC?",
+    "relatedTopics": [
+      "jdk-jre-jvm",
+      "performance-best-practices"
+    ],
+    "shortAnswer": "Young objects are collected cheaply and survivors are promoted; G1 targets pause time with region-based collection, Parallel targets throughput with longer pauses.",
+    "tips": [
+      "Explain the generational hypothesis before naming collectors.",
+      "Tie the choice to a measurable goal: pause time versus throughput."
+    ],
+    "title": "Generational GC and collector choice",
+    "topicId": "garbage-collection"
+  },
+  {
+    "category": "Spring Framework",
+    "detailedAnswer": "Singleton is the default scope, so the container creates one instance per application context, while prototype creates a new instance on every request for the bean. The classic trap is injecting a prototype bean into a singleton: the injection happens once, so the singleton keeps the same prototype instance forever. Fix it by injecting a provider, such as ObjectProvider or Provider, and asking for a fresh instance on each use, or by using a scoped proxy. Request and session scopes only exist in a web context, and relying on them in a service layer makes the service untestable outside a request, so keep scope decisions at the edge where they belong.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you get a fresh prototype instance inside a singleton?",
+      "Why is request scope a poor fit for a service bean?"
+    ],
+    "id": "iq-m2-bean-scopes-prototype",
+    "module": "module-2",
+    "question": "What goes wrong when a prototype bean is injected into a singleton, and how do you fix it?",
+    "relatedTopics": [
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "The singleton captures one prototype instance at injection time; inject ObjectProvider or Provider and request a fresh instance per use, or use a scoped proxy.",
+    "tips": [
+      "State the trap first, then the fix — interviewers want both.",
+      "Mention that prototype beans are not destroyed by the container."
+    ],
+    "title": "Prototype beans in singletons",
+    "topicId": "bean-scopes-lifecycle"
+  },
+  {
+    "category": "Spring Boot",
+    "detailedAnswer": "Spring Boot resolves configuration from many sources in a defined precedence order, roughly: command-line arguments and environment variables beat application properties files, which beat packaged defaults, and profile-specific files such as application-prod.properties beat the base application.properties within the same source type. Binding properties into a validated @ConfigurationProperties class is safer than scattering @Value annotations, because it groups related settings, supports relaxed binding and type conversion, and fails fast on invalid values when validation is enabled. Secrets should come from environment variables or a secret store, never from a committed properties file, and profile-specific behaviour should be expressed as configuration, not as if-statements scattered through code. When a value surprises you, check the active profiles and the effective property source order before assuming the code is wrong.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Where should secrets live, and why not in application.properties?",
+      "How do you fail fast on invalid configuration?"
+    ],
+    "id": "iq-m2-profiles-configuration",
+    "module": "module-2",
+    "question": "How does Spring Boot decide which configuration value wins, and how should you structure configuration for multiple environments?",
+    "relatedTopics": [
+      "spring-boot-autoconfig"
+    ],
+    "shortAnswer": "Higher-precedence sources such as command-line arguments and environment variables beat properties files, and profile-specific files beat the base file; bind settings into validated @ConfigurationProperties classes.",
+    "tips": [
+      "Recite the precedence order in one sentence.",
+      "Recommend @ConfigurationProperties over scattered @Value."
+    ],
+    "title": "Profiles and configuration precedence",
+    "topicId": "configuration-profiles"
+  },
+  {
+    "category": "Spring MVC",
+    "detailedAnswer": "A @RestControllerAdvice class centralizes exception handling across controllers, mapping each exception type to a consistent error body and HTTP status, so controllers stay focused on happy-path logic. Bean Validation annotations such as @NotNull, @Size, and @Pattern on a request DTO, triggered by @Valid, reject bad input before business logic runs, and validation failures arrive as a MethodArgumentNotValidException you can translate in the same advice class. Return ResponseEntity when the status or headers vary, such as 201 Created with a Location header after creating a resource, and keep error bodies stable with fields for a code, a message, and request context. Never leak stack traces or internal exception messages to clients, and never use exceptions for ordinary control flow.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Where does validation run relative to controller logic?",
+      "What should a stable API error body contain?"
+    ],
+    "id": "iq-m2-rest-exception-handling",
+    "module": "module-2",
+    "question": "How do you design consistent error handling and validation for a Spring MVC REST API?",
+    "relatedTopics": [
+      "spring-mvc-rest"
+    ],
+    "shortAnswer": "Validate DTOs with Bean Validation, translate exceptions centrally in @RestControllerAdvice into stable error bodies, and use ResponseEntity when status or headers vary.",
+    "tips": [
+      "Pair validation and exception translation — they belong together in the answer.",
+      "Mention 201 with a Location header as the ResponseEntity example."
+    ],
+    "title": "REST error handling and validation",
+    "topicId": "validation-exception-handling"
+  },
+  {
+    "category": "Spring Data JPA",
+    "detailedAnswer": "Derived query methods are readable for simple lookups, but they grow unwieldy for complex conditions, so use @Query for explicit JPQL or native SQL, and projections or DTO queries when you only need a few columns. Pagination with Pageable is convenient, but offset pagination degrades on large tables because the database still scans skipped rows, so keyset pagination on an ordered unique key is better for infinite-scroll or export workloads. Keep transaction boundaries at the service layer, not the repository, so a unit of work that touches several repositories commits or rolls back together, and avoid lazy-loading collections inside a controller after the transaction has closed. Count queries for Page results can also be expensive, so use Slice or a separate count only when the total is actually displayed.",
+    "difficulty": "Medium",
+    "followUps": [
+      "When is keyset pagination better than offset pagination?",
+      "Why should transactions live at the service layer?"
+    ],
+    "id": "iq-m2-jpa-queries-pagination",
+    "module": "module-2",
+    "question": "How do you choose between derived queries, @Query, and pagination strategies in Spring Data JPA?",
+    "relatedTopics": [
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "Derived queries for simple lookups, @Query for complex or selective queries, offset pagination for small result sets, and keyset pagination for large or scrolling workloads.",
+    "tips": [
+      "Name the offset-pagination cost: skipped rows are still scanned.",
+      "Put transactions at the service layer, not the repository."
+    ],
+    "title": "JPA queries and pagination",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Microservices",
+    "detailedAnswer": "A microservice deployment typically needs service discovery so instances can find each other as they scale, centralized configuration so behaviour changes without redeploying, and a resilience layer with timeouts, retries with backoff, and circuit breakers. Timeouts bound how long you wait, retries help only for transient and idempotent failures, and a circuit breaker stops calling a failing dependency so it can recover instead of being overwhelmed by retries. Retrying a non-idempotent operation, such as a payment, without an idempotency key can duplicate its effect, so retry policy and idempotency must be designed together. Health endpoints and distributed tracing are what let you find the failing service in the first place, so treat observability as part of the design, not an afterthought.",
+    "difficulty": "Medium",
+    "followUps": [
+      "When is a retry dangerous rather than helpful?",
+      "How do a timeout, a retry, and a circuit breaker complement each other?"
+    ],
+    "id": "iq-m2-microservices-resilience",
+    "module": "module-2",
+    "question": "What resilience patterns does a microservice need, and when does each one apply?",
+    "relatedTopics": [
+      "actuator-microservices-deployment",
+      "spring-mvc-rest"
+    ],
+    "shortAnswer": "Service discovery, centralized configuration, timeouts to bound waits, retries only for transient idempotent failures, and circuit breakers to stop overwhelming a failing dependency.",
+    "tips": [
+      "Distinguish retries from circuit breakers by their purpose.",
+      "Flag non-idempotent retries, such as payments, as the classic mistake."
+    ],
+    "title": "Microservice resilience patterns",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "SQL",
+    "detailedAnswer": "An inner join returns only rows with a match on both sides, a left join keeps every row from the left table and fills unmatched right-side columns with null, and a full outer join keeps unmatched rows from both sides. To find duplicates, group by the candidate columns and keep only groups whose count is greater than one; to find orphan rows, use a left join and filter for null on the right side, or an anti-join with NOT EXISTS. Indexes speed up filtered and joined columns, but every index slows writes and costs storage, so index the columns your queries actually filter and join on, and verify with an execution plan rather than guessing. A common mistake is joining on a column with a different type or collation, which silently prevents index use.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How would you find customers with no orders?",
+      "Why can adding an index make some queries slower?"
+    ],
+    "id": "iq-m2-sql-joins-duplicates",
+    "module": "module-2",
+    "question": "How do join types differ, and how would you find duplicate and orphan rows in SQL?",
+    "relatedTopics": [
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "Inner keeps only matches, left keeps all left rows with nulls for misses, full outer keeps both sides; find duplicates with GROUP BY and HAVING COUNT greater than one, orphans with a left join filtered to null.",
+    "tips": [
+      "Give the orphan-row query pattern, not just the join definitions.",
+      "Mention checking the execution plan before adding indexes."
+    ],
+    "title": "SQL joins, duplicates, and orphans",
+    "topicId": "jdbc-networking"
+  },
+  {
+    "category": "Coding",
+    "detailedAnswer": "The task is to group words that are anagrams of each other, for example listen and silent. The idiomatic approach is a single pass over the input: for each word, build a canonical key by sorting its characters or by counting character frequencies, then append the word to the list stored under that key in a hash map. Sorting gives a key in time proportional to word length times log word length, while a frequency count gives a linear-time key and is preferable for long words. At the end, return the map values as the groups. A common mistake is comparing words pairwise, which is quadratic, or using the unsorted word itself as the key, which never groups anything.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How would you improve the key for very long words?",
+      "How does the complexity change if the alphabet is tiny, such as lowercase letters only?"
+    ],
+    "id": "iq-m2-coding-group-anagrams",
+    "module": "module-2",
+    "question": "Coding task: group a list of words into sets of anagrams. What is your approach and its complexity?",
+    "relatedTopics": [
+      "collections-framework",
+      "strings"
+    ],
+    "shortAnswer": "Build a canonical key per word, by sorted characters or character counts, and collect words into a hash map keyed by that key; each word is processed once.",
+    "tips": [
+      "State the key idea first — the rest of the solution follows from it.",
+      "Compare sorting versus counting keys to show you considered trade-offs."
+    ],
+    "title": "Coding: group anagrams",
+    "topicId": "collections-framework"
+  },
+  {
+    "category": "Scenario-based",
+    "detailedAnswer": "Start by reproducing the slowness with a realistic request and measuring where time goes: check application metrics for thread-pool saturation, database connection-pool waits, and cache hit rates, and enable slow-query logging before changing anything. The usual culprits, in order, are an N+1 query pattern introduced by a new feature, a missing index on a newly filtered column, an unbounded result set being serialized, and a downstream call without a timeout. Fix the query or add the index, page or limit the result, add a timeout and a cache only where the data tolerates staleness, and verify with the same measurement you started from. A common mistake is adding caching or scaling instances first, which hides the bad query and spreads its cost across more machines.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How do you confirm an N+1 problem rather than guessing?",
+      "When is adding a cache the wrong fix?"
+    ],
+    "id": "iq-m2-scenario-slow-api",
+    "module": "module-2",
+    "question": "Scenario: a REST endpoint that used to respond in 200ms now takes 5 seconds under load, with no recent deployment. How do you investigate and fix it?",
+    "relatedTopics": [
+      "performance-best-practices",
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "Measure first — thread pool, connection pool, slow queries, cache hit rate — then fix the usual causes in order: N+1 queries, missing index, unbounded results, or a timeout-less downstream call.",
+    "tips": [
+      "Lead with measurement, not with a fix.",
+      "Name the trap: scaling out before finding the bad query."
+    ],
+    "title": "Scenario: suddenly slow API",
+    "topicId": "performance-best-practices"
+  },
+  {
+    "category": "Java",
+    "detailedAnswer": "The Java Memory Model defines happens-before relationships that guarantee when one thread's writes become visible to another: unlocking a monitor happens before a later lock of the same monitor, writing a volatile variable happens before a later read of it, and starting a thread happens before anything in that thread. Double-checked locking was broken before Java 5 because the instance reference could become visible before the constructor finished, letting another thread observe a partially constructed object. Declaring the field volatile fixes it, because the volatile write of the reference happens after construction and is visible only after the object is fully initialized. In practice, prefer an enum singleton, a static holder class, or dependency injection over hand-rolled double-checked locking, and never rely on timing or sleep to order visibility.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why was double-checked locking broken before Java 5?",
+      "What is a safe alternative to double-checked locking?"
+    ],
+    "id": "iq-m2-java-memory-model-dcl",
+    "module": "module-2",
+    "question": "Why did double-checked locking need volatile, and what does happens-before guarantee?",
+    "relatedTopics": [
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Happens-before guarantees visibility between ordered actions; without volatile, another thread could see a partially constructed singleton, so volatile orders the reference publication after construction.",
+    "tips": [
+      "Explain the partially constructed object problem concretely.",
+      "Recommend the enum singleton or static holder as the practical alternative."
+    ],
+    "title": "Java Memory Model and double-checked locking",
+    "topicId": "java-memory-model"
+  },
+  {
+    "category": "Collections",
+    "commonMistakes": [
+      "Overriding equals() without hashCode().",
+      "Using a mutable entity with a generated id as a key before the id is set.",
+      "Assuming a lost entry means the map is broken rather than the key changed."
+    ],
+    "detailedAnswer": "The contract has two parts: if two objects are equal, they must return the same hash code, and if you override one of equals() or hashCode(), you should override both so they agree on which fields matter. A HashMap finds an entry by hashing the key and looking in one bucket, so it assumes the hash never changes while the key sits in the map. If the key is mutable and a field used in hashCode changes after the put, a later get hashes to a different bucket and returns null, and even remove() cannot find the entry — the map quietly leaks an entry you can no longer reach. The same failure appears with equals-only overrides: two equal objects land in different buckets because their default identity hash codes differ. The safe rule is to make map keys immutable, or at least never change the fields that equals() and hashCode() use after insertion; records and well-designed value objects are good keys for exactly this reason.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What happens if you override equals() but not hashCode()?",
+      "Why is a record a safer HashMap key than a mutable bean?"
+    ],
+    "id": "iq-m2src-equals-hashcode-mutable-keys",
+    "module": "module-2",
+    "question": "What is the contract between equals() and hashCode(), and what goes wrong when you use a mutable object as a HashMap key?",
+    "relatedTopics": [
+      "collections-deep-dive",
+      "oop-principles"
+    ],
+    "shortAnswer": "Equal objects must return the same hash code, and hashCode must stay stable while the object is a key; if a key's fields change after insertion, its hash changes and the entry becomes unfindable even though it is still in the map.",
+    "tips": [
+      "State the contract first, then the mutable-key failure — the interviewer wants the cause, not just the rule.",
+      "Mention that remove() fails too, not just get()."
+    ],
+    "title": "equals/hashCode contract and mutable map keys",
+    "topicId": "collections-framework"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Forgetting serialVersionUID and breaking saved data after a small class change.",
+      "Serializing a field that holds a password or a live connection.",
+      "Assuming a deserialized object went through validation in the constructor."
+    ],
+    "detailedAnswer": "A class must implement Serializable, and every field reachable from it must be serializable too — one non-serializable field makes the whole write fail with a NotSerializableException, so you mark such fields transient or give the class custom writeObject/readObject methods. Static fields are never serialized because they belong to the class, not the object, so a deserialized object sees the current static values, not the ones from serialization time. The serialVersionUID is the version stamp checked on read: if you change the class without declaring a stable id, the compiler generates a new one and old saved data fails with an InvalidClassException, so declare an explicit id and change it only when you mean to break compatibility. Mark passwords, tokens, and cached derived values transient, and rebuild them after deserialization; never assume deserialization runs your constructor, because it does not — it rebuilds the object directly, so invariants your constructor enforces must be re-checked in readObject.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Does deserialization call the constructor? Why does that matter?",
+      "When would you write custom writeObject and readObject methods?"
+    ],
+    "id": "iq-m2src-serialization-pitfalls",
+    "module": "module-2",
+    "question": "What can go wrong when you serialize an object in Java, and how do serialVersionUID, transient, and non-serializable fields fit in?",
+    "relatedTopics": [
+      "exception-handling"
+    ],
+    "shortAnswer": "Serialization fails or silently loses data when a field is not serializable, when serialVersionUID changes between versions, or when you forget that static fields are never serialized and sensitive fields need transient.",
+    "tips": [
+      "Name the three classic failures: non-serializable field, version mismatch, and static/transient surprises.",
+      "Point out that deserialization skips the constructor — it surprises interviewers when candidates know it."
+    ],
+    "title": "Java serialization pitfalls",
+    "topicId": "reflection-serialization"
+  },
+  {
+    "category": "JVM",
+    "commonMistakes": [
+      "Treating the two as interchangeable.",
+      "Catching NoClassDefFoundError instead of fixing the classpath.",
+      "Missing the earlier ExceptionInInitializerError in the logs."
+    ],
+    "detailedAnswer": "ClassNotFoundException happens when something explicitly loads a class by name — Class.forName, a JDBC driver load, or a plugin system — and the class is not on the classpath; it is a checked exception, so calling code is expected to handle it. NoClassDefFoundError is different: the class was there when the code was compiled, but at runtime the classloader cannot find it, or its static initializer failed earlier and the class is now unusable. The most common production causes are a jar present in the build but missing from the deployed artifact, two versions of the same library on the classpath, and a static block that threw an ExceptionInInitializerError on first load, after which every later use reports NoClassDefFoundError instead of the original cause. When you see it, check the deployment classpath first, then look earlier in the logs for the failed static initialization that poisoned the class.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does a failed static initializer later show up as NoClassDefFoundError?",
+      "How would you find which jar is missing in a deployed application?"
+    ],
+    "id": "iq-m2src-noclassdef-vs-classnotfound",
+    "module": "module-2",
+    "question": "What is the difference between NoClassDefFoundError and ClassNotFoundException, and when does each one appear?",
+    "relatedTopics": [
+      "garbage-collection"
+    ],
+    "shortAnswer": "ClassNotFoundException is a checked exception when code asks the classloader for a class by name at runtime and it is missing; NoClassDefFoundError is an error when a class that was present at compile time cannot be found or failed to load at runtime.",
+    "tips": [
+      "Lead with the compile-time versus runtime distinction — that is the whole answer in one line.",
+      "Mention the poisoned-class case: a static init failure hides behind this error."
+    ],
+    "title": "NoClassDefFoundError vs ClassNotFoundException",
+    "topicId": "jdk-jre-jvm"
+  },
+  {
+    "category": "Collections",
+    "commonMistakes": [
+      "Storing custom objects with no Comparable or Comparator.",
+      "Writing a Comparator that disagrees with equals and losing elements.",
+      "Assuming TreeSet allows null like HashSet does."
+    ],
+    "detailedAnswer": "TreeSet is backed by a tree, so every add, remove, and lookup costs logarithmic time and iteration comes out in sorted order, unlike HashSet, which is unordered. A class either implements Comparable to define its one natural ordering, or you pass a Comparator to the TreeSet constructor when you want a different ordering or the class has no natural one — for example, sorting employees by salary instead of by id. Two traps matter in interviews: first, if you try to store a custom object with neither, you get a ClassCastException at runtime, not at compile time; second, TreeSet decides duplicates by comparison, not by equals, so two objects that compare as zero are treated as the same element even if equals says they differ, and one silently disappears. Nulls are also a trap: a TreeSet with natural ordering rejects null, while one with a null-tolerant Comparator may accept it. Keep the comparison consistent with equals where you can, and use a Comparator when the ordering belongs to the use case rather than the class itself.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why can TreeSet silently drop an element that HashSet would keep?",
+      "When would you choose TreeSet over sorting a list once?"
+    ],
+    "id": "iq-m2src-treeset-comparable-comparator",
+    "module": "module-2",
+    "question": "How does TreeSet order its elements, and when do you use Comparable versus a Comparator — including for custom objects?",
+    "relatedTopics": [
+      "collections-deep-dive"
+    ],
+    "shortAnswer": "TreeSet keeps elements sorted using their natural ordering (Comparable) or a Comparator given at construction; a custom object needs one of the two, and elements that compare as equal are treated as duplicates and only one is kept.",
+    "tips": [
+      "Explain the duplicate rule (comparison, not equals) — it is the part most candidates miss.",
+      "Contrast with HashSet on ordering and on how duplicates are decided."
+    ],
+    "title": "TreeSet, Comparable, and Comparator",
+    "topicId": "collections-framework"
+  },
+  {
+    "category": "Streams",
+    "commonMistakes": [
+      "Using map() where flatMap() was needed and getting nested lists.",
+      "Doing real work or mutation inside peek().",
+      "Expecting peek() to run when the pipeline has no terminal operation."
+    ],
+    "detailedAnswer": "Use map() for one-to-one changes, such as turning a User into its email address: the stream stays the same length. Use flatMap() when each element holds several things, such as each order holding a list of items: flatMap turns each order into a stream of its items and merges all those streams, so the result is one flat stream of items instead of a stream of lists. The classic mistake is mapping to a List and ending up with a Stream of Lists when a flat stream was wanted. peek() exists to look at elements while they pass through, mainly for logging or debugging during development; it returns the same elements unchanged. Using peek() to mutate elements or to do real work is a mistake, because the pipeline may skip peek entirely — streams are lazy, so peek never runs if there is no terminal operation, and in some pipelines elements may not pass through peek in the order you expect. Keep side effects out of stream pipelines; if you need to change data, map() is the honest operation.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What does your stream contain if you map each order to its list of items instead of flatMapping?",
+      "Why might a peek() call never execute?"
+    ],
+    "id": "iq-m2src-map-flatmap-peek",
+    "module": "module-2",
+    "question": "What is the difference between map() and flatMap() in a stream, and when is peek() appropriate instead of map()?",
+    "relatedTopics": [
+      "functional-interfaces-optional"
+    ],
+    "shortAnswer": "map() turns each element into one new element, flatMap() turns each element into a stream and flattens the results into one stream, and peek() only looks at elements for debugging — it should not change them.",
+    "tips": [
+      "Give the one-to-one versus one-to-many contrast first.",
+      "Mention laziness: peek without a terminal operation does nothing."
+    ],
+    "title": "map vs flatMap, and peek vs map",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Streams",
+    "commonMistakes": [
+      "Calling get() without checking isPresent().",
+      "Wrapping a value that can never be null in ofNullable() and hiding a bug.",
+      "Using Optional as a field or parameter type."
+    ],
+    "detailedAnswer": "Optional.of(value) throws immediately on null, which is right when null would be a bug, while Optional.ofNullable(value) accepts a possibly-null value and gives an empty Optional — using of() with a value that might be null just moves the NullPointerException to a different line. findFirst() guarantees the first element in encounter order, which costs coordination in a parallel stream, while findAny() is allowed to return any matching element, so it can be faster when you only need one match and do not care which. Both return an Optional, so handle the empty case with orElse, orElseGet, or orElseThrow rather than calling get() blindly. Do not use Optional as a field type, a method parameter, or a collection element: it adds wrapping for no benefit, breaks serialization, and makes the API awkward — return it from methods that may have no result, and use orElseThrow at the boundary where a missing value is genuinely an error.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why is findAny() allowed to be faster than findFirst() in a parallel stream?",
+      "Why is Optional a poor choice for a method parameter?"
+    ],
+    "id": "iq-m2src-optional-findfirst-findany",
+    "module": "module-2",
+    "question": "How should you use Optional correctly — of() versus ofNullable(), findFirst() versus findAny() — and when should you not use Optional at all?",
+    "relatedTopics": [
+      "streams-lambdas"
+    ],
+    "shortAnswer": "Use of() only when the value cannot be null and ofNullable() when it might be; findFirst() keeps encounter order while findAny() may return any match and is faster in parallel streams; do not use Optional for fields, parameters, or collections.",
+    "tips": [
+      "Pair each API choice with its rule: of() for never-null, ofNullable() for maybe-null.",
+      "Name the places Optional does not belong — fields, parameters, collections."
+    ],
+    "title": "Optional: of vs ofNullable, findFirst vs findAny",
+    "topicId": "functional-interfaces-optional"
+  },
+  {
+    "category": "Concurrency",
+    "commonMistakes": [
+      "Using ReentrantLock everywhere for no reason.",
+      "Forgetting unlock in a finally block.",
+      "Leaving ThreadLocal values set on pooled threads."
+    ],
+    "detailedAnswer": "synchronized is simpler and the compiler helps you release the lock, so it should be the default. ReentrantLock earns its place when you need something synchronized cannot do: tryLock with a timeout so a thread gives up instead of waiting forever, lockInterruptibly so a waiting thread can be interrupted, a fair ordering policy, or several Condition objects so different waiters can be woken separately. The price is discipline — you must release the lock in a finally block, or an exception leaves it held forever. ThreadLocal gives each thread its own copy of a value, which fits state that is logically per-thread: a non-thread-safe formatter, a per-request context holder, or a reusable buffer. The danger is thread pools: pooled threads are reused, so a ThreadLocal value set during one request is still there for the next request unless you remove it, which leaks data between requests and can hold large objects alive. Always remove ThreadLocal values in a finally block when the work finishes.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What happens if you forget to unlock a ReentrantLock in a finally block?",
+      "Why is ThreadLocal especially risky with a thread pool?"
+    ],
+    "id": "iq-m2src-reentrantlock-threadlocal",
+    "module": "module-2",
+    "question": "When would you choose ReentrantLock over synchronized, and what are legitimate uses of ThreadLocal?",
+    "relatedTopics": [
+      "executors-completablefuture"
+    ],
+    "shortAnswer": "Choose ReentrantLock when you need timed or interruptible lock attempts, fairness, or multiple wait sets; use ThreadLocal only for genuinely per-thread state such as a date formatter or request context, and always clean it up in pooled threads.",
+    "tips": [
+      "Start with 'synchronized by default, ReentrantLock for a named feature' — it shows judgement.",
+      "Name the pool-reuse leak for ThreadLocal; interviewers look for it."
+    ],
+    "title": "ReentrantLock vs synchronized, and ThreadLocal uses",
+    "topicId": "concurrency-basics"
+  },
+  {
+    "category": "Concurrency",
+    "commonMistakes": [
+      "Using execute() and never noticing failed tasks.",
+      "Ignoring the Future returned by submit().",
+      "Using an unbounded queue and discovering overload only through an out-of-memory error."
+    ],
+    "detailedAnswer": "execute() takes a Runnable, returns nothing, and if the task throws, the exception is lost unless the thread's uncaught-exception handler sees it — a silent failure that is hard to debug. submit() returns a Future: for a Runnable it completes with null, for a Callable it holds the result, and in both cases calling get() rethrows the task's exception wrapped in an ExecutionException, so failures become visible. That makes submit() the safer default when a task can fail. Rejection happens when the pool is at maximum size and the work queue is full, or after shutdown: the default handler throws RejectedExecutionException to the caller, which is honest but can crash the submitting thread if unhandled. Alternatives are CallerRunsPolicy, which makes the submitting thread run the task itself and naturally slows down the producer, or a custom handler that logs and records the rejection. In production, prefer a bounded queue with CallerRunsPolicy or a recorded rejection over an unbounded queue, because an unbounded queue hides overload until the application runs out of memory.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why is an unbounded work queue dangerous in production?",
+      "How does CallerRunsPolicy act as backpressure?"
+    ],
+    "id": "iq-m2src-submit-execute-rejection",
+    "module": "module-2",
+    "question": "What is the difference between submit() and execute() on an ExecutorService, and how do you handle tasks that get rejected?",
+    "relatedTopics": [
+      "concurrency-basics"
+    ],
+    "shortAnswer": "execute() runs a Runnable and drops its exceptions silently, while submit() returns a Future that lets you retrieve the result or the failure; when the pool and its queue are full, a RejectedExecutionHandler decides what happens to the extra task.",
+    "tips": [
+      "Contrast the two by what happens to a thrown exception — that is the key difference.",
+      "Recommend a bounded queue and a deliberate rejection policy, not the defaults."
+    ],
+    "title": "ExecutorService: submit vs execute and rejection handling",
+    "topicId": "executors-completablefuture"
+  },
+  {
+    "category": "Spring Framework",
+    "commonMistakes": [
+      "Doing heavy work in a constructor instead of @PostConstruct, before dependencies are ready.",
+      "Expecting @PreDestroy to run for prototype beans — the container never destroys them.",
+      "Confusing BeanFactory with the container actually used in a Spring Boot app."
+    ],
+    "detailedAnswer": "The lifecycle runs in a fixed order: the container instantiates the bean, injects its dependencies, calls aware interfaces such as BeanNameAware, runs BeanPostProcessor methods before initialization, invokes the init method (@PostConstruct or an init-method), and then the bean serves requests; on shutdown it calls destroy methods (@PreDestroy or a destroy-method). BeanPostProcessors are the extension point where frameworks wrap beans in proxies, which is why @Transactional and @Cacheable work. BeanFactory is the minimal container: it creates beans lazily and offers little else. ApplicationContext builds on it with eager creation of singletons at startup, so configuration errors fail fast instead of at first request, plus event publishing, internationalization, environment and profile handling, and resource loading. In practice everyone uses ApplicationContext; BeanFactory only matters when you need a deliberately lazy, lightweight container, such as in a resource-constrained embedded case.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Where in the lifecycle do proxy-based features like @Transactional get applied?",
+      "Why is eager singleton creation useful at startup?"
+    ],
+    "id": "iq-m2src-bean-lifecycle-context",
+    "module": "module-2",
+    "question": "What are the stages of a Spring bean's lifecycle, and what does ApplicationContext add over BeanFactory?",
+    "relatedTopics": [
+      "bean-scopes-lifecycle"
+    ],
+    "shortAnswer": "A bean is instantiated, its dependencies are injected, aware callbacks and post-processors run, init methods execute, and on shutdown destroy methods run; ApplicationContext adds eager singleton creation, events, messaging, and environment support on top of BeanFactory's basic container.",
+    "tips": [
+      "Recite the lifecycle in order — interviewers listen for the sequence.",
+      "Mention fail-fast startup as the practical benefit of ApplicationContext."
+    ],
+    "title": "Spring bean lifecycle and ApplicationContext vs BeanFactory",
+    "topicId": "spring-ioc-di"
+  },
+  {
+    "category": "Spring Framework",
+    "commonMistakes": [
+      "Marking several beans @Primary for the same type.",
+      "Hard-coding qualifier strings in many places so a rename breaks injection silently.",
+      "Expecting Spring to pick a bean by itself when two match."
+    ],
+    "detailedAnswer": "When two beans share a type and one is injected by type alone, Spring fails with a no-unique-bean error rather than guessing. @Primary on one bean definition says 'use this one when nobody specifies otherwise', which is right for a default implementation — for example, a primary payment gateway with an alternative kept for special cases. @Qualifier on the injection point says 'use the bean with this name', which is right when the choice belongs to the caller, such as injecting a specific notification sender in one service and a different one elsewhere. The two compose: @Qualifier wins over @Primary at a point that names a bean, and @Primary applies everywhere else. If the bean names drift from the qualifier strings, the failure appears at startup, which is good — fail fast beats a wrong bean at runtime. Keep qualifier names as constants where they are reused, and avoid marking everything @Primary, because two primaries of the same type fail just like no primary at all.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What happens if two beans of the same type are both marked @Primary?",
+      "Why is a startup failure better than silently picking a bean?"
+    ],
+    "id": "iq-m2src-qualifier-primary",
+    "module": "module-2",
+    "question": "When Spring finds two beans of the same type, how do @Qualifier and @Primary resolve the conflict, and when would you use each?",
+    "relatedTopics": [
+      "bean-scopes-lifecycle"
+    ],
+    "shortAnswer": "@Primary marks one bean as the default when several match, while @Qualifier at the injection point picks one bean by name; use @Primary for a sensible default and @Qualifier when the caller must choose explicitly.",
+    "tips": [
+      "State the rule as default versus explicit choice — it makes the answer easy to follow.",
+      "Note that @Qualifier beats @Primary where both apply."
+    ],
+    "title": "@Qualifier vs @Primary for conflicting beans",
+    "topicId": "spring-ioc-di"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Writing a separate test method for every input value.",
+      "Using try/catch with a forgotten fail() call.",
+      "Asserting only the exception type when the message is part of the contract."
+    ],
+    "detailedAnswer": "With @ParameterizedTest and a source such as @ValueSource or @MethodSource, the same test body runs once per input, and each run is reported separately with its arguments, so a failure names the exact input that broke. A @MethodSource can supply whole argument sets, including the expected result, which keeps the test table visible in one place. For exceptions, assertThrows(ExpectedException.class, () -> service.doWork(badInput)) both asserts the type and returns the exception so you can check its message. This replaces the old pattern of a try block with a fail() call, which was easy to get wrong — forgetting the fail() made the test pass when no exception was thrown. One test per input looks thorough but hides the pattern: when the rule changes, you must edit a dozen tests instead of one table. Keep each parameterized case independent, give the method source a clear name, and assert the message as well as the type when the message is part of the contract.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why is forgetting fail() in the old try/catch exception-test pattern so dangerous?",
+      "When would @MethodSource be better than @ValueSource?"
+    ],
+    "id": "iq-m2src-junit5-parameterized-exceptions",
+    "module": "module-2",
+    "question": "How do you write parameterized tests and exception tests in JUnit 5, and why are they better than writing one test per case?",
+    "relatedTopics": [
+      "tst-test-design"
+    ],
+    "shortAnswer": "A parameterized test runs one test method over many inputs from a value or method source, and assertThrows checks that a call fails with the expected exception; both replace a pile of near-identical tests with one readable case each.",
+    "tips": [
+      "Show the assertThrows shape in words: exception type plus the executable.",
+      "Emphasise that each parameterized run is reported separately."
+    ],
+    "title": "JUnit 5: parameterized tests and testing exceptions",
+    "topicId": "tst-junit-mockito-fundamentals"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Exposing all endpoints with no authentication.",
+      "Letting health depend on a slow downstream so the load balancer drops healthy instances.",
+      "Checking metrics on a dashboard but never alerting on them."
+    ],
+    "detailedAnswer": "Actuator adds operational endpoints to a running application: health shows whether the app and its dependencies are up, metrics exposes counters and timers for dashboards and alerts, info carries build or git details, and loggers lets you change log levels at runtime without restarting. In production, expose only a small safe set — typically health and info — and keep sensitive endpoints such as env, configprops, heapdump, and threaddump behind authentication and, ideally, a separate management port reachable only from inside the network. The env endpoint can leak secrets and connection strings, and a heap dump can contain tokens and passwords, so treating them as public is a real security hole. Health itself needs care: the simple liveness check should answer even when a downstream is slow, while the readiness check can include dependencies, so a load balancer stops sending traffic to an instance that cannot serve yet. Wire the endpoints into your monitoring with alerts on health going down and on error-rate metrics, not just a dashboard you glance at.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why should liveness and readiness be different checks?",
+      "What could an attacker learn from an exposed env endpoint?"
+    ],
+    "id": "iq-m2src-actuator-securing",
+    "module": "module-2",
+    "question": "What do Spring Boot Actuator endpoints give you in production, and how should you secure them?",
+    "relatedTopics": [
+      "spring-boot-autoconfig"
+    ],
+    "shortAnswer": "Actuator exposes health, metrics, environment, and log-control endpoints for monitoring; expose only health and info publicly, protect the rest behind authentication, and never expose env or heap dumps outside a trusted network.",
+    "tips": [
+      "Name the endpoints to expose and the ones to hide — the split is the answer.",
+      "Mention a separate management port as the cleanest protection."
+    ],
+    "title": "Actuator endpoints and securing them",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Caching without any eviction on writes.",
+      "Expecting time-based expiration from the default simple cache.",
+      "Calling a cached method directly within the same class and wondering why it never caches."
+    ],
+    "detailedAnswer": "Add @EnableCaching, then put @Cacheable on a method whose result is expensive and safe to reuse — Spring stores the result under a key built from the method arguments and returns it on later calls without running the method. When the underlying data changes, use @CacheEvict on the write method to remove the stale entry, or @CachePut to run the method and store its fresh result. Eviction is an action you trigger, usually on a write; expiration is a policy on the cache, such as removing entries after a fixed time or after a period without access, and it needs a real cache provider — the default simple in-memory cache has no expiration support. The classic production bug is caching something and never evicting it, so users see stale data indefinitely. Cache only data that tolerates staleness, keep the key design explicit when arguments are complex objects, and remember the method must be called through the Spring proxy: a self-call inside the same class bypasses the cache entirely.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does calling a @Cacheable method from inside the same class skip the cache?",
+      "How do you decide what is safe to cache?"
+    ],
+    "id": "iq-m2src-spring-boot-caching",
+    "module": "module-2",
+    "question": "How do you add caching to a Spring Boot application, and what is the difference between cache eviction and cache expiration?",
+    "relatedTopics": [
+      "spring-boot-autoconfig"
+    ],
+    "shortAnswer": "Enable caching and annotate methods with @Cacheable for reads, @CacheEvict to remove entries when data changes, and @CachePut to refresh them; eviction is an explicit removal, expiration is a time-based removal configured on the cache itself.",
+    "tips": [
+      "Separate the two concepts crisply: eviction is an action, expiration is a policy.",
+      "Name the stale-data bug as the first risk."
+    ],
+    "title": "Caching in Spring Boot: @Cacheable, eviction, and expiration",
+    "topicId": "performance-best-practices"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Using long-lived access tokens with no refresh flow.",
+      "Putting passwords or personal data in the token payload.",
+      "Accepting tokens without checking issuer, audience, or algorithm."
+    ],
+    "detailedAnswer": "The flow is: the client posts credentials, the server checks them against the user store, and returns a signed JWT containing the user id and roles plus an expiry — typically minutes, not hours. A filter placed before the normal security checks reads the Authorization header, verifies the signature and expiry, and puts an authenticated principal into the security context; requests without a valid token are rejected before reaching any controller. Keep the signing secret out of source control and rotate it on a schedule, and never put sensitive data in the token payload — it is only encoded, not encrypted, so anyone holding the token can read it. The hard problems are refresh and revocation: use a separate, longer-lived refresh token stored server-side that can be rotated and revoked, and accept that an access token stays usable until it expires, which is why short lifetimes matter. On logout, delete the refresh token; do not pretend the access token is dead. Validate the token's issuer and audience claims, reject tokens signed with the wrong algorithm, and always send tokens over HTTPS.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why can you not truly revoke an access token before it expires?",
+      "What belongs in a JWT payload and what must never go there?"
+    ],
+    "id": "iq-m2src-jwt-spring-boot",
+    "module": "module-2",
+    "question": "How do you secure a Spring Boot API with JWT, and what are the tricky parts — token expiry, refresh, and revocation?",
+    "relatedTopics": [
+      "spring-mvc-rest"
+    ],
+    "shortAnswer": "A login endpoint issues a short-lived signed JWT, a filter validates it on each request and fills the security context, and refresh tokens rotate access; revocation is the hard part because a valid token cannot be unsent, so keep lifetimes short.",
+    "tips": [
+      "Name the filter position and the security context — that shows the mechanics.",
+      "Be honest about revocation: short lifetimes plus refresh rotation is the real answer."
+    ],
+    "title": "JWT authentication in Spring Boot",
+    "topicId": "security-jwt"
+  },
+  {
+    "category": "Spring Data JPA",
+    "commonMistakes": [
+      "Marking everything eager to dodge lazy-loading errors.",
+      "Accessing a lazy collection in a controller after the transaction closed.",
+      "Using getReferenceById() and expecting an empty result for a missing row."
+    ],
+    "detailedAnswer": "Lazy loading means the association is loaded only when first accessed, inside an open session; eager loading fetches it with the parent every time. Eager feels convenient but loads data most callers never need and can pull a whole object graph into memory, so the rule is lazy by default and eager only for small associations the use case always needs, such as an order's status lookup. The trap is accessing a lazy collection after the transaction closes, which throws LazyInitializationException — fix it by fetching what you need inside the transaction with a join fetch or an entity graph, not by switching everything to eager. findById() runs a query immediately and gives you Optional.empty() when the row is missing. getReferenceById() returns a proxy with only the id filled in and no query; it is cheap when you only need a reference, for example to set a foreign key on a new child, but touching any other field on a missing row throws EntityNotFoundException. Use findById() when you need the data or must know if it exists, and getReferenceById() only when the id alone is enough.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you fix a LazyInitializationException without making everything eager?",
+      "Why is getReferenceById() useful when creating a child entity?"
+    ],
+    "id": "iq-m2src-jpa-fetch-strategies",
+    "module": "module-2",
+    "question": "When should an association be lazy or eager in JPA, and what is the difference between findById() and getReferenceById() (the old getOne())?",
+    "relatedTopics": [
+      "jdbc-networking"
+    ],
+    "shortAnswer": "Keep associations lazy by default and fetch eagerly only what a use case always needs; findById() hits the database and returns an empty result when missing, while getReferenceById() returns a proxy without a query and fails only when you touch it.",
+    "tips": [
+      "Give the rule first — lazy by default — then the exception.",
+      "Contrast the two methods by when the query runs and when the failure appears."
+    ],
+    "title": "JPA fetch strategies: lazy vs eager, get vs load",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Spring Data JPA",
+    "commonMistakes": [
+      "Inserting thousands of rows in one transaction without flush and clear.",
+      "Running automatic schema updates against production.",
+      "Writing a migration that drops a column other code still reads."
+    ],
+    "detailedAnswer": "Saving entities one by one in a loop is slow for two reasons: each save becomes its own round trip unless JDBC batching is enabled, and the persistence context keeps every managed entity in memory, so it grows without bound. The fix is to enable batching in configuration, save in chunks of a few dozen, and call flush() and clear() after each chunk so the context is emptied and memory stays flat. For very large loads, a bulk insert through JdbcTemplate or a native batch is often simpler than fighting the persistence context. For schema changes, use a versioned migration tool: each change is a numbered script that is applied once, in order, and recorded in a history table, so every environment ends up with the same schema and a failed migration stops the deploy instead of half-applying. Never rely on automatic schema updates in production — they can drop columns, cannot express data migrations, and leave environments silently different. Keep migrations small, backwards-compatible where possible, and test them against a copy of production data.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does the persistence context grow during a large insert loop?",
+      "What goes wrong when two environments apply schema changes in different orders?"
+    ],
+    "id": "iq-m2src-jpa-bulk-batch-migration",
+    "module": "module-2",
+    "question": "How do you insert thousands of rows efficiently with JPA, and how do you handle schema changes safely in a project that uses it?",
+    "relatedTopics": [
+      "db-sql-fundamentals"
+    ],
+    "shortAnswer": "Save in batches with JDBC batching enabled and flush and clear the persistence context regularly so memory stays flat; manage schema changes with versioned migration scripts, never with automatic schema updates in production.",
+    "tips": [
+      "Name the two costs of naive looping: round trips and the growing persistence context.",
+      "Contrast migration scripts with automatic schema updates — the latter is the trap."
+    ],
+    "title": "JPA bulk inserts, batching, and schema migration",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Assuming ordering across a whole topic.",
+      "Adding consumers beyond the partition count and expecting more throughput.",
+      "Using no key and then being surprised that related messages arrive out of order."
+    ],
+    "detailedAnswer": "A topic is a named stream of records, divided into partitions for scale: each partition is an append-only log with an offset per record, and Kafka keeps records in order inside one partition only. A producer chooses a partition by key, so all messages with the same key — for example, all events for one order — land in the same partition and stay ordered; without a key, messages spread across partitions and global order is lost. Consumers work in groups: Kafka assigns each partition to exactly one member of a group, so adding consumers scales up to the number of partitions, and adding more consumers than partitions leaves the extras idle. If a consumer dies, the group rebalances and its partitions move to surviving members, which can briefly pause consumption and may redeliver messages processed just before the failure. Replication keeps a copy of each partition on other brokers, with one leader handling reads and writes; if the leader fails, a replica is elected. The practical rules follow from this: pick partition count from the throughput and consumer parallelism you need, key by the entity whose order matters, and design consumers to tolerate redelivery.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does adding consumers beyond the partition count not help?",
+      "How do you guarantee all events for one order stay in order?"
+    ],
+    "id": "iq-m2src-kafka-partitions-consumer-groups",
+    "module": "module-2",
+    "question": "How do Kafka topics, partitions, and consumer groups work together, and what does that mean for ordering and scaling?",
+    "relatedTopics": [
+      "sd-caching-queues-databases"
+    ],
+    "shortAnswer": "A topic is split into partitions, each an ordered log; producers send related messages to the same partition, and a consumer group splits partitions across its members, so ordering holds within a partition but not across the topic.",
+    "tips": [
+      "Explain ordering as per-partition, not per-topic — that is the core insight.",
+      "Tie consumer scaling to partition count explicitly."
+    ],
+    "title": "Kafka topics, partitions, and consumer groups",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Believing acks=all alone prevents duplicates.",
+      "Retrying without idempotence and duplicating records.",
+      "Adding consumers past the partition count to fix lag."
+    ],
+    "detailedAnswer": "Producer acks trade durability against latency: acks=0 never waits, acks=1 waits for the leader only, and acks=all waits for all in-sync replicas, which is the safe choice for data you cannot lose. If a send fails and the producer retries, the same record can be written twice, so enable idempotence — the producer tags each batch with a sequence number and the broker drops duplicates — and keep retries bounded with backoff. Exactly-once is stronger: it needs an idempotent producer plus transactions spanning produce and consume, and even then it means the effect appears once, not that no duplicate was ever written internally; the consumer side must be idempotent too, or a redelivery after a crash will still double-apply. When consumers lag, look in order at slow processing in the consumer, too few partitions to parallelize, frequent rebalances from unstable members, and a producer surge that outruns the consumers; adding consumers helps only up to the partition count, and the durable fixes are faster processing, more partitions, and stable consumer configuration.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why does exactly-once still need an idempotent consumer?",
+      "What would you check first when a consumer group starts lagging?"
+    ],
+    "id": "iq-m2src-kafka-exactly-once-acks",
+    "module": "module-2",
+    "question": "How do you configure Kafka for reliable delivery — what do producer acks, idempotent producers, and exactly-once semantics actually guarantee, and what causes consumer lag?",
+    "relatedTopics": [
+      "sd-caching-queues-databases"
+    ],
+    "shortAnswer": "Acks control how many replicas must confirm a write, an idempotent producer prevents duplicate writes from retries, and exactly-once needs both plus transactional consumption; lag means consumers are slower than producers, so check processing time, partition count, and rebalances first.",
+    "tips": [
+      "Explain each guarantee as a separate layer: acks, idempotence, transactions.",
+      "Give the lag checklist in order — processing, partitions, rebalances."
+    ],
+    "title": "Kafka delivery guarantees: acks, idempotence, and exactly-once",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Putting business logic in the gateway.",
+      "Hard-coding service addresses instead of using discovery.",
+      "Treating a registry failure as a total outage rather than a scaling freeze."
+    ],
+    "detailedAnswer": "Clients should not call dozens of services directly: the API gateway gives them one address, routes each request to the right service, checks authentication, enforces rate limits, and can combine calls or cache common responses. Behind it, services find each other through discovery: each instance registers itself with a registry when it starts, sends heartbeats while healthy, and deregisters on shutdown, so callers always get a current list of addresses instead of hard-coded hosts. Client-side discovery means the caller asks the registry and picks an instance; server-side discovery means the caller asks a router that does it for them. If the registry fails, the damage is limited but real: already-running services keep working from their cached instance lists, but new instances cannot register, dead ones are not removed, and scaling or deploys stop working until the registry recovers — so the registry itself needs replication and health checks. Keep the gateway thin: business logic there becomes a bottleneck that every team must change together, which defeats the point of splitting services.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why do running services survive a registry outage but new deployments do not?",
+      "What belongs in a gateway and what should stay in the services?"
+    ],
+    "id": "iq-m2src-microservices-gateway-discovery",
+    "module": "module-2",
+    "question": "What do an API gateway and service discovery do in a microservices system, and what breaks when the service registry fails?",
+    "relatedTopics": [
+      "sd-scalability-basics"
+    ],
+    "shortAnswer": "The gateway is the single entry point that routes, authenticates, rate-limits, and aggregates for clients; service discovery lets services find each other's current addresses as instances scale, and a registry failure means new instances cannot be found even though running ones keep working from cache.",
+    "tips": [
+      "Separate the two jobs: gateway faces clients, discovery faces services.",
+      "Mention cached instance lists — that is why a registry outage is partial, not total."
+    ],
+    "title": "API gateway and service discovery in microservices",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Storing passwords in plain text or with MD5/SHA-256.",
+      "Adding a custom filter in the wrong position so it never runs.",
+      "Confusing 401 (not authenticated) with 403 (not allowed)."
+    ],
+    "detailedAnswer": "Every request passes through a chain of filters before it reaches a controller. Early filters handle cross-site protections and session handling, the authentication filter checks the credentials — a login form, a bearer token, or a client certificate — and on success stores the authenticated user in the security context, and the authorization filter then checks whether that user may access the requested resource, returning 401 when unauthenticated and 403 when authenticated but not allowed. You can add your own filter at a defined position in the chain, for example a JWT filter before the standard authentication filter, and order matters: a filter placed after authorization never sees the request it was meant to protect. For passwords, store only a salted hash produced by a slow, adaptive algorithm such as BCrypt: the salt makes identical passwords hash differently, and the slowness makes brute force expensive, while fast hashes such as plain MD5 or SHA-256 are crackable at billions of guesses per second. Never store plain-text passwords, never roll your own hashing, and use a strong work factor that you raise as hardware improves.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does filter order matter when you add a JWT filter?",
+      "Why is a fast hash a bad choice for passwords even with a salt?"
+    ],
+    "id": "iq-m2src-security-filter-chain-passwords",
+    "module": "module-2",
+    "question": "How does the Spring Security filter chain protect a request, and how should passwords be stored?",
+    "relatedTopics": [
+      "spring-mvc-rest"
+    ],
+    "shortAnswer": "A chain of filters runs before your controller: it checks authentication, fills the security context, and enforces authorization; passwords are stored only as salted hashes with a slow algorithm such as BCrypt, never in plain text or with a fast hash.",
+    "tips": [
+      "Walk the chain in order: authenticate, fill the context, authorize.",
+      "Name BCrypt plus salt plus slowness as the three properties."
+    ],
+    "title": "Spring Security filter chain and password storage",
+    "topicId": "security-jwt"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Using the old implicit flow and exposing tokens in the browser.",
+      "Skipping state validation on the redirect.",
+      "Storing the refresh token where client-side code can read it."
+    ],
+    "detailedAnswer": "The flow keeps secrets away from the browser. The application redirects the user to the authorization server with its client id, the requested scopes, and a random state value; the user logs in there and approves the access. The server redirects back with a short-lived authorization code, and the application exchanges that code for an access token and a refresh token by calling the server directly from its backend, authenticating with its client secret — a call the browser never sees. With PKCE, the application also proves it is the same party that started the flow, which protects public clients such as mobile apps that cannot keep a secret. The access token is then sent to resource servers and checked for scope and expiry, while the refresh token is stored securely server-side and used to get new access tokens. This beats the old implicit flow, where tokens went straight to the browser and could be stolen from history or logs, and it beats collecting the user's password directly, which would let the application impersonate the user everywhere. Always validate the state parameter to stop cross-site request forgery on the login redirect itself.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What does PKCE add for clients that cannot keep a secret?",
+      "Why is the code exchanged on the back channel instead of in the browser?"
+    ],
+    "id": "iq-m2src-oauth2-authorization-code",
+    "module": "module-2",
+    "question": "How does the OAuth2 authorization code flow work, and why is it preferred over putting passwords or tokens in the browser?",
+    "relatedTopics": [
+      "spring-mvc-rest"
+    ],
+    "shortAnswer": "The user logs in at the authorization server, which returns a short-lived code to the application; the application exchanges that code for tokens over a back channel, so passwords and tokens never pass through the browser.",
+    "tips": [
+      "Stress the separation: browser sees the code, backend sees the tokens.",
+      "Mention state validation — it is the CSRF protection for login."
+    ],
+    "title": "OAuth2 authorization code flow",
+    "topicId": "security-jwt"
+  },
+  {
+    "category": "SQL",
+    "commonMistakes": [
+      "Using HAVING for a filter that belongs in WHERE.",
+      "Normalizing a reporting table until every read needs six joins.",
+      "Adding indexes without checking the execution plan."
+    ],
+    "detailedAnswer": "Normalization organizes tables so each fact is stored once: first normal form means atomic values with no repeating groups, second means every non-key column depends on the whole key, and third means no transitive dependencies between non-key columns. It prevents update anomalies — changing a customer's address in one place instead of fifty — and keeps data consistent. But it costs joins, so for read-heavy reporting you sometimes denormalize deliberately, duplicating a column or precomputing an aggregate to avoid an expensive join, and accept the extra write care that comes with it. WHERE and HAVING are often confused: WHERE filters individual rows before grouping, so it cannot use aggregate functions, while HAVING filters the groups after aggregation, which is how you ask for customers with more than five orders. A common performance mistake is filtering with HAVING when WHERE would do — the database then groups rows it could have discarded. Indexes help WHERE and join columns most; check the execution plan before adding one, because every index slows writes.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Give a case where you would deliberately denormalize.",
+      "Why is filtering in HAVING slower than the same filter in WHERE?"
+    ],
+    "id": "iq-m2src-sql-normalization-where-having",
+    "module": "module-2",
+    "question": "What is normalization, when do you denormalize, and how do WHERE and HAVING differ in a grouped query?",
+    "relatedTopics": [
+      "db-joins-indexes-transactions"
+    ],
+    "shortAnswer": "Normalization removes duplicated data by splitting tables so each fact lives once; denormalize deliberately for read speed when joins get expensive; WHERE filters rows before grouping, HAVING filters groups after aggregation.",
+    "tips": [
+      "Define each normal form in one clause — candidates who ramble lose the thread.",
+      "Use the 'more than five orders' example for HAVING."
+    ],
+    "title": "Normalization, WHERE vs HAVING, and index use",
+    "topicId": "db-sql-fundamentals"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Using a HashMap and returning a character that is not actually first.",
+      "Scanning the string once per character, making it quadratic.",
+      "Forgetting the empty-string and all-repeated cases."
+    ],
+    "detailedAnswer": "The trick is to keep insertion order while counting: group the characters with Collectors.groupingBy, supplying a LinkedHashMap so entries stay in first-seen order, and count each group with Collectors.counting(). Then stream the map entries, keep the first one whose count is one, and return its key, or null when every character repeats. The counting pass touches each character once and the scan touches at most the distinct characters, so the whole thing is linear in the length of the string, with memory proportional to the number of distinct characters. A plain HashMap would give the right counts but the wrong 'first', because iteration order is not insertion order — that is the most common mistake. A simpler two-pass alternative counts with a map and then scans the original string for the first character whose count is one; it is equally linear and easier to read, and it handles the empty-string and all-repeated cases by returning null.\nExample solution:\n\n```java\nimport java.util.LinkedHashMap;\nimport java.util.Map;\nimport java.util.function.Function;\nimport java.util.stream.Collectors;\n\npublic class FirstNonRepeated {\n    public static Character firstNonRepeated(String input) {\n        if (input == null || input.isEmpty()) {\n            return null;\n        }\n        Map<Character, Long> counts = input.chars()\n                .mapToObj(c -> (char) c)\n                .collect(Collectors.groupingBy(\n                        Function.identity(), LinkedHashMap::new, Collectors.counting()));\n        return counts.entrySet().stream()\n                .filter(e -> e.getValue() == 1)\n                .map(Map.Entry::getKey)\n                .findFirst()\n                .orElse(null);\n    }\n}\n```",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does a plain HashMap give the wrong answer here?",
+      "How would you change this to find the first repeated character instead?"
+    ],
+    "id": "iq-m2src-coding-first-nonrepeated-stream",
+    "module": "module-2",
+    "question": "Coding task: given a string, find the first character that appears exactly once, using the Stream API. How do you do it, and what is the complexity?",
+    "relatedTopics": [
+      "collections-framework"
+    ],
+    "shortAnswer": "Count characters into an order-preserving map with groupingBy and counting, then take the first entry with count one; it is one pass to count plus one pass over the distinct characters, so linear time.",
+    "tips": [
+      "Name the LinkedHashMap first — order is the whole difficulty of this task.",
+      "Mention the simpler two-pass version as the readable alternative."
+    ],
+    "title": "Coding: first non-repeated character with streams",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Special-casing the first node instead of using a dummy.",
+      "Copying nodes instead of relinking them.",
+      "Forgetting to attach the remaining tail after the loop."
+    ],
+    "detailedAnswer": "Use a dummy node at the front so you never need special code for the first element: keep a tail pointer starting at the dummy, and while both lists have nodes, link the smaller current node after the tail and advance that list and the tail. When one list runs out, link the rest of the other list as it is — it is already sorted, so no further comparison is needed — and return dummy.next as the merged head. The dummy node is the key idea: without it, the first link needs a separate branch and the code gets messy. The merge reuses the existing nodes, so it uses constant extra space beyond the dummy node, and it touches each node once, giving linear time in the combined length. Using <= when comparing keeps the merge stable, so equal values keep their original relative order. A recursive version is shorter but risks a stack overflow on long lists, so prefer the iterative version in production code; also handle null inputs, since a null list just means the other list is the answer.\nExample solution:\n\n```java\npublic class MergeSortedLists {\n    static class Node {\n        int value;\n        Node next;\n\n        Node(int value) {\n            this.value = value;\n        }\n    }\n\n    public static Node merge(Node first, Node second) {\n        Node dummy = new Node(0);\n        Node tail = dummy;\n        while (first != null && second != null) {\n            if (first.value <= second.value) {\n                tail.next = first;\n                first = first.next;\n            } else {\n                tail.next = second;\n                second = second.next;\n            }\n            tail = tail.next;\n        }\n        tail.next = (first != null) ? first : second;\n        return dummy.next;\n    }\n}\n```",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why is a dummy node worth adding?",
+      "What changes if the lists are sorted in descending order?"
+    ],
+    "id": "iq-m2src-coding-merge-sorted-lists",
+    "module": "module-2",
+    "question": "Coding task: merge two sorted singly linked lists into one sorted list. What is your approach, and what is the complexity?",
+    "relatedTopics": [
+      "dsa-arrays-strings"
+    ],
+    "shortAnswer": "Walk both lists with a dummy head node, always linking the smaller current node, then attach the remaining tail; it is linear in the total length with constant extra space because nodes are reused, not copied.",
+    "tips": [
+      "Explain the dummy node before writing the loop — it is the insight the interviewer wants.",
+      "State that nodes are reused: that is why the space is constant."
+    ],
+    "title": "Coding: merge two sorted linked lists",
+    "topicId": "collections-framework"
+  }
+]

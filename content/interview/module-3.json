@@ -1,1 +1,895 @@
-[{"category":"Java","detailedAnswer":"PECS summarizes wildcard use: use extends when you only produce values from a structure, and super when you only consume values into it, because a List of Number cannot accept a List of Integer as a subtype even though Integer is a subtype of Number. Type erasure means generic type arguments are removed at compile time, so a List of String and a List of Integer are the same class at runtime, you cannot overload methods that differ only by generic argument, and you cannot create arrays of a parameterized type directly. The compiler inserts casts and bridge methods so overriding still works after erasure, which is why reflection sometimes reveals synthetic bridge methods. When erasure loses information you need at runtime, pass an explicit Class token or a type token instead of fighting the type system.","difficulty":"Hard","followUps":["Why can you not overload a method on List of String versus List of Integer?","How do you recover type information lost to erasure?"],"id":"iq-m3-generics-pecs-erasure","module":"module-3","question":"Explain PECS and type erasure, and the practical limits they place on generic code.","relatedTopics":["collections-framework"],"shortAnswer":"PECS: extends for producers, super for consumers; erasure removes type arguments at runtime, so generic overloads and parameterized arrays are impossible and reflection may show bridge methods.","tips":["Give one producer example and one consumer example.","Mention bridge methods — senior interviewers listen for them."],"title":"Generics: PECS and erasure","topicId":"generics-deep-dive"},{"category":"Collections","detailedAnswer":"ConcurrentHashMap scales by striping locks across bins rather than locking the whole map, and its atomic bulk methods such as compute, merge, and forEach operate per bin, so they do not give you a consistent snapshot across the whole map. A mapping function in computeIfAbsent must be short, non-blocking, and side-effect free, because it can run while holding a bin lock and may be invoked more than once under contention, which can stall other threads or cause surprising duplicate work. Sizing matters less than in HashMap because concurrency level is a hint, not a hard segment count, but an undersized map still resizes under load, and a huge initial capacity wastes memory. For high-contention counters, prefer LongAdder over AtomicLong inside the map, and for compound multi-key updates, accept that you need an external lock or a redesign, not a single atomic map call.","difficulty":"Medium","followUps":["Why is there no atomic operation across two keys?","When does LongAdder beat AtomicLong?"],"id":"iq-m3-concurrenthashmap-deep","module":"module-3","question":"What are the scaling limits and traps of ConcurrentHashMap in high-contention code?","relatedTopics":["collections-framework","concurrency-basics"],"shortAnswer":"It scales by bin-level locking, but compute functions run under a bin lock and may repeat, bulk operations are not whole-map atomic, and multi-key updates need external coordination.","tips":["Name the computeIfAbsent trap specifically.","State plainly that no map call is atomic across two keys."],"title":"ConcurrentHashMap at scale","topicId":"collections-deep-dive"},{"category":"Streams","detailedAnswer":"A correct parallel reduction needs an associative, stateless combiner and an identity that is truly neutral, otherwise results vary between runs depending on how work is split. Stateful intermediate operations such as sorted, distinct, and limit on an unordered stream force buffering or coordination that can erase parallel gains, and encounter order adds further coordination costs that an unordered stream avoids. Short-circuiting operations such as findAny are faster in parallel than findFirst, which must respect order. Before parallelizing, check that the source splits efficiently — a LinkedList or an iterator-based stream splits poorly — that the per-element work is large enough to outweigh splitting overhead, and that no operation blocks or mutates shared state.","difficulty":"Hard","followUps":["Why does a parallel reduce give different answers if the combiner is not associative?","Why is findAny faster than findFirst in parallel?"],"id":"iq-m3-streams-parallel-reduction","module":"module-3","question":"What makes a stream reduction correct in parallel, and which operations destroy parallel performance?","relatedTopics":["streams-lambdas","functional-interfaces-optional"],"shortAnswer":"Parallel reduction needs an associative combiner and a true identity; stateful operations, encounter order, poor splitting, and blocking or mutating operations destroy its gains.","tips":["Use associativity as the correctness test.","Mention findAny versus findFirst as the concrete ordering example."],"title":"Parallel stream correctness","topicId":"streams-lambdas"},{"category":"Concurrency","detailedAnswer":"An executor saturates in stages: tasks queue up, threads grow to the maximum, the queue fills, and then the rejection policy decides whether callers block, run the task themselves, or drop it — and the default abort policy throws RejectedExecutionException at the worst moment. A bounded queue with caller-runs or a backpressure-aware policy protects downstream systems, while an unbounded queue hides overload until memory or latency explodes. Separate executors by workload class — CPU-bound, blocking I/O, and scheduled work — so one slow dependency cannot starve everything else, and expose queue depth, active threads, and rejections as metrics with alerts. Virtual threads change the calculus for blocking I/O by making a thread per task cheap, but they do not remove the need for bounds, timeouts, and backpressure when the downstream system itself is the bottleneck.","difficulty":"Hard","followUps":["Why is an unbounded queue more dangerous than a rejection?","When do virtual threads not solve saturation?"],"id":"iq-m3-executor-saturation","module":"module-3","question":"How do you design an executor so overload degrades gracefully instead of crashing the service?","relatedTopics":["concurrency-basics"],"shortAnswer":"Bound the queue, choose an explicit rejection policy, separate executors by workload, and alert on queue depth and rejections; virtual threads help blocking I/O but do not remove downstream limits.","tips":["Walk through the saturation stages in order.","Warn that an unbounded queue hides overload until it is too late."],"title":"Executor saturation and backpressure","topicId":"executors-completablefuture"},{"category":"JVM","detailedAnswer":"Start from the symptom: long pauses point to garbage collection logs and heap sizing, a steadily growing heap points to a leak, and high CPU without progress points to a hot loop or lock contention. Enable GC logging, then read pause times, allocation rate, and promotion rate before touching flags, and take a heap dump only after confirming the heap is actually growing, since a dump freezes or slows the process. Analyze the dump for the largest retained objects and their shortest paths to GC roots, which usually reveal a static cache, a listener never deregistered, or an unbounded collection. Metaspace growth points instead to classloader leaks, often from repeated redeploys, while native memory growth points outside the heap entirely. Fix the retention cause, then tune the collector; tuning flags around a leak only postpones the outage.","difficulty":"Hard","followUps":["How do you distinguish a leak from a heap that is too small?","What does growth in Metaspace, rather than the heap, suggest?"],"id":"iq-m3-jvm-memory-leak-diagnosis","module":"module-3","question":"Production heap usage climbs until the service restarts. How do you diagnose it?","relatedTopics":["garbage-collection","performance-best-practices"],"shortAnswer":"Confirm growth with GC logs, identify whether it is heap, Metaspace, or native memory, then analyze a heap dump for dominant retained objects and their paths to GC roots and fix the retention cause.","tips":["Order the answer: confirm, locate, analyze, fix — not flags first.","Name the usual suspects: static caches, unremoved listeners, unbounded collections."],"title":"Diagnosing a production memory leak","topicId":"garbage-collection"},{"category":"Spring Framework","detailedAnswer":"Spring AOP and @Transactional work through proxies: a call from outside the bean goes through the proxy, which starts a transaction or applies advice, while a call from one method of the bean to another bypasses the proxy entirely, so the annotation on the called method is silently ignored. The same applies to private methods, which proxies cannot intercept, and to final classes or methods with JDK dynamic proxies. The fixes are to restructure so the transactional method is called through another bean, to self-inject the proxy, or to use AspectJ weaving when proxy limits are truly unacceptable. This also explains why @Transactional on a method that only calls another method in the same class appears to do nothing, and why a rollback only happens for unchecked exceptions by default unless rollbackFor is configured.","difficulty":"Medium","followUps":["Why does @Transactional not work on a private method?","How do you make a self-call go through the proxy?"],"id":"iq-m3-spring-proxy-self-invocation","module":"module-3","question":"Why does @Transactional sometimes silently do nothing, and how do proxies explain it?","relatedTopics":["spring-ioc-di","spring-data-jpa"],"shortAnswer":"Proxies only intercept external calls, so self-invocation and private methods bypass @Transactional; call through another bean or the proxy, and remember rollback is unchecked-only by default.","tips":["Explain the proxy mechanism before the fix.","Mention rollbackFor, since it is the second half of the same interview question."],"title":"Spring proxies and self-invocation","topicId":"spring-ioc-di"},{"category":"Spring Boot","detailedAnswer":"Auto-configuration classes are ordered and conditional, so when two starters provide the same bean, the one whose conditions match and that is ordered first wins, and a user-defined bean of the same type normally makes auto-configuration back off via @ConditionalOnMissingBean. Conflicts usually come from an explicit @Bean that shadows the auto-configured one, a starter pulled in transitively that you did not expect, or a condition such as @ConditionalOnClass that behaves differently in tests versus production because the classpath differs. Debug with the auto-configuration report, which lists what applied, what was excluded, and why each candidate was skipped, and with the conditions evaluation report in tests. Prefer excluding a specific auto-configuration or defining a replacement bean deliberately over broad component-scan exclusions, which hide future surprises.","difficulty":"Medium","followUps":["How do you find which starter brought in an unwanted bean?","When is excluding an auto-configuration better than overriding its bean?"],"id":"iq-m3-autoconfig-conflicts","module":"module-3","question":"Two starters configure the same bean and the wrong one wins. How do you diagnose and resolve it?","relatedTopics":["configuration-profiles"],"shortAnswer":"Check conditions, ordering, and the auto-configuration report; a user bean normally backs auto-configuration off, so resolve conflicts by excluding a specific auto-configuration or defining the intended bean explicitly.","tips":["Name the auto-configuration report as the first diagnostic step.","Distinguish transitive starter surprises from deliberate overrides."],"title":"Auto-configuration conflicts","topicId":"spring-boot-autoconfig"},{"category":"Spring MVC","detailedAnswer":"Filters run at the servlet level, before Spring MVC dispatches, so they see every request but not the handler, while interceptors run inside Spring MVC around the handler, with access to the controller method and model, and argument resolvers and exception resolvers run even closer to the handler. Use filters for cross-cutting transport concerns such as logging and authentication headers, interceptors for handler-aware concerns such as feature flags or tenant context, and @ControllerAdvice for consistent error translation. For asynchronous handling, Callable and DeferredResult release the request thread while work completes, and WebFlux-style reactive endpoints only help when the whole downstream chain is non-blocking; wrapping a blocking call in a reactive type just moves the blockage. Idempotency for retried POSTs belongs at the API layer with an idempotency key stored with the result, not in the client retry logic alone.","difficulty":"Medium","followUps":["Why can a filter not know which controller will handle a request?","When does async handling not improve throughput?"],"id":"iq-m3-mvc-filters-interceptors-async","module":"module-3","question":"How do filters, interceptors, and async handling differ in Spring MVC, and where does idempotency belong?","relatedTopics":["spring-mvc-rest","validation-exception-handling"],"shortAnswer":"Filters run before dispatch without handler knowledge, interceptors run around the handler, async releases the request thread, and idempotency belongs server-side with a stored key and result.","tips":["Order the layers from outermost to innermost.","Flag wrapping a blocking call in a reactive type as fake async."],"title":"Filters, interceptors, and async MVC","topicId":"spring-mvc-rest"},{"category":"Spring Data JPA","detailedAnswer":"Optimistic locking with a @Version column lets concurrent updates proceed and fails the loser with an OptimisticLockException instead of silently overwriting, which suits low-contention data such as user profiles, while pessimistic locking suits high-contention resources such as inventory counts. Isolation levels trade correctness for concurrency: read committed prevents dirty reads, repeatable read prevents non-repeatable reads, and serializable prevents phantoms, but each stronger level costs throughput and increases lock waits. Lost updates, phantom reads, and write skew are the anomalies to name, and the fix is usually a version column plus a retry for the loser, or a pessimistic lock for the contested row, rather than raising the global isolation level. Second-level caching helps read-heavy reference data but can serve stale entities across nodes, so it needs explicit invalidation and must never cache frequently mutated data.","difficulty":"Hard","followUps":["When would you choose pessimistic over optimistic locking?","Why is raising the global isolation level usually the wrong fix?"],"id":"iq-m3-jpa-locking-isolation","module":"module-3","question":"How do you handle concurrent updates in JPA, and what do isolation levels actually buy you?","relatedTopics":["spring-data-jpa"],"shortAnswer":"Optimistic locking with @Version for low contention, pessimistic locks for hot rows, and isolation levels chosen per anomaly, not raised globally; cache only stable reference data.","tips":["Pair each locking strategy with its contention profile.","Name one anomaly per isolation level instead of reciting definitions."],"title":"JPA locking and isolation","topicId":"spring-data-jpa"},{"category":"Microservices","detailedAnswer":"Two-phase commit gives strong consistency across services but couples them to a coordinator and blocks on coordinator failure, so most systems accept eventual consistency and design for it. A saga sequences local transactions with compensating actions for rollback, but compensations are not true rollbacks: they are new business operations that must themselves be idempotent and must handle partial failure. The transactional outbox pattern solves the dual-write problem by writing the event to an outbox table in the same local transaction as the state change, then relaying it asynchronously, so an event is never lost and never sent without its state change. Consumers must still be idempotent, because at-least-once delivery means duplicates are normal, and event schemas must evolve compatibly so old consumers keep working.","difficulty":"Hard","followUps":["Why is a compensating action not the same as a rollback?","How does the outbox pattern solve the dual-write problem?"],"id":"iq-m3-saga-outbox","module":"module-3","question":"How do you keep data consistent across microservices without distributed transactions?","relatedTopics":["actuator-microservices-deployment"],"shortAnswer":"Use sagas with idempotent compensations for multi-service workflows and the transactional outbox for reliable event publication, and make every consumer idempotent under at-least-once delivery.","tips":["Contrast 2PC blocking with saga compensation explicitly.","Name the dual-write problem — it is the heart of the question."],"title":"Sagas and the transactional outbox","topicId":"actuator-microservices-deployment"},{"category":"SQL","detailedAnswer":"Window functions such as ROW_NUMBER, RANK, and running totals compute over a window of rows without collapsing them, so you can rank orders per customer or compute a moving average while keeping every row. Offset pagination with LIMIT and OFFSET is simple but scans and discards skipped rows, so it slows as the offset grows and can skip or repeat rows when data changes between pages. Keyset pagination, filtering on an ordered unique key such as a timestamp plus id, stays fast at any depth and is stable under inserts, but it cannot jump to an arbitrary page number. Covering indexes, which include every column a query needs, let the database answer from the index alone, but each extra index costs write performance and storage, so verify with the execution plan and measure on realistic data volumes.","difficulty":"Medium","followUps":["Why can offset pagination skip rows when data changes?","When is a covering index worth its write cost?"],"id":"iq-m3-sql-window-keyset","module":"module-3","question":"When do window functions and keyset pagination beat GROUP BY and OFFSET pagination?","relatedTopics":["jdbc-networking"],"shortAnswer":"Window functions rank and aggregate without collapsing rows; keyset pagination on an ordered unique key stays fast and stable at depth, while OFFSET scans skipped rows and shifts under concurrent writes.","tips":["Give one window-function example and one keyset example.","State the OFFSET weakness in terms of scanning, not just slowness."],"title":"Window functions and keyset pagination","topicId":"spring-data-jpa"},{"category":"Coding","detailedAnswer":"The task is to design an LRU cache with get and put in constant time. The idiomatic approach pairs a hash map from key to node with a doubly linked list ordered by recency: the map gives constant-time lookup, and the list lets you move a node to the front on access and evict the tail node on overflow, both in constant time. On get, return the value and move its node to the front; on put, insert or update the node, move it to the front, and if the size exceeds capacity, remove the tail node from both the list and the map. A linked hash map in access-order mode provides this out of the box in Java, but interviewers usually want the map-plus-list structure explained, and for a concurrent version you must add locking or sharding rather than assuming the structure is thread-safe.","difficulty":"Hard","followUps":["How would you make this cache thread-safe?","How does the design change if eviction must consider entry size, not just count?"],"id":"iq-m3-coding-lru-cache","module":"module-3","question":"Coding task: design an LRU cache with constant-time get and put. What data structures do you combine, and why?","relatedTopics":["collections-framework","collections-deep-dive"],"shortAnswer":"Combine a hash map for constant-time lookup with a doubly linked list for recency order: move accessed nodes to the front and evict from the tail.","tips":["Explain why each structure alone is insufficient.","Mention LinkedHashMap access-order mode, then explain the underlying structure anyway."],"title":"Coding: LRU cache design","topicId":"collections-deep-dive"},{"category":"Scenario-based","detailedAnswer":"First, establish whether threads are blocked, deadlocked, or merely busy: thread dumps taken a few seconds apart show threads stuck in the same place for a deadlock or lock wait, versus threads moving through different code for CPU saturation. A common root cause is a thread pool exhausted by calls to a slow downstream service without timeouts, so every request thread waits and new requests queue until the service appears dead. Mitigate immediately by shedding load or restarting with bounded pools and timeouts, then fix the dependency contract: add timeouts, bulkheads per dependency, and circuit breakers, and alert on queue depth before it reaches saturation. A post-incident review should ask why the missing timeout was not caught by a checklist or test, because the same failure will recur with the next slow dependency.","difficulty":"Hard","followUps":["How do thread dumps distinguish deadlock from CPU saturation?","What metric would have warned you before saturation?"],"id":"iq-m3-scenario-thread-exhaustion","module":"module-3","question":"Scenario: a service stops responding under normal traffic, CPU is low, and restarts only help briefly. How do you diagnose it?","relatedTopics":["performance-best-practices","executors-completablefuture"],"shortAnswer":"Low CPU plus unresponsiveness suggests thread-pool exhaustion or deadlock; compare thread dumps over time, then bound pools, add timeouts and bulkheads, and alert on queue depth.","tips":["Use the low-CPU clue — it rules out a hot loop.","Name bulkheads as the structural fix, not just timeouts."],"title":"Scenario: thread-pool exhaustion","topicId":"performance-best-practices"},{"category":"Java","detailedAnswer":"Records give concise immutable data carriers with automatically generated equals, hashCode, and accessors, and they suit DTOs and value objects, but they are final and cannot extend another class, so they are a poor fit for entities with evolving behaviour or frameworks that require proxies and no-arg construction. Sealed classes restrict which classes may extend them, which makes a hierarchy exhaustive and lets pattern-matching switches be checked by the compiler, and pattern matching replaces chains of instanceof checks and casts with a single readable form. Virtual threads make a thread-per-request style cheap for blocking I/O workloads, but they do not help CPU-bound work and they can pin a carrier thread when code synchronizes on a monitor. Migrate incrementally: introduce records and pattern matching where they clarify code, and adopt virtual threads only after confirming the workload is blocking I/O and the libraries used do not pin carriers.","difficulty":"Medium","followUps":["Why are records a poor fit for JPA entities?","When does a virtual thread pin its carrier thread?"],"id":"iq-m3-modern-java-migration","module":"module-3","question":"How do you decide where records, sealed classes, pattern matching, and virtual threads actually help?","relatedTopics":["modern-java-features","concurrency-basics"],"shortAnswer":"Records for immutable data carriers, sealed classes for exhaustive hierarchies, pattern matching for type dispatch, and virtual threads only for blocking I/O workloads that do not pin carriers.","tips":["Give one good fit and one poor fit per feature.","Warn about carrier pinning for virtual threads — it is the current senior-level trap."],"title":"Modern Java: where each feature fits","topicId":"modern-java-features"}]
+[
+  {
+    "category": "Java",
+    "detailedAnswer": "PECS summarizes wildcard use: use extends when you only produce values from a structure, and super when you only consume values into it, because a List of Number cannot accept a List of Integer as a subtype even though Integer is a subtype of Number. Type erasure means generic type arguments are removed at compile time, so a List of String and a List of Integer are the same class at runtime, you cannot overload methods that differ only by generic argument, and you cannot create arrays of a parameterized type directly. The compiler inserts casts and bridge methods so overriding still works after erasure, which is why reflection sometimes reveals synthetic bridge methods. When erasure loses information you need at runtime, pass an explicit Class token or a type token instead of fighting the type system.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why can you not overload a method on List of String versus List of Integer?",
+      "How do you recover type information lost to erasure?"
+    ],
+    "id": "iq-m3-generics-pecs-erasure",
+    "module": "module-3",
+    "question": "Explain PECS and type erasure, and the practical limits they place on generic code.",
+    "relatedTopics": [
+      "collections-framework"
+    ],
+    "shortAnswer": "PECS: extends for producers, super for consumers; erasure removes type arguments at runtime, so generic overloads and parameterized arrays are impossible and reflection may show bridge methods.",
+    "tips": [
+      "Give one producer example and one consumer example.",
+      "Mention bridge methods — senior interviewers listen for them."
+    ],
+    "title": "Generics: PECS and erasure",
+    "topicId": "generics-deep-dive"
+  },
+  {
+    "category": "Collections",
+    "detailedAnswer": "ConcurrentHashMap scales by striping locks across bins rather than locking the whole map, and its atomic bulk methods such as compute, merge, and forEach operate per bin, so they do not give you a consistent snapshot across the whole map. A mapping function in computeIfAbsent must be short, non-blocking, and side-effect free, because it can run while holding a bin lock and may be invoked more than once under contention, which can stall other threads or cause surprising duplicate work. Sizing matters less than in HashMap because concurrency level is a hint, not a hard segment count, but an undersized map still resizes under load, and a huge initial capacity wastes memory. For high-contention counters, prefer LongAdder over AtomicLong inside the map, and for compound multi-key updates, accept that you need an external lock or a redesign, not a single atomic map call.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why is there no atomic operation across two keys?",
+      "When does LongAdder beat AtomicLong?"
+    ],
+    "id": "iq-m3-concurrenthashmap-deep",
+    "module": "module-3",
+    "question": "What are the scaling limits and traps of ConcurrentHashMap in high-contention code?",
+    "relatedTopics": [
+      "collections-framework",
+      "concurrency-basics"
+    ],
+    "shortAnswer": "It scales by bin-level locking, but compute functions run under a bin lock and may repeat, bulk operations are not whole-map atomic, and multi-key updates need external coordination.",
+    "tips": [
+      "Name the computeIfAbsent trap specifically.",
+      "State plainly that no map call is atomic across two keys."
+    ],
+    "title": "ConcurrentHashMap at scale",
+    "topicId": "collections-deep-dive"
+  },
+  {
+    "category": "Streams",
+    "detailedAnswer": "A correct parallel reduction needs an associative, stateless combiner and an identity that is truly neutral, otherwise results vary between runs depending on how work is split. Stateful intermediate operations such as sorted, distinct, and limit on an unordered stream force buffering or coordination that can erase parallel gains, and encounter order adds further coordination costs that an unordered stream avoids. Short-circuiting operations such as findAny are faster in parallel than findFirst, which must respect order. Before parallelizing, check that the source splits efficiently — a LinkedList or an iterator-based stream splits poorly — that the per-element work is large enough to outweigh splitting overhead, and that no operation blocks or mutates shared state.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why does a parallel reduce give different answers if the combiner is not associative?",
+      "Why is findAny faster than findFirst in parallel?"
+    ],
+    "id": "iq-m3-streams-parallel-reduction",
+    "module": "module-3",
+    "question": "What makes a stream reduction correct in parallel, and which operations destroy parallel performance?",
+    "relatedTopics": [
+      "streams-lambdas",
+      "functional-interfaces-optional"
+    ],
+    "shortAnswer": "Parallel reduction needs an associative combiner and a true identity; stateful operations, encounter order, poor splitting, and blocking or mutating operations destroy its gains.",
+    "tips": [
+      "Use associativity as the correctness test.",
+      "Mention findAny versus findFirst as the concrete ordering example."
+    ],
+    "title": "Parallel stream correctness",
+    "topicId": "streams-lambdas"
+  },
+  {
+    "category": "Concurrency",
+    "detailedAnswer": "An executor saturates in stages: tasks queue up, threads grow to the maximum, the queue fills, and then the rejection policy decides whether callers block, run the task themselves, or drop it — and the default abort policy throws RejectedExecutionException at the worst moment. A bounded queue with caller-runs or a backpressure-aware policy protects downstream systems, while an unbounded queue hides overload until memory or latency explodes. Separate executors by workload class — CPU-bound, blocking I/O, and scheduled work — so one slow dependency cannot starve everything else, and expose queue depth, active threads, and rejections as metrics with alerts. Virtual threads change the calculus for blocking I/O by making a thread per task cheap, but they do not remove the need for bounds, timeouts, and backpressure when the downstream system itself is the bottleneck.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why is an unbounded queue more dangerous than a rejection?",
+      "When do virtual threads not solve saturation?"
+    ],
+    "id": "iq-m3-executor-saturation",
+    "module": "module-3",
+    "question": "How do you design an executor so overload degrades gracefully instead of crashing the service?",
+    "relatedTopics": [
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Bound the queue, choose an explicit rejection policy, separate executors by workload, and alert on queue depth and rejections; virtual threads help blocking I/O but do not remove downstream limits.",
+    "tips": [
+      "Walk through the saturation stages in order.",
+      "Warn that an unbounded queue hides overload until it is too late."
+    ],
+    "title": "Executor saturation and backpressure",
+    "topicId": "executors-completablefuture"
+  },
+  {
+    "category": "JVM",
+    "detailedAnswer": "Start from the symptom: long pauses point to garbage collection logs and heap sizing, a steadily growing heap points to a leak, and high CPU without progress points to a hot loop or lock contention. Enable GC logging, then read pause times, allocation rate, and promotion rate before touching flags, and take a heap dump only after confirming the heap is actually growing, since a dump freezes or slows the process. Analyze the dump for the largest retained objects and their shortest paths to GC roots, which usually reveal a static cache, a listener never deregistered, or an unbounded collection. Metaspace growth points instead to classloader leaks, often from repeated redeploys, while native memory growth points outside the heap entirely. Fix the retention cause, then tune the collector; tuning flags around a leak only postpones the outage.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How do you distinguish a leak from a heap that is too small?",
+      "What does growth in Metaspace, rather than the heap, suggest?"
+    ],
+    "id": "iq-m3-jvm-memory-leak-diagnosis",
+    "module": "module-3",
+    "question": "Production heap usage climbs until the service restarts. How do you diagnose it?",
+    "relatedTopics": [
+      "garbage-collection",
+      "performance-best-practices"
+    ],
+    "shortAnswer": "Confirm growth with GC logs, identify whether it is heap, Metaspace, or native memory, then analyze a heap dump for dominant retained objects and their paths to GC roots and fix the retention cause.",
+    "tips": [
+      "Order the answer: confirm, locate, analyze, fix — not flags first.",
+      "Name the usual suspects: static caches, unremoved listeners, unbounded collections."
+    ],
+    "title": "Diagnosing a production memory leak",
+    "topicId": "garbage-collection"
+  },
+  {
+    "category": "Spring Framework",
+    "detailedAnswer": "Spring AOP and @Transactional work through proxies: a call from outside the bean goes through the proxy, which starts a transaction or applies advice, while a call from one method of the bean to another bypasses the proxy entirely, so the annotation on the called method is silently ignored. The same applies to private methods, which proxies cannot intercept, and to final classes or methods with JDK dynamic proxies. The fixes are to restructure so the transactional method is called through another bean, to self-inject the proxy, or to use AspectJ weaving when proxy limits are truly unacceptable. This also explains why @Transactional on a method that only calls another method in the same class appears to do nothing, and why a rollback only happens for unchecked exceptions by default unless rollbackFor is configured.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does @Transactional not work on a private method?",
+      "How do you make a self-call go through the proxy?"
+    ],
+    "id": "iq-m3-spring-proxy-self-invocation",
+    "module": "module-3",
+    "question": "Why does @Transactional sometimes silently do nothing, and how do proxies explain it?",
+    "relatedTopics": [
+      "spring-ioc-di",
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "Proxies only intercept external calls, so self-invocation and private methods bypass @Transactional; call through another bean or the proxy, and remember rollback is unchecked-only by default.",
+    "tips": [
+      "Explain the proxy mechanism before the fix.",
+      "Mention rollbackFor, since it is the second half of the same interview question."
+    ],
+    "title": "Spring proxies and self-invocation",
+    "topicId": "spring-ioc-di"
+  },
+  {
+    "category": "Spring Boot",
+    "detailedAnswer": "Auto-configuration classes are ordered and conditional, so when two starters provide the same bean, the one whose conditions match and that is ordered first wins, and a user-defined bean of the same type normally makes auto-configuration back off via @ConditionalOnMissingBean. Conflicts usually come from an explicit @Bean that shadows the auto-configured one, a starter pulled in transitively that you did not expect, or a condition such as @ConditionalOnClass that behaves differently in tests versus production because the classpath differs. Debug with the auto-configuration report, which lists what applied, what was excluded, and why each candidate was skipped, and with the conditions evaluation report in tests. Prefer excluding a specific auto-configuration or defining a replacement bean deliberately over broad component-scan exclusions, which hide future surprises.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you find which starter brought in an unwanted bean?",
+      "When is excluding an auto-configuration better than overriding its bean?"
+    ],
+    "id": "iq-m3-autoconfig-conflicts",
+    "module": "module-3",
+    "question": "Two starters configure the same bean and the wrong one wins. How do you diagnose and resolve it?",
+    "relatedTopics": [
+      "configuration-profiles"
+    ],
+    "shortAnswer": "Check conditions, ordering, and the auto-configuration report; a user bean normally backs auto-configuration off, so resolve conflicts by excluding a specific auto-configuration or defining the intended bean explicitly.",
+    "tips": [
+      "Name the auto-configuration report as the first diagnostic step.",
+      "Distinguish transitive starter surprises from deliberate overrides."
+    ],
+    "title": "Auto-configuration conflicts",
+    "topicId": "spring-boot-autoconfig"
+  },
+  {
+    "category": "Spring MVC",
+    "detailedAnswer": "Filters run at the servlet level, before Spring MVC dispatches, so they see every request but not the handler, while interceptors run inside Spring MVC around the handler, with access to the controller method and model, and argument resolvers and exception resolvers run even closer to the handler. Use filters for cross-cutting transport concerns such as logging and authentication headers, interceptors for handler-aware concerns such as feature flags or tenant context, and @ControllerAdvice for consistent error translation. For asynchronous handling, Callable and DeferredResult release the request thread while work completes, and WebFlux-style reactive endpoints only help when the whole downstream chain is non-blocking; wrapping a blocking call in a reactive type just moves the blockage. Idempotency for retried POSTs belongs at the API layer with an idempotency key stored with the result, not in the client retry logic alone.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why can a filter not know which controller will handle a request?",
+      "When does async handling not improve throughput?"
+    ],
+    "id": "iq-m3-mvc-filters-interceptors-async",
+    "module": "module-3",
+    "question": "How do filters, interceptors, and async handling differ in Spring MVC, and where does idempotency belong?",
+    "relatedTopics": [
+      "spring-mvc-rest",
+      "validation-exception-handling"
+    ],
+    "shortAnswer": "Filters run before dispatch without handler knowledge, interceptors run around the handler, async releases the request thread, and idempotency belongs server-side with a stored key and result.",
+    "tips": [
+      "Order the layers from outermost to innermost.",
+      "Flag wrapping a blocking call in a reactive type as fake async."
+    ],
+    "title": "Filters, interceptors, and async MVC",
+    "topicId": "spring-mvc-rest"
+  },
+  {
+    "category": "Spring Data JPA",
+    "detailedAnswer": "Optimistic locking with a @Version column lets concurrent updates proceed and fails the loser with an OptimisticLockException instead of silently overwriting, which suits low-contention data such as user profiles, while pessimistic locking suits high-contention resources such as inventory counts. Isolation levels trade correctness for concurrency: read committed prevents dirty reads, repeatable read prevents non-repeatable reads, and serializable prevents phantoms, but each stronger level costs throughput and increases lock waits. Lost updates, phantom reads, and write skew are the anomalies to name, and the fix is usually a version column plus a retry for the loser, or a pessimistic lock for the contested row, rather than raising the global isolation level. Second-level caching helps read-heavy reference data but can serve stale entities across nodes, so it needs explicit invalidation and must never cache frequently mutated data.",
+    "difficulty": "Hard",
+    "followUps": [
+      "When would you choose pessimistic over optimistic locking?",
+      "Why is raising the global isolation level usually the wrong fix?"
+    ],
+    "id": "iq-m3-jpa-locking-isolation",
+    "module": "module-3",
+    "question": "How do you handle concurrent updates in JPA, and what do isolation levels actually buy you?",
+    "relatedTopics": [
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "Optimistic locking with @Version for low contention, pessimistic locks for hot rows, and isolation levels chosen per anomaly, not raised globally; cache only stable reference data.",
+    "tips": [
+      "Pair each locking strategy with its contention profile.",
+      "Name one anomaly per isolation level instead of reciting definitions."
+    ],
+    "title": "JPA locking and isolation",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Microservices",
+    "detailedAnswer": "Two-phase commit gives strong consistency across services but couples them to a coordinator and blocks on coordinator failure, so most systems accept eventual consistency and design for it. A saga sequences local transactions with compensating actions for rollback, but compensations are not true rollbacks: they are new business operations that must themselves be idempotent and must handle partial failure. The transactional outbox pattern solves the dual-write problem by writing the event to an outbox table in the same local transaction as the state change, then relaying it asynchronously, so an event is never lost and never sent without its state change. Consumers must still be idempotent, because at-least-once delivery means duplicates are normal, and event schemas must evolve compatibly so old consumers keep working.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why is a compensating action not the same as a rollback?",
+      "How does the outbox pattern solve the dual-write problem?"
+    ],
+    "id": "iq-m3-saga-outbox",
+    "module": "module-3",
+    "question": "How do you keep data consistent across microservices without distributed transactions?",
+    "relatedTopics": [
+      "actuator-microservices-deployment"
+    ],
+    "shortAnswer": "Use sagas with idempotent compensations for multi-service workflows and the transactional outbox for reliable event publication, and make every consumer idempotent under at-least-once delivery.",
+    "tips": [
+      "Contrast 2PC blocking with saga compensation explicitly.",
+      "Name the dual-write problem — it is the heart of the question."
+    ],
+    "title": "Sagas and the transactional outbox",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "SQL",
+    "detailedAnswer": "Window functions such as ROW_NUMBER, RANK, and running totals compute over a window of rows without collapsing them, so you can rank orders per customer or compute a moving average while keeping every row. Offset pagination with LIMIT and OFFSET is simple but scans and discards skipped rows, so it slows as the offset grows and can skip or repeat rows when data changes between pages. Keyset pagination, filtering on an ordered unique key such as a timestamp plus id, stays fast at any depth and is stable under inserts, but it cannot jump to an arbitrary page number. Covering indexes, which include every column a query needs, let the database answer from the index alone, but each extra index costs write performance and storage, so verify with the execution plan and measure on realistic data volumes.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why can offset pagination skip rows when data changes?",
+      "When is a covering index worth its write cost?"
+    ],
+    "id": "iq-m3-sql-window-keyset",
+    "module": "module-3",
+    "question": "When do window functions and keyset pagination beat GROUP BY and OFFSET pagination?",
+    "relatedTopics": [
+      "jdbc-networking"
+    ],
+    "shortAnswer": "Window functions rank and aggregate without collapsing rows; keyset pagination on an ordered unique key stays fast and stable at depth, while OFFSET scans skipped rows and shifts under concurrent writes.",
+    "tips": [
+      "Give one window-function example and one keyset example.",
+      "State the OFFSET weakness in terms of scanning, not just slowness."
+    ],
+    "title": "Window functions and keyset pagination",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Coding",
+    "detailedAnswer": "The task is to design an LRU cache with get and put in constant time. The idiomatic approach pairs a hash map from key to node with a doubly linked list ordered by recency: the map gives constant-time lookup, and the list lets you move a node to the front on access and evict the tail node on overflow, both in constant time. On get, return the value and move its node to the front; on put, insert or update the node, move it to the front, and if the size exceeds capacity, remove the tail node from both the list and the map. A linked hash map in access-order mode provides this out of the box in Java, but interviewers usually want the map-plus-list structure explained, and for a concurrent version you must add locking or sharding rather than assuming the structure is thread-safe.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How would you make this cache thread-safe?",
+      "How does the design change if eviction must consider entry size, not just count?"
+    ],
+    "id": "iq-m3-coding-lru-cache",
+    "module": "module-3",
+    "question": "Coding task: design an LRU cache with constant-time get and put. What data structures do you combine, and why?",
+    "relatedTopics": [
+      "collections-framework",
+      "collections-deep-dive"
+    ],
+    "shortAnswer": "Combine a hash map for constant-time lookup with a doubly linked list for recency order: move accessed nodes to the front and evict from the tail.",
+    "tips": [
+      "Explain why each structure alone is insufficient.",
+      "Mention LinkedHashMap access-order mode, then explain the underlying structure anyway."
+    ],
+    "title": "Coding: LRU cache design",
+    "topicId": "collections-deep-dive"
+  },
+  {
+    "category": "Scenario-based",
+    "detailedAnswer": "First, establish whether threads are blocked, deadlocked, or merely busy: thread dumps taken a few seconds apart show threads stuck in the same place for a deadlock or lock wait, versus threads moving through different code for CPU saturation. A common root cause is a thread pool exhausted by calls to a slow downstream service without timeouts, so every request thread waits and new requests queue until the service appears dead. Mitigate immediately by shedding load or restarting with bounded pools and timeouts, then fix the dependency contract: add timeouts, bulkheads per dependency, and circuit breakers, and alert on queue depth before it reaches saturation. A post-incident review should ask why the missing timeout was not caught by a checklist or test, because the same failure will recur with the next slow dependency.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How do thread dumps distinguish deadlock from CPU saturation?",
+      "What metric would have warned you before saturation?"
+    ],
+    "id": "iq-m3-scenario-thread-exhaustion",
+    "module": "module-3",
+    "question": "Scenario: a service stops responding under normal traffic, CPU is low, and restarts only help briefly. How do you diagnose it?",
+    "relatedTopics": [
+      "performance-best-practices",
+      "executors-completablefuture"
+    ],
+    "shortAnswer": "Low CPU plus unresponsiveness suggests thread-pool exhaustion or deadlock; compare thread dumps over time, then bound pools, add timeouts and bulkheads, and alert on queue depth.",
+    "tips": [
+      "Use the low-CPU clue — it rules out a hot loop.",
+      "Name bulkheads as the structural fix, not just timeouts."
+    ],
+    "title": "Scenario: thread-pool exhaustion",
+    "topicId": "performance-best-practices"
+  },
+  {
+    "category": "Java",
+    "detailedAnswer": "Records give concise immutable data carriers with automatically generated equals, hashCode, and accessors, and they suit DTOs and value objects, but they are final and cannot extend another class, so they are a poor fit for entities with evolving behaviour or frameworks that require proxies and no-arg construction. Sealed classes restrict which classes may extend them, which makes a hierarchy exhaustive and lets pattern-matching switches be checked by the compiler, and pattern matching replaces chains of instanceof checks and casts with a single readable form. Virtual threads make a thread-per-request style cheap for blocking I/O workloads, but they do not help CPU-bound work and they can pin a carrier thread when code synchronizes on a monitor. Migrate incrementally: introduce records and pattern matching where they clarify code, and adopt virtual threads only after confirming the workload is blocking I/O and the libraries used do not pin carriers.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why are records a poor fit for JPA entities?",
+      "When does a virtual thread pin its carrier thread?"
+    ],
+    "id": "iq-m3-modern-java-migration",
+    "module": "module-3",
+    "question": "How do you decide where records, sealed classes, pattern matching, and virtual threads actually help?",
+    "relatedTopics": [
+      "modern-java-features",
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Records for immutable data carriers, sealed classes for exhaustive hierarchies, pattern matching for type dispatch, and virtual threads only for blocking I/O workloads that do not pin carriers.",
+    "tips": [
+      "Give one good fit and one poor fit per feature.",
+      "Warn about carrier pinning for virtual threads — it is the current senior-level trap."
+    ],
+    "title": "Modern Java: where each feature fits",
+    "topicId": "modern-java-features"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Storing listeners in a strong collection and leaking the objects they point to.",
+      "Expecting get() on a phantom reference to return the object.",
+      "Using soft references as a substitute for a bounded cache with an eviction policy."
+    ],
+    "detailedAnswer": "A strong reference is an ordinary variable: as long as it exists, the object cannot be collected. A soft reference (SoftReference) is cleared only when the JVM is running low on memory, which makes it a reasonable fit for a memory-sensitive cache that you are happy to rebuild. A weak reference (WeakReference) does not stop collection at all: the object is reclaimed at the next collection once only weak references remain, which is why WeakHashMap is used for listener registries and metadata that must not keep the key alive. A phantom reference (PhantomReference) never lets you reach the object through get(), which always returns null; it exists only so a ReferenceQueue can tell you the object has been reclaimed, which is the safe way to run cleanup after finalization was removed. The common mistake is using a strong reference inside a cache or listener list and then wondering why the heap grows: the objects are reachable, so no collector will ever free them.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why is WeakHashMap a natural fit for listener registries?",
+      "How would you build a cache that the collector may empty under memory pressure?",
+      "Why was finalization replaced by phantom references and cleaners?"
+    ],
+    "id": "iq-m3src-reference-types-gc",
+    "module": "module-3",
+    "question": "What are the four reference types in Java, and how does each one affect when the garbage collector can reclaim an object?",
+    "relatedTopics": [
+      "collections-deep-dive",
+      "performance-best-practices"
+    ],
+    "shortAnswer": "Strong references keep an object alive; soft references are cleared only when memory is short, weak references are cleared at the next collection, and phantom references only let you know an object has been reclaimed.",
+    "tips": [
+      "Order them by strength: strong, soft, weak, phantom.",
+      "Give one real use for each instead of reciting definitions."
+    ],
+    "title": "Strong, soft, weak, and phantom references",
+    "topicId": "garbage-collection"
+  },
+  {
+    "category": "JVM",
+    "commonMistakes": [
+      "Treating Metaspace growth as a heap leak and tuning heap flags.",
+      "Leaving Metaspace uncapped in production.",
+      "Forgetting that JDBC drivers and shutdown hooks can pin a classloader."
+    ],
+    "detailedAnswer": "Before Java 8, class metadata lived in PermGen, a fixed-size part of the heap that threw OutOfMemoryError: PermGen space when an application loaded too many classes, which happened often with repeated redeploys. Java 8 moved that metadata to Metaspace, which lives in native memory outside the heap and by default grows until the operating system runs out of memory, although you can cap it with MaxMetaspaceSize. The practical difference for diagnosis is that a growing heap points to retained objects, while a growing Metaspace points to classes being loaded and never unloaded, usually because a classloader is held by a static reference, a thread-local, or a registered driver or listener. Setting a cap is worth doing in production: without one, a classloader leak consumes native memory until the whole process is killed, and with one, it fails fast with a clear Metaspace error instead.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why can a class only be unloaded when its classloader is unreachable?",
+      "What is a sensible MaxMetaspaceSize for a service, and why set one at all?",
+      "How do repeated redeploys in the same JVM cause Metaspace growth?"
+    ],
+    "id": "iq-m3src-metaspace-permgen",
+    "module": "module-3",
+    "question": "What is Metaspace, how does it differ from PermGen, and what does Metaspace growth tell you in production?",
+    "relatedTopics": [
+      "jdk-jre-jvm",
+      "reflection-serialization"
+    ],
+    "shortAnswer": "Metaspace replaced PermGen in Java 8 and holds class metadata in native memory with a default limit that grows as needed, so steady Metaspace growth usually points to a classloader leak rather than a heap leak.",
+    "tips": [
+      "Contrast the failure mode: PermGen failed fast, Metaspace grows silently.",
+      "Tie the diagnosis to classloaders, not to heap dumps."
+    ],
+    "title": "Metaspace versus PermGen",
+    "topicId": "garbage-collection"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Reading fields in a different order than they were written.",
+      "Forgetting the public no-arg constructor and getting an InvalidClassException.",
+      "Using Externalizable when plain Serializable with transient fields would do."
+    ],
+    "detailedAnswer": "With Serializable, the JVM uses reflection to write the object's fields for you, which is easy but gives you no say over the format, the size, or which fields are included beyond marking fields transient. Externalizable extends Serializable and requires a public no-arg constructor plus readExternal and writeExternal methods that you write yourself, so you decide the exact bytes, the order, and how to handle fields added in a later version. That control is useful when the default format is too large, when you need a stable wire format across versions, or when some fields need custom handling such as encryption. The price is that you must keep the read and write order in step yourself, and forgetting a field or reading in the wrong order corrupts the stream silently. For most application code, Serializable plus a serialVersionUID and a few transient fields is enough; reach for Externalizable when the serialized form itself is part of your contract.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does Externalizable require a public no-arg constructor?",
+      "What goes wrong if readExternal reads fields in a different order than writeExternal wrote them?",
+      "How would you keep a serialized form compatible when you add a field?"
+    ],
+    "id": "iq-m3src-externalizable-serializable",
+    "module": "module-3",
+    "question": "How does Externalizable differ from Serializable, and when would you choose one over the other?",
+    "relatedTopics": [
+      "exception-handling"
+    ],
+    "shortAnswer": "Serializable lets the JVM write every non-transient field automatically; Externalizable hands full control to your readExternal and writeExternal methods, so you choose exactly what is written and in what order.",
+    "tips": [
+      "Frame it as control versus convenience.",
+      "Mention the no-arg constructor requirement; interviewers listen for it."
+    ],
+    "title": "Externalizable versus Serializable",
+    "topicId": "reflection-serialization"
+  },
+  {
+    "category": "JVM",
+    "commonMistakes": [
+      "Assuming loadClass runs static initialisers.",
+      "Breaking parent delegation and loading two copies of the same class.",
+      "Keeping a reference to a classloader and wondering why its classes never unload."
+    ],
+    "detailedAnswer": "A JVM has three built-in loaders in a parent chain: the bootstrap loader loads the core JDK classes, the platform loader loads platform modules, and the application loader loads classes from the classpath. A custom loader, such as the one a web container creates per application, sits below these. Loading follows parent delegation: a loader asks its parent first and only loads the class itself if no parent can, which is what stops an application from replacing a core class like java.lang.String with its own version. Class.forName() loads the class and runs its static initialisers immediately, which is why it is used to trigger driver registration; ClassLoader.loadClass() only loads and links the class, and its static block runs later when the class is first used. That difference matters when a static block has side effects or when you want to inspect a class without running its initialisation. Classes are only unloaded when their loader becomes unreachable, which is why a leaked loader keeps every class it loaded alive in Metaspace.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does parent delegation stop an application replacing java.lang.String?",
+      "When would you create a custom classloader, and what breaks if you skip delegation?",
+      "Why does a leaked classloader show up as Metaspace growth?"
+    ],
+    "id": "iq-m3src-classloaders",
+    "module": "module-3",
+    "question": "What are the classloaders in a JVM, how does delegation work, and how do Class.forName() and ClassLoader.loadClass() differ?",
+    "relatedTopics": [
+      "garbage-collection",
+      "reflection-serialization"
+    ],
+    "shortAnswer": "Bootstrap, platform, and application loaders delegate upwards before loading a class themselves; forName loads and initialises the class, while loadClass only loads it and leaves static initialisation for later.",
+    "tips": [
+      "Draw the three loaders as a chain before explaining delegation.",
+      "State the forName versus loadClass difference as initialise now versus initialise later."
+    ],
+    "title": "Classloaders: types, delegation, and loading a class",
+    "topicId": "jdk-jre-jvm"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Returning a shallow copy and letting callers mutate shared state.",
+      "Forgetting to make clone public or to handle CloneNotSupportedException.",
+      "Deep-copying immutable fields such as Strings for no benefit."
+    ],
+    "detailedAnswer": "A shallow copy creates a new object and copies each field value across, so a field that points to a list or another object still points to the same list or object in both copies; changing it through one copy changes it for the other. A deep copy also copies every referenced object, so the two graphs are fully independent, which is what you want when the copy must be safe to mutate on its own. Java's built-in route is awkward: Cloneable is only a marker interface, Object.clone() is protected and throws CloneNotSupportedException, and the default implementation is shallow, so you must override clone, make it public, handle the exception, and manually deep-copy each mutable field yourself. For that reason, most teams prefer a copy constructor or a small factory method that builds a new object field by field: the intent is visible, the depth is explicit, and there is no checked exception or protected method to work around. Whichever route you take, document whether the copy is deep or shallow, because callers will assume one or the other.",
+    "difficulty": "Medium",
+    "followUps": [
+      "When is a shallow copy actually safe to hand out?",
+      "How would you deep-copy an object graph without writing clone at all?",
+      "Why do many teams avoid Cloneable in favour of a copy constructor?"
+    ],
+    "id": "iq-m3src-deep-shallow-clone",
+    "module": "module-3",
+    "question": "What is the difference between deep and shallow cloning, and what are the traps in Java's Cloneable design?",
+    "relatedTopics": [
+      "reflection-serialization",
+      "design-patterns-solid"
+    ],
+    "shortAnswer": "A shallow copy duplicates the object but shares its referenced fields; a deep copy duplicates those fields too. Cloneable is a marker interface with a protected, exception-throwing clone method, so it is easy to get wrong.",
+    "tips": [
+      "Give one shared-reference example that shows the shallow-copy trap.",
+      "State your preference and why, rather than only describing clone()."
+    ],
+    "title": "Deep versus shallow cloning",
+    "topicId": "oop-principles"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Checking the condition with if instead of while.",
+      "Calling wait or notify outside a synchronized block.",
+      "Using notify and waking a thread waiting on the wrong condition."
+    ],
+    "detailedAnswer": "The design is a small buffer with a fixed capacity, a put method that waits while the buffer is full, and a take method that waits while it is empty, both synchronized on the same monitor. Waiting must happen inside a while loop that re-checks the condition after waking: a thread can wake spuriously, or another consumer can take the last item before this thread runs again, and an if would let it proceed on a false assumption and fail. After adding an item, put calls notifyAll so a waiting consumer wakes; after removing one, take calls notifyAll so a waiting producer wakes. notifyAll is preferred over notify here because producers and consumers wait on different conditions on the same monitor, and waking one arbitrary thread may wake the wrong kind. A fresh implementation looks like this:\n\n```java\nimport java.util.LinkedList;\nimport java.util.Queue;\n\nclass BoundedBuffer<T> {\n    private final Queue<T> queue = new LinkedList<>();\n    private final int capacity;\n\n    BoundedBuffer(int capacity) {\n        this.capacity = capacity;\n    }\n\n    public synchronized void put(T item) throws InterruptedException {\n        while (queue.size() == capacity) {\n            wait();\n        }\n        queue.add(item);\n        notifyAll();\n    }\n\n    public synchronized T take() throws InterruptedException {\n        while (queue.isEmpty()) {\n            wait();\n        }\n        T item = queue.remove();\n        notifyAll();\n        return item;\n    }\n}\n```\n\nIn production code you would usually use a BlockingQueue instead, which provides this behaviour already tested, but interviewers ask for wait and notify to check that you understand monitors, lost wakeups, and why the condition loop matters.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What goes wrong if you use notify() instead of notifyAll() here?",
+      "Why must wait() be called while holding the monitor?",
+      "When would you replace this with a BlockingQueue, and what do you lose?"
+    ],
+    "id": "iq-m3src-coding-producer-consumer",
+    "module": "module-3",
+    "question": "Coding task: write a bounded producer-consumer buffer in plain Java using wait() and notifyAll(). Why must the condition be checked in a while loop, not an if?",
+    "relatedTopics": [
+      "executors-completablefuture",
+      "java-memory-model"
+    ],
+    "shortAnswer": "Guard the buffer with synchronized methods, wait in a while loop when it is full or empty, and notifyAll after each change; the while loop protects against spurious wakeups and against another thread taking the item first.",
+    "tips": [
+      "Write the while loop first and explain it before the rest.",
+      "Mention spurious wakeups by name."
+    ],
+    "title": "Coding: producer-consumer with wait and notify",
+    "topicId": "concurrency-basics"
+  },
+  {
+    "category": "Coding",
+    "commonMistakes": [
+      "Capturing an argument when the expected object was already known.",
+      "Verifying every interaction instead of the one that defines the behaviour.",
+      "Stubbing with any() and then asserting nothing about the values."
+    ],
+    "detailedAnswer": "A behaviour test has three steps: arrange the mocks, act by calling the service method, and assert by verifying the interactions. When the service builds the entity itself, for example by stamping the current time or copying fields from a request, you cannot write the expected object in advance, so you capture the real argument instead. ArgumentCaptor takes the object the mock actually received so you can assert on its fields, while verify with times(1) checks the call happened exactly once. A fresh example looks like this:\n\n```java\nimport static org.junit.jupiter.api.Assertions.assertEquals;\nimport static org.mockito.Mockito.times;\nimport static org.mockito.Mockito.verify;\nimport static org.mockito.Mockito.when;\n\nimport org.junit.jupiter.api.Test;\nimport org.junit.jupiter.api.extension.ExtendWith;\nimport org.mockito.ArgumentCaptor;\nimport org.mockito.InjectMocks;\nimport org.mockito.Mock;\nimport org.mockito.junit.jupiter.MockitoExtension;\n\n@ExtendWith(MockitoExtension.class)\nclass OrderServiceTest {\n\n    @Mock\n    private OrderRepository repository;\n\n    @InjectMocks\n    private OrderService service;\n\n    @Test\n    void placesOrderWithDiscountApplied() {\n        when(repository.save(org.mockito.ArgumentMatchers.any()))\n                .thenAnswer(invocation -> invocation.getArgument(0));\n\n        service.placeOrder(\"BOOK-1\", 2);\n\n        ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);\n        verify(repository, times(1)).save(captor.capture());\n        assertEquals(\"BOOK-1\", captor.getValue().itemCode());\n        assertEquals(2, captor.getValue().quantity());\n    }\n}\n```\n\nReach for a captor when the argument is constructed inside the code under test; when you already know the exact object, a plain verify with that object is simpler and reads better. Keep the test focused on one behaviour: a test that verifies five interactions at once becomes brittle and fails whenever the implementation changes without the behaviour changing.",
+    "difficulty": "Medium",
+    "followUps": [
+      "When is a plain verify with an expected object better than a captor?",
+      "How does verifyNoMoreInteractions differ from verify with times(1)?",
+      "Why is stubbing a mock you then verify a smell?"
+    ],
+    "id": "iq-m3src-coding-mockito-argument-captor",
+    "module": "module-3",
+    "question": "Coding task: how do you test that a service saves exactly the right entity using Mockito, and when do you reach for an ArgumentCaptor instead of a simple verify?",
+    "relatedTopics": [
+      "tst-spring-boot-tests",
+      "tst-test-design"
+    ],
+    "shortAnswer": "Stub the dependencies, call the service, then verify the repository method was called once and capture its argument to assert on the saved fields; use a captor when the exact argument is built inside the method and you cannot construct it in advance.",
+    "tips": [
+      "Explain the trigger first: the argument is built inside the method.",
+      "Keep one behaviour per test."
+    ],
+    "title": "Coding: verify behaviour with Mockito ArgumentCaptor",
+    "topicId": "tst-junit-mockito-fundamentals"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Forgetting readResolve and creating a second instance on deserialization.",
+      "Thinking a private constructor alone makes a Singleton safe.",
+      "Using a Singleton for mutable global state that tests cannot reset."
+    ],
+    "detailedAnswer": "A classic Singleton with a private constructor and a static instance looks safe, but it has three holes. Reflection can make the private constructor accessible and call it, producing a second instance; deserialization creates a new object without calling the constructor, so reading a serialized Singleton back gives you a second instance unless you add a readResolve method that returns the existing one; and cloning copies the instance unless clone is blocked. The usual defences are to throw from the constructor if an instance already exists, which stops reflection, to add readResolve, which stops deserialization, and to refuse cloning. The simpler and stronger answer is an enum with a single constant: the JVM guarantees one instance per classloader, serialization is handled by the language, and reflection cannot instantiate an enum, so all three attacks fail by construction. The trade-off is that an enum cannot extend another class and is awkward when construction needs parameters, in which case a static holder class with lazy initialisation plus the defences above is the fallback.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why does readResolve fix the deserialization hole?",
+      "What breaks if you serialize a Singleton without readResolve?",
+      "When would you avoid a Singleton entirely, even a safe one?"
+    ],
+    "id": "iq-m3src-singleton-breaking",
+    "module": "module-3",
+    "question": "How can a Singleton be broken in Java, and what is the most robust way to implement one?",
+    "relatedTopics": [
+      "reflection-serialization",
+      "concurrency-basics"
+    ],
+    "shortAnswer": "Reflection can call the private constructor, deserialization can create a second instance, and cloning can copy it; an enum singleton is immune to all three, which is why it is the most robust form.",
+    "tips": [
+      "Name all three attacks, then give the enum answer.",
+      "Mention that enum singletons cannot extend a class."
+    ],
+    "title": "How a Singleton breaks, and how to defend it",
+    "topicId": "design-patterns-solid"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Using an Abstract Factory for a single product type.",
+      "Letting callers mix products from different families.",
+      "Putting creation logic in the caller and calling it a factory."
+    ],
+    "detailedAnswer": "Factory Method solves the problem of creating a single product: a creator class defines a method that returns a product, and each subclass decides which concrete product to build, so the calling code depends only on the product interface. Abstract Factory solves a bigger problem: creating a family of related products that belong together, such as a button, a text field, and a scroll bar that must all follow the same visual theme. It defines one factory interface with a creation method per product, and each concrete factory produces the whole matching set, so a caller cannot accidentally mix a dark-theme button with a light-theme text field. Choose Factory Method when you have one product type and the variation is which implementation is built; choose Abstract Factory when you have several related types and the variation is which consistent family is built. In Spring, a @Bean factory method is the everyday form of the first idea, while choosing between whole configuration families is the second idea in framework form.",
+    "difficulty": "Medium",
+    "followUps": [
+      "What breaks if you mix products from two Abstract Factory families?",
+      "How does a Spring @Bean method relate to the Factory Method idea?",
+      "Why is the factory itself usually hidden behind an interface?"
+    ],
+    "id": "iq-m3src-factory-vs-abstract-factory",
+    "module": "module-3",
+    "question": "How do the Factory Method and Abstract Factory patterns differ, and how do you choose between them?",
+    "relatedTopics": [
+      "sd-design-patterns-lld",
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "Factory Method creates one kind of object and lets subclasses decide the concrete type; Abstract Factory creates a whole family of related objects that must work together, such as a matching set of UI controls.",
+    "tips": [
+      "Use one product versus a family of products as the dividing line.",
+      "Give a concrete family example, such as a UI theme."
+    ],
+    "title": "Factory versus Abstract Factory",
+    "topicId": "design-patterns-solid"
+  },
+  {
+    "category": "Java",
+    "commonMistakes": [
+      "Adding a builder to a two-field class.",
+      "Validating each field alone and missing invalid combinations.",
+      "Exposing the half-built object before build() is called."
+    ],
+    "detailedAnswer": "A constructor with many parameters is hard to call correctly: callers mix up two Strings or two ints, and adding an optional field forces either a new constructor or a null argument. Telescoping constructors, where each constructor adds one more parameter, multiply quickly and still leave the caller guessing which argument is which. A builder fixes this by giving each field a named setter-like step, letting optional fields be left out, and producing an immutable object at the end through a single build step that can validate the whole combination. The cost is a second class, more code to maintain, and an object that is mutable during construction, so a builder is overkill for a small value object with two or three required fields, where a constructor or a record is simpler and clearer. In interviews, the honest answer names the threshold: roughly four or more parameters, or any case where two parameters share a type and could be swapped by mistake.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How does a builder help make an immutable object?",
+      "Where would you validate: in each builder step or in build()?",
+      "Why is a record sometimes a better answer than a builder?"
+    ],
+    "id": "iq-m3src-builder-vs-constructor",
+    "module": "module-3",
+    "question": "When is the Builder pattern the right choice over constructors, and when does it become overkill?",
+    "relatedTopics": [
+      "oop-principles",
+      "modern-java-features"
+    ],
+    "shortAnswer": "Use a builder when an object has many parameters, several optional ones, or combinations that would need many constructors; skip it for small objects with two or three required fields, where a plain constructor is clearer.",
+    "tips": [
+      "Name the threshold: four or more parameters, or same-type parameters that can be swapped.",
+      "Mention validation in build() as the place to check the whole combination."
+    ],
+    "title": "Builder versus telescoping constructors",
+    "topicId": "design-patterns-solid"
+  },
+  {
+    "category": "Spring Framework",
+    "commonMistakes": [
+      "Listing patterns without a Spring example for any of them.",
+      "Confusing a container-managed singleton bean with a hand-written Singleton class.",
+      "Calling every @Bean method a factory without explaining what it creates."
+    ],
+    "detailedAnswer": "Spring is a good place to show pattern knowledge because the framework uses the patterns rather than just describing them. The IoC container is a factory: you ask for a bean by name or type and it decides which concrete class to build. Beans are singletons by default, with the container holding one shared instance per scope. AOP and @Transactional are proxies: the container wraps your bean so cross-cutting behaviour runs around your method. JdbcTemplate and RestTemplate are template methods: the framework owns the fixed steps, such as opening and closing resources, and you supply only the varying part. Adapters appear wherever Spring bridges two APIs, for example HandlerAdapter letting one dispatcher call controllers written in different styles. Naming the pattern is only half the answer; the senior version points at the concrete class or annotation in your own project and explains what would break if the pattern were removed.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why are Spring singleton beans not the same as a Singleton pattern class?",
+      "How does a proxy change what happens when one bean method calls another?",
+      "Where does the Observer pattern appear in Spring?"
+    ],
+    "id": "iq-m3src-patterns-in-spring",
+    "module": "module-3",
+    "question": "Which design patterns does the Spring Framework itself use, and where can you point to each one in real code?",
+    "relatedTopics": [
+      "design-patterns-solid",
+      "bean-scopes-lifecycle"
+    ],
+    "shortAnswer": "Spring is built on patterns: the container is a factory, beans are singletons by default, proxies add advice, templates handle boilerplate, and adapters bridge different APIs.",
+    "tips": [
+      "Give the pattern and the Spring class together, not the pattern alone.",
+      "Use the proxy example to connect back to @Transactional behaviour."
+    ],
+    "title": "Design patterns inside the Spring Framework",
+    "topicId": "spring-ioc-di"
+  },
+  {
+    "category": "Spring Framework",
+    "commonMistakes": [
+      "Calling an @Async method from the same bean and expecting it to run in the background.",
+      "Using the default executor under load.",
+      "Letting exceptions from void @Async methods vanish silently."
+    ],
+    "detailedAnswer": "Marking a method @Async and enabling async support makes Spring run it through a proxy on a thread from a TaskExecutor instead of the caller's thread, returning a Future or CompletableFuture you can compose. The default executor is a simple one that creates a new thread per task, so a production setup should define its own ThreadPoolTaskExecutor with a bounded queue, a named thread prefix, and a rejection policy, otherwise a burst of async calls can exhaust threads exactly like any other unbounded pool. The trap is the same proxy rule as @Transactional: the proxy only intercepts calls that arrive from outside the bean, so when one method of a bean calls its own @Async method, the call never reaches the proxy and the work runs synchronously on the caller's thread with no error to warn you. The fixes are the same too: call the async method through another bean, or inject the bean's own proxy. Exceptions also need care: a void @Async method that throws has no caller to receive the exception, so configure an AsyncUncaughtExceptionHandler to log it, or return a CompletableFuture so failures can be handled.",
+    "difficulty": "Medium",
+    "followUps": [
+      "Why does a self-call run synchronously instead of failing loudly?",
+      "What should a production TaskExecutor configure that the default does not?",
+      "Where does a thrown exception go from a void @Async method?"
+    ],
+    "id": "iq-m3src-spring-async",
+    "module": "module-3",
+    "question": "How does @Async work in Spring, what executor does it need, and what goes wrong when an @Async method is called from the same bean?",
+    "relatedTopics": [
+      "spring-ioc-di",
+      "concurrency-basics"
+    ],
+    "shortAnswer": "@Async runs the method on a separate thread through a proxy, so it needs a configured TaskExecutor and an external call; a self-call bypasses the proxy and runs synchronously on the caller's thread.",
+    "tips": [
+      "Connect the trap to the proxy rule, not to async itself.",
+      "Name the executor configuration as a production requirement."
+    ],
+    "title": "@Async, executors, and the self-invocation trap",
+    "topicId": "executors-completablefuture"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Creating beans unconditionally so consumers cannot override them.",
+      "Forgetting the properties prefix so settings collide with other starters.",
+      "Bundling a heavy dependency every consumer is forced to carry."
+    ],
+    "detailedAnswer": "A custom starter has two parts: a small module that declares the dependencies a team always needs together, and an auto-configuration class that creates the beans for that setup. The auto-configuration is registered so Spring Boot can find it, and it is guarded by conditions: @ConditionalOnClass so it only applies when the library is present, @ConditionalOnMissingBean so a team's own bean wins, and @ConditionalOnProperty so the whole setup can be switched off. Configuration properties bind the team's settings from application properties with a clear prefix, and the starter should be ordered after the auto-configurations it depends on. The value for consumers is that a new service gets logging, metrics, security defaults, or client setup by adding one dependency instead of copying the same configuration class into every project. The risks to name are a starter that is too opinionated and hard to override, and a starter that drags in a heavy dependency every consumer must then exclude.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How does a team's own bean override a starter's bean?",
+      "How do you let a team switch a starter off without removing the dependency?",
+      "What makes a starter too opinionated to reuse?"
+    ],
+    "id": "iq-m3src-custom-starter",
+    "module": "module-3",
+    "question": "How do you build a custom Spring Boot starter, and what does auto-configuration do for the teams that use it?",
+    "relatedTopics": [
+      "configuration-profiles",
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "A starter is a dependency that pulls in the libraries a team needs, plus an auto-configuration class that creates the beans only when its conditions match, so consumers get a working setup by adding one dependency.",
+    "tips": [
+      "Describe the two parts first: dependency plus auto-configuration.",
+      "Name the three conditions as the mechanism that makes it safe."
+    ],
+    "title": "Building a custom Spring Boot starter",
+    "topicId": "spring-boot-autoconfig"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Assuming one @Transactional covers both databases.",
+      "Leaking the tenant key in a ThreadLocal across requests.",
+      "Forgetting @Primary and getting an ambiguous-bean failure at startup."
+    ],
+    "detailedAnswer": "Spring Boot auto-configures a single DataSource, so a second database needs explicit beans: one DataSource, one EntityManagerFactory, and one transaction manager per database, with one of each marked @Primary so injection still works where only one is needed. To choose at runtime, for example per tenant, use AbstractRoutingDataSource, which picks the target DataSource from a key held in a ThreadLocal context that is set early in the request, usually by a filter or interceptor, and cleared afterwards so the thread does not leak the tenant into the next request. The hard part is transactions: a @Transactional method uses one transaction manager, so a write that touches both databases is two separate transactions and can commit in one and fail in the other. The honest answer is to avoid spanning databases in one transaction: keep each operation to one source, or accept eventual consistency with a saga or outbox. Also name the testing cost: each DataSource doubles the test setup, and a forgotten @Primary produces an ambiguous-bean error at startup.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why must the routing key be cleared after the request?",
+      "What happens if you forget @Primary with two DataSources?",
+      "How would you handle a write that must touch both databases?"
+    ],
+    "id": "iq-m3src-multiple-datasources",
+    "module": "module-3",
+    "question": "How do you configure multiple DataSources in Spring Boot, switch between them at runtime, and what breaks with transactions?",
+    "relatedTopics": [
+      "spring-boot-autoconfig",
+      "actuator-microservices-deployment"
+    ],
+    "shortAnswer": "Define one DataSource bean per database, mark one @Primary, and route with AbstractRoutingDataSource driven by a context holder; transactions spanning both databases are not atomic, so keep each transaction to one source or use a saga.",
+    "tips": [
+      "List the three beans per database before the routing part.",
+      "State plainly that cross-database transactions are not atomic."
+    ],
+    "title": "Multiple DataSources and runtime routing",
+    "topicId": "spring-data-jpa"
+  },
+  {
+    "category": "Scenario-based",
+    "commonMistakes": [
+      "Adding instances before checking whether the database is the bottleneck.",
+      "Raising the connection pool without checking what the database can handle.",
+      "Scaling a stateful service and splitting user sessions across instances."
+    ],
+    "detailedAnswer": "Start by finding the real bottleneck instead of guessing: check CPU, memory, thread-pool queue depth, database connection pool usage, and the slowest endpoints, and look at whether latency comes from the service, the database, or a downstream call. If the service itself is stateless, the fastest safe move is to add instances behind the load balancer, since a stateless service scales horizontally without code changes. Next protect the shared resources: raise the database connection pool only as far as the database can handle, add caching for hot read endpoints, and add timeouts and circuit breakers on downstream calls so a slow dependency cannot exhaust your threads. Then look at the code: add indexes for the slow queries, move heavy work off the request thread with async processing or a queue, and check for accidental per-request work such as repeated serialization or uncached lookups. Finally, make sure the change is safe to run: confirm sessions are not stored in memory on one instance, confirm the deployment can roll out without downtime, and set alerts on the metrics you just watched so the next doubling is caught earlier.",
+    "difficulty": "Hard",
+    "followUps": [
+      "How do you know whether the bottleneck is the service or the database?",
+      "Why can raising the connection pool make things worse?",
+      "What breaks if the service keeps session state in memory?"
+    ],
+    "id": "iq-m3src-scenario-scale-boot",
+    "module": "module-3",
+    "question": "Scenario: your Spring Boot service must suddenly handle twice the traffic it was designed for. What do you do first, and what do you change next?",
+    "relatedTopics": [
+      "performance-best-practices",
+      "spring-data-jpa"
+    ],
+    "shortAnswer": "First confirm where the bottleneck is with metrics and logs, then scale out behind a load balancer and protect the database with pooling, caching, and timeouts; only then tune the code, because scaling a bottleneck just moves it.",
+    "tips": [
+      "Order the answer: measure, scale out, protect shared resources, then tune code.",
+      "Name one metric for each layer."
+    ],
+    "title": "Scenario: doubling traffic on a Spring Boot service",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "SQL",
+    "commonMistakes": [
+      "Adding an index without reading the plan first.",
+      "Testing the fix on a tiny dataset.",
+      "Fixing the query while the real problem is N+1 in the application."
+    ],
+    "detailedAnswer": "Start with the execution plan: EXPLAIN shows whether the database uses an index or scans the whole table, how many rows it expects to touch, and whether it sorts or joins in an expensive order. The usual causes are a missing index on the filtered or joined column, a query that defeats its index with a function on the column or a leading wildcard, a table that has grown past the point where the old plan works, or stale statistics that make the planner choose badly. Fixes follow the cause: add a covering index for the columns the query actually reads, rewrite the query so the filter can use the index, or update statistics and re-check the plan. Measure on realistic data volumes, because a query that is fast on a thousand rows can be slow on ten million, and check the fix under the same load, since an index that helps one query slows every write to the table. Also check the application side: an N+1 pattern, where one query per row replaces one joined query, often looks like a slow query but is really a slow loop.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you tell a missing index from stale statistics?",
+      "Why can an index that fixes a read hurt overall performance?",
+      "When is the real problem N+1 rather than the query itself?"
+    ],
+    "id": "iq-m3src-sql-slow-query",
+    "module": "module-3",
+    "question": "A query that was fast is now slow in production. How do you find the cause and fix it?",
+    "relatedTopics": [
+      "spring-data-jpa",
+      "jdbc-networking"
+    ],
+    "shortAnswer": "Run EXPLAIN to see the plan, check whether an index is used and how many rows are scanned, then fix the query or the index, and verify the plan changed on production-like data volumes.",
+    "tips": [
+      "Start every answer with EXPLAIN.",
+      "Tie each cause to its fix."
+    ],
+    "title": "Diagnosing a slow query in production",
+    "topicId": "db-joins-indexes-transactions"
+  },
+  {
+    "category": "Spring Boot",
+    "commonMistakes": [
+      "Adding a filter without a position and letting it land in a random spot.",
+      "Doing heavy work in a filter that runs on every request.",
+      "Assuming filters only run for controller requests."
+    ],
+    "detailedAnswer": "Every request passes through a chain of servlet filters before it reaches a controller, and Spring Security owns that chain: one filter checks the security context, another handles login, another checks the user's roles against the URL, and another writes the security context back at the end. A custom filter, such as one that reads a token from a header and builds an authentication object, is added in the security configuration with addFilterBefore or addFilterAfter, positioned relative to a filter whose job you understand, for example before the filter that checks authorization, so your authentication is in place when the check runs. Putting it in the wrong place is the classic bug: after the authorization check it never runs in time, and before the context filter it cannot rely on the security context existing. Filters are servlet-level, so they run for every request including errors and static resources, and they should do one small job and pass the request on quickly; heavy work in a filter slows every request. For debugging, enable security debug logging to see which filter rejected a request and why.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What happens if your filter runs after the authorization filter?",
+      "Why should a filter do only one small job?",
+      "How do you find out which filter rejected a request?"
+    ],
+    "id": "iq-m3src-security-filter-chain",
+    "module": "module-3",
+    "question": "What is the Spring Security filter chain, how do you add a custom filter, and where does it belong in the order?",
+    "relatedTopics": [
+      "spring-mvc-rest",
+      "spring-ioc-di"
+    ],
+    "shortAnswer": "Security is a chain of servlet filters that runs before your controllers; a custom filter is added with addFilterBefore or addFilterAfter relative to a known filter, and its position decides what it can see and what it can break.",
+    "tips": [
+      "Explain position as the whole answer: before or after a known filter.",
+      "Name the classic bug: the filter runs too late."
+    ],
+    "title": "Spring Security filter chain and custom filters",
+    "topicId": "security-jwt"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Adding consumers beyond the partition count and expecting more throughput.",
+      "Ignoring rebalances as a cause of lag.",
+      "Assuming replication alone prevents data loss."
+    ],
+    "detailedAnswer": "Consumer lag is the gap between the newest message and the last one a group has processed, and it is measured per partition, so the first step is to see whether one partition is stuck or all of them are behind. Common causes are slow processing in the consumer, too few consumers for the partition count, since a partition can only be read by one consumer in a group, and frequent rebalances, where a consumer joining or leaving stops the whole group while partitions are reassigned. Rebalances get slow when consumers take long to finish their current work or hold large state, and the fix is usually a mix of faster processing, more partitions, and the cooperative rebalancing protocol that moves fewer partitions at a time. When a partition leader fails, the cluster elects a new leader from the in-sync replicas, and consumers resume from there; the risk is the window where the leader accepted a write that no replica had copied yet, in which case that write is lost even though replication was configured. To shrink that window, require the producer to wait for all in-sync replicas before acknowledging, and keep the minimum in-sync replica count above one so a single replica cannot accept writes alone.",
+    "difficulty": "Hard",
+    "followUps": [
+      "Why can a group not scale past its partition count?",
+      "What makes a rebalance slow, and what does cooperative rebalancing change?",
+      "How can data be lost even with replication enabled?"
+    ],
+    "id": "iq-m3src-kafka-consumer-lag",
+    "module": "module-3",
+    "question": "Your Kafka consumers are falling behind and rebalances take a long time. How do you diagnose it, and what happens when a partition leader fails?",
+    "relatedTopics": [
+      "sd-caching-queues-databases"
+    ],
+    "shortAnswer": "Check lag per partition, slow processing, and rebalance causes first; add consumers up to the partition count or speed up processing, and remember a failed leader is replaced by an in-sync replica, but data can still be lost if the leader dies before replicas catch up.",
+    "tips": [
+      "Start with lag per partition, not total lag.",
+      "Name the lost-write window explicitly."
+    ],
+    "title": "Kafka consumer lag, rebalances, and broker failure",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Letting a choreographed saga grow until nobody can trace it.",
+      "Writing a compensating action that cannot safely run twice.",
+      "Treating a compensation as a database rollback."
+    ],
+    "detailedAnswer": "A saga breaks a multi-service transaction into local steps, each with a compensating action that undoes it if a later step fails. Choreography runs the saga without a boss: each service listens for an event, does its step, and publishes the next event, so the flow is defined by the services themselves. That is simple and loosely coupled for a short chain, but the overall flow is invisible: no one place shows the order, a missing event is hard to spot, and adding a step means changing several services. Orchestration puts one coordinator in charge: it calls each service in order, tracks which steps have completed, and runs the compensations in reverse when one fails. That makes the flow visible, testable, and easy to change, at the cost of a central service that every step depends on. Choose choreography when the flow is short, stable, and each service owns its part; choose orchestration when the flow is long, branches on results, or needs a clear audit trail. Either way, compensations must be idempotent, because a retry can run one twice, and every participant must handle duplicate events.",
+    "difficulty": "Hard",
+    "followUps": [
+      "What breaks first when a choreographed saga grows to ten steps?",
+      "How does the orchestrator know which compensations to run after a failure?",
+      "Why must a compensating action be idempotent?"
+    ],
+    "id": "iq-m3src-saga-choreography-orchestration",
+    "module": "module-3",
+    "question": "How do choreography and orchestration differ as ways to run a saga, and how do you choose between them?",
+    "relatedTopics": [
+      "sd-designing-real-systems"
+    ],
+    "shortAnswer": "In choreography each service reacts to events on its own; in orchestration one coordinator tells each service what to do. Choreography is looser and simpler for short flows, orchestration is clearer and easier to debug for long, branching flows.",
+    "tips": [
+      "Contrast who holds the flow: nobody, or one coordinator.",
+      "Give the decision rule as flow length and branching."
+    ],
+    "title": "Saga choreography versus orchestration",
+    "topicId": "actuator-microservices-deployment"
+  },
+  {
+    "category": "Microservices",
+    "commonMistakes": [
+      "Sharing one pool across all dependencies and calling it a bulkhead.",
+      "Sizing pools by guesswork instead of latency and traffic.",
+      "Queueing rejected calls instead of failing fast."
+    ],
+    "detailedAnswer": "The pattern is named after a ship: watertight compartments keep one leak from sinking the whole vessel. In a service, the compartments are resource pools: each downstream dependency gets its own thread pool, its own database connection pool, or a semaphore limiting concurrent calls, so a slow payment service can exhaust only its own pool while the rest of the service keeps answering. In Spring Boot the usual implementation is a separate executor per client, or a resilience library's bulkhead that caps concurrent calls and rejects the excess fast instead of queueing it. The key difference from a circuit breaker is timing: a bulkhead limits damage while calls are still being attempted, whereas a circuit breaker watches failures and stops calling a dependency entirely for a while. They are usually combined: the bulkhead bounds the blast radius and the breaker stops the bleeding. The trap is sizing: a pool that is too small rejects healthy traffic, and one that is too large is no bulkhead at all, so size each pool from the dependency's latency and the traffic you expect, and expose pool usage as a metric.",
+    "difficulty": "Medium",
+    "followUps": [
+      "How do you size a bulkhead pool for a dependency?",
+      "Why combine a bulkhead with a circuit breaker instead of choosing one?",
+      "What happens when a bulkhead rejects a call?"
+    ],
+    "id": "iq-m3src-bulkhead-pattern",
+    "module": "module-3",
+    "question": "What is the Bulkhead pattern, how do you implement it in a Spring Boot service, and how does it differ from a circuit breaker?",
+    "relatedTopics": [
+      "executors-completablefuture",
+      "sd-caching-queues-databases"
+    ],
+    "shortAnswer": "A bulkhead isolates resources per dependency, usually with separate thread pools or connection pools, so one slow dependency cannot consume everything; a circuit breaker stops calling a failing dependency, while a bulkhead limits the damage while calls continue.",
+    "tips": [
+      "Use the ship image, then the pool.",
+      "State the breaker difference as limit versus stop."
+    ],
+    "title": "The Bulkhead pattern in practice",
+    "topicId": "actuator-microservices-deployment"
+  }
+]
