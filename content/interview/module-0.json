@@ -522,5 +522,302 @@
       "tst-spring-boot-tests",
       "spring-mvc-rest"
     ]
-  }
+  },
+{
+  "id": "iq-m0src2-sql-indexes-transactions",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: SQL indexes and transactions",
+  "question": "Module 0 revision: SQL indexes and transactions in one minute",
+  "shortAnswer": "Indexes make lookups fast at the cost of slower writes; transactions group statements into one atomic, ACID unit, and the isolation level trades consistency against concurrency.",
+  "detailedAnswer": "An index is a separate lookup structure, usually a B-tree, that lets the database find rows without scanning the whole table. Index the columns used in WHERE, JOIN and ORDER BY clauses, and use a composite index when queries filter on several columns together, remembering the leftmost-prefix rule: an index on (department, salary) helps queries on department alone but not on salary alone. The price is slower inserts, updates and deletes, because every index must be maintained, plus extra storage, so index deliberately and confirm with EXPLAIN rather than indexing every column. A transaction groups statements so they commit together or roll back together: BEGIN, then work, then COMMIT on success or ROLLBACK on failure. ACID sums up the guarantees: atomicity (all or nothing), consistency (rules and constraints hold after the transaction), isolation (concurrent transactions do not see each other's half-finished work), and durability (committed data survives a crash). Isolation levels trade safety for concurrency: READ COMMITTED blocks dirty reads, REPEATABLE READ also blocks non-repeatable reads, and SERIALIZABLE blocks phantom reads too but is the slowest. Prevent lost updates, where two transactions overwrite each other, with SELECT ... FOR UPDATE or optimistic locking with a version column, and keep transactions short so locks are held briefly.",
+  "followUps": [
+    "When does adding an index make a query slower instead of faster?",
+    "What is the difference between READ COMMITTED and REPEATABLE READ?",
+    "How would you prevent two users from overwriting each other's update to the same row?"
+  ],
+  "tips": [
+    "Answer index questions with the trade-off first: faster reads, slower writes, extra storage — then name the leftmost-prefix rule."
+  ],
+  "commonMistakes": [
+    "Indexing every column and slowing down writes for no benefit.",
+    "Holding a transaction open across user input or a slow network call."
+  ],
+  "difficulty": "Medium",
+  "topicId": "db-joins-indexes-transactions",
+  "relatedTopics": [
+    "db-sql-fundamentals",
+    "spring-data-jpa"
+  ]
+},
+{
+  "id": "iq-m0src2-spring-transactions",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Transactions in Spring with @Transactional",
+  "question": "Module 0 revision: @Transactional in one minute",
+  "shortAnswer": "Put @Transactional on service methods: Spring wraps the method in a transaction via a proxy, rolls back on unchecked exceptions by default, and lets you control propagation and isolation.",
+  "detailedAnswer": "Place @Transactional on service methods, not controllers or repositories, so one business operation maps to one transaction. It works through a proxy, which has two consequences interviewers love to test: calling another method on the same object (this) bypasses the proxy, so the transaction advice never runs, and annotating a private method has no effect because the proxy cannot intercept it. By default a transaction rolls back only on unchecked exceptions (RuntimeException and Error); a checked exception commits unless you set rollbackFor. Propagation controls how a method behaves when a transaction already exists: REQUIRED, the default, joins the existing transaction; REQUIRES_NEW suspends it and starts a fresh one, useful for audit logging that must survive even if the outer work rolls back; NESTED runs a savepoint inside the current transaction. Isolation picks how much concurrent interference is tolerated, matching the database levels from READ COMMITTED up to SERIALIZABLE. Mark read-only work with readOnly = true so the database and JPA can skip dirty checking and optimise the query. A classic failure is a lazy-loaded association accessed after the transaction closed, which throws LazyInitializationException: fetch what you need inside the transaction with JOIN FETCH or an entity graph instead of widening the transaction.",
+  "followUps": [
+    "Why does calling a @Transactional method from another method in the same class not start a transaction?",
+    "When would you use REQUIRES_NEW instead of REQUIRED?",
+    "A checked exception was thrown but the data was still saved — why?"
+  ],
+  "tips": [
+    "Lead with the proxy rule: @Transactional only works when the call goes through the Spring proxy, never on self-invocation or private methods."
+  ],
+  "commonMistakes": [
+    "Expecting rollback on a checked exception without rollbackFor.",
+    "Annotating private methods or relying on self-invocation to start a transaction."
+  ],
+  "difficulty": "Medium",
+  "topicId": "spring-data-jpa",
+  "relatedTopics": [
+    "db-joins-indexes-transactions",
+    "spring-ioc-di"
+  ]
+},
+{
+  "id": "iq-m0src2-scheduling",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Scheduling with @Scheduled",
+  "question": "Module 0 revision: @Scheduled in one minute",
+  "shortAnswer": "Enable scheduling once, then annotate methods: fixedRate runs on a fixed start-to-start interval, fixedDelay waits after the previous run finishes, and cron runs on a calendar schedule.",
+  "detailedAnswer": "Add @EnableScheduling, usually on the main application class, and annotate a no-argument method with @Scheduled. fixedRate starts the next run a fixed time after the previous run started, so runs can overlap if a run takes longer than the interval. fixedDelay waits a fixed time after the previous run finished, so runs never overlap but the gap varies with how long the work takes. cron takes a six-field expression (seconds, minutes, hours, day of month, month, day of week), which is the choice for calendar schedules such as every night at 2am, and supports a zone attribute when the server timezone is not the schedule's timezone. By default Spring runs all scheduled methods on a single thread, so one slow job delays every other job: configure a TaskScheduler with a pool when jobs must run independently. Keep scheduled work idempotent, because a restart or a second instance can run it twice, and use a distributed lock or a leader election if only one instance may run it. For work that should run in the background but not on a schedule, @Async on a method (with @EnableAsync) runs it on a separate thread pool, with the same proxy rule as AOP: self-invocation bypasses it.",
+  "followUps": [
+    "What is the difference between fixedRate and fixedDelay?",
+    "A scheduled job runs twice after a restart — how do you prevent that?",
+    "Why would you give the scheduler a thread pool instead of the default single thread?"
+  ],
+  "tips": [
+    "Say the cron field order out loud — seconds first — because getting the fields wrong is the most common scheduling mistake."
+  ],
+  "commonMistakes": [
+    "Forgetting @EnableScheduling and wondering why nothing runs.",
+    "Using fixedRate for a job that must never overlap with itself."
+  ],
+  "difficulty": "Easy",
+  "topicId": "spring-boot-autoconfig",
+  "relatedTopics": [
+    "executors-completablefuture",
+    "actuator-microservices-deployment"
+  ]
+},
+{
+  "id": "iq-m0src2-resttemplate-webclient",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Calling other services — RestTemplate vs WebClient",
+  "question": "Module 0 revision: RestTemplate vs WebClient in one minute",
+  "shortAnswer": "RestTemplate is the older synchronous, blocking HTTP client; WebClient is the non-blocking replacement for high-concurrency calls, and RestClient is the modern synchronous option.",
+  "detailedAnswer": "When one service calls another over HTTP, RestTemplate is the classic Spring client: simple and synchronous, one thread blocked per request until the response arrives. That blocking model is fine for occasional calls but wastes threads when a service fans out to many downstream services at once. WebClient, from Spring WebFlux, is non-blocking: a small number of threads can juggle many in-flight requests, which is why it is the recommended choice for high-concurrency service-to-service calls, and it also supports streaming responses. RestTemplate is in maintenance mode, not removed, but new code should prefer WebClient for reactive stacks or RestClient, added in Spring Framework 6.1, which keeps the familiar synchronous style with a modern fluent API. Whichever client you use, create it once as a bean instead of building a new one per request, set connect and read timeouts explicitly so a slow downstream service cannot hang your threads forever, and handle error statuses deliberately rather than letting every 4xx or 5xx surface as a generic exception. For resilience, combine the client with timeouts, retries with backoff, and a circuit breaker.",
+  "followUps": [
+    "When would you choose WebClient over RestTemplate?",
+    "What happens if you never set a timeout on an HTTP client?",
+    "How is RestClient different from RestTemplate?"
+  ],
+  "tips": [
+    "Frame the answer as a thread-economics trade-off: blocking clients hold a thread per call, non-blocking clients do not."
+  ],
+  "commonMistakes": [
+    "Creating a new RestTemplate or WebClient for every request instead of reusing one bean.",
+    "Calling a downstream service with no timeout and letting threads pile up."
+  ],
+  "difficulty": "Medium",
+  "topicId": "spring-mvc-rest",
+  "relatedTopics": [
+    "spring-boot-autoconfig",
+    "actuator-microservices-deployment"
+  ]
+},
+{
+  "id": "iq-m0src2-filter-interceptor",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Servlet filter vs Spring interceptor",
+  "question": "Module 0 revision: filter vs interceptor vs AOP in one minute",
+  "shortAnswer": "Filters run at the servlet level before Spring sees the request; interceptors run inside Spring MVC around the handler method; AOP advises any Spring bean method.",
+  "detailedAnswer": "A servlet filter sits in front of the DispatcherServlet and sees every request and response, but it knows nothing about Spring: it cannot tell which controller method will handle the request. Use filters for edge concerns such as logging, CORS headers, compression, or request tracing. A HandlerInterceptor runs inside Spring MVC, around the handler method, with preHandle before the controller, postHandle after it, and afterCompletion once the response is done; it knows the handler method, so it can apply logic per endpoint, for example checking a header for a specific controller or recording per-endpoint metrics. Aspect-oriented programming goes one level deeper: advice runs around any Spring bean method, not just web handlers, which is where logging, transactions and security checks on service methods belong. The request flows in this order: filter, then interceptor, then controller, then back out through interceptor and filter. CORS is typically handled at the filter level or with a global CORS configuration, not inside a controller. A common trap is doing authentication in an interceptor while expecting it to protect non-MVC endpoints such as Actuator: filters and Spring Security's filter chain cover those, interceptors do not.",
+  "followUps": [
+    "Where would you add request logging: filter, interceptor, or AOP?",
+    "Why does an interceptor not protect an Actuator endpoint?",
+    "How do you apply CORS to a whole application?"
+  ],
+  "tips": [
+    "Draw the order in one sentence — filter, interceptor, controller — and pick the layer by asking what the code needs to know: the raw request, the handler method, or any bean method."
+  ],
+  "commonMistakes": [
+    "Using an interceptor for something that must also cover non-MVC requests.",
+    "Putting business logic in a filter or interceptor instead of a service."
+  ],
+  "difficulty": "Medium",
+  "topicId": "spring-mvc-rest",
+  "relatedTopics": [
+    "validation-exception-handling",
+    "security-jwt"
+  ]
+},
+{
+  "id": "iq-m0src2-kafka-basics",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Kafka basics",
+  "question": "Module 0 revision: Kafka in one minute",
+  "shortAnswer": "Kafka is a distributed log: producers append events to topics split into partitions, consumers read them in order per partition, and consumer groups share the work.",
+  "detailedAnswer": "A topic is a named stream of events, split into partitions so it can scale across brokers; ordering is guaranteed only within one partition, never across the whole topic. Producers append records to a topic, choosing the partition from the record key, so all events with the same key land in the same partition in order. Consumers read from partitions and track their position with offsets; a consumer group splits a topic's partitions across its members, so adding consumers scales consumption until there is one consumer per partition. Delivery is at-least-once by default: a consumer can receive the same message twice after a crash or rebalance, so consumers must be idempotent and handle duplicates gracefully. Use Kafka over synchronous REST when services should be decoupled, when many consumers need the same event, or when bursts of work should be buffered instead of overwhelming a downstream service. Compared with a traditional broker such as RabbitMQ, Kafka keeps messages durably in the log so they can be replayed, which suits event-driven systems and audit trails. The classic traps are assuming global ordering across partitions, assuming exactly-once delivery without the extra configuration and idempotent design it requires, and letting a slow consumer fall behind until the lag becomes unrecoverable.",
+  "followUps": [
+    "How do you guarantee ordering for events about the same order or user?",
+    "What happens when a consumer crashes halfway through processing a message?",
+    "When would you use Kafka instead of a direct REST call?"
+  ],
+  "tips": [
+    "Anchor the answer on two phrases: ordering is per partition only, and delivery is at-least-once, so consumers must be idempotent."
+  ],
+  "commonMistakes": [
+    "Assuming messages arrive in order across the whole topic.",
+    "Writing a consumer that breaks when it sees the same message twice."
+  ],
+  "difficulty": "Medium",
+  "topicId": "sd-caching-queues-databases",
+  "relatedTopics": [
+    "actuator-microservices-deployment",
+    "spring-boot-autoconfig"
+  ]
+},
+{
+  "id": "iq-m0src2-spring-cloud",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Spring Cloud — discovery, gateway and circuit breakers",
+  "question": "Module 0 revision: service discovery and resilience in one minute",
+  "shortAnswer": "Services find each other through a registry instead of hardcoded URLs, traffic enters through a gateway, and circuit breakers stop calls to a failing service before it drags the rest down.",
+  "detailedAnswer": "Hardcoding hostnames and ports does not survive services that scale up, move, or restart, so services register themselves with a discovery server such as Eureka, sending regular heartbeats, and look each other up by name instead of by address. Configuration is centralised in a config server so every service reads the same properties without a redeploy. All outside traffic enters through an API gateway, which routes by path, applies authentication, rate limiting and request logging in one place; the older Zuul proxy has been superseded by Spring Cloud Gateway. When a downstream service starts failing, a circuit breaker stops calling it: closed while calls succeed, open after a run of failures so calls fail fast instead of piling up threads, and half-open after a pause to try a single probe call before closing again. Hystrix, the original Netflix circuit breaker, is deprecated; Resilience4j is the current library, and it pairs with timeouts, retries with backoff, and bulkheads that limit how many threads one dependency may consume. The point of all of this is graceful degradation: a failing dependency should return a fallback or a clear error, not cascade into a system-wide outage.",
+  "followUps": [
+    "Why is a hardcoded service URL a problem in a microservices system?",
+    "What are the three states of a circuit breaker?",
+    "What does a gateway do that a load balancer does not?"
+  ],
+  "tips": [
+    "Name the modern replacements: Spring Cloud Gateway over Zuul, Resilience4j over Hystrix — interviewers check whether the knowledge is current."
+  ],
+  "commonMistakes": [
+    "Recommending Hystrix or Zuul for a new system without noting they are legacy.",
+    "Adding retries without backoff and amplifying an outage."
+  ],
+  "difficulty": "Medium",
+  "topicId": "actuator-microservices-deployment",
+  "relatedTopics": [
+    "sd-caching-queues-databases",
+    "spring-boot-autoconfig"
+  ]
+},
+{
+  "id": "iq-m0src2-abstract-vs-interface",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Abstract class vs interface",
+  "question": "Module 0 revision: abstract class vs interface in one minute",
+  "shortAnswer": "An abstract class shares code and state with its subclasses; an interface is a contract a class promises to fulfil, and a class can implement many of them.",
+  "detailedAnswer": "An abstract class can hold instance fields, constructors, concrete methods and abstract methods, and it is used when subclasses share behaviour and state: a common base for payment processors that all need the same logging and validation, for example. A class extends exactly one abstract class, and the abstract class can force subclasses to implement specific methods by declaring them abstract. An interface declares a contract: method signatures, constants, and since Java 8, default and static methods, but no instance state. A class can implement many interfaces, which is how Java gets the flexibility of multiple inheritance without its ambiguity. Choose an abstract class when the types share an is-a relationship plus common implementation; choose an interface when you are describing a capability or role that unrelated classes can play, such as Comparable, Runnable, or a repository contract. Default methods let interfaces evolve without breaking existing implementations, but they blur the old sharp line, so the deciding question is still state and shared code: if subclasses need shared fields and helper methods, reach for the abstract class. A marker interface is an empty interface, such as Serializable, that simply labels a class so other code can treat it specially.",
+  "followUps": [
+    "When would you pick an abstract class over an interface?",
+    "Can an interface have a method with a body?",
+    "What is a marker interface for?"
+  ],
+  "tips": [
+    "Answer with the decision rule, not just definitions: shared state and code means abstract class, a role many unrelated classes can play means interface."
+  ],
+  "commonMistakes": [
+    "Using an abstract class where an interface would keep the design open.",
+    "Forgetting that a class can implement many interfaces but extend only one class."
+  ],
+  "difficulty": "Easy",
+  "topicId": "oop-principles",
+  "relatedTopics": [
+    "design-patterns-solid",
+    "language-basics-syntax"
+  ]
+},
+{
+  "id": "iq-m0src2-static-final",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: static and final",
+  "question": "Module 0 revision: static and final in one minute",
+  "shortAnswer": "static means it belongs to the class, shared by all instances; final means it cannot be changed — a variable assigned once, a method never overridden, a class never extended.",
+  "detailedAnswer": "A static field or method belongs to the class, not to any instance: there is one copy shared by all objects, it is accessed through the class name, and it can be used without creating an object. That is why main is static: the JVM calls it before any object exists. A static method cannot use instance fields or this, and it cannot be overridden, only hidden by a subclass method with the same signature, which is a common trap. A final variable can be assigned only once; a blank final variable, declared without a value, must be assigned in every constructor. A final method cannot be overridden, and a final class, such as String, cannot be extended at all. Final on a reference means the reference cannot be pointed at another object, but the object itself may still be mutable: a final List can still have elements added to it. Constructors cannot be final, because they are never inherited or overridden. In practice, make fields final wherever possible: it documents intent, helps the compiler and the reader, and is a building block of immutable, thread-safe objects.",
+  "followUps": [
+    "Why is the main method static?",
+    "Can a final List still change?",
+    "What is a blank final variable and where must it be assigned?"
+  ],
+  "tips": [
+    "The two traps interviewers reuse most: final on a reference does not make the object immutable, and static methods are hidden, not overridden."
+  ],
+  "commonMistakes": [
+    "Saying a final collection is immutable.",
+    "Trying to use instance fields from a static method."
+  ],
+  "difficulty": "Easy",
+  "topicId": "language-basics-syntax",
+  "relatedTopics": [
+    "oop-principles",
+    "variables-operators-control-flow"
+  ]
+},
+{
+  "id": "iq-m0src2-flyway-migrations",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: Database migrations with Flyway",
+  "question": "Module 0 revision: Flyway database migrations in one minute",
+  "shortAnswer": "Flyway applies versioned SQL migration files in order and records each one, so every environment's schema evolves the same way, safely and repeatably.",
+  "detailedAnswer": "Instead of editing a database by hand or letting an ORM recreate the schema, write each schema change as a versioned migration file, named by convention V1__create_orders_table.sql, V2__add_customer_index.sql, and so on. On startup Flyway checks a history table, applies any migrations that have not run yet, in version order, inside a transaction, and records them so they are never applied twice. Repeatable migrations, prefixed R__, run again whenever their checksum changes and suit views and stored procedures that are redefined rather than altered. The golden rule is never edit a migration that has already run anywhere: fix it with a new migration, because the history table's checksums would otherwise fail validation on the next deploy. Never use Hibernate's automatic schema update in production; it is a development convenience that can drop or alter columns silently. Flyway and Liquibase solve the same problem, Flyway with plain SQL files and Liquibase with database-independent change sets, and the practical choice usually comes down to team preference and whether the schema must run unchanged on several database engines.",
+  "followUps": [
+    "What do you do when a migration that already ran needs a correction?",
+    "Why is automatic schema update unsafe in production?",
+    "What is the difference between a versioned and a repeatable migration?"
+  ],
+  "tips": [
+    "The one line interviewers want: never edit an applied migration, always add a new one."
+  ],
+  "commonMistakes": [
+    "Editing an applied migration and breaking checksum validation on every other environment.",
+    "Relying on Hibernate ddl-auto in production."
+  ],
+  "difficulty": "Easy",
+  "topicId": "db-sql-java-developers",
+  "relatedTopics": [
+    "db-sql-fundamentals",
+    "dv-deploying-java-aws"
+  ]
+},
+{
+  "id": "iq-m0src2-swagger-openapi",
+  "module": "module-0",
+  "category": "Revision",
+  "title": "Revision: API documentation with OpenAPI and Swagger",
+  "question": "Module 0 revision: OpenAPI and Swagger in one minute",
+  "shortAnswer": "OpenAPI is the standard description of a REST API; Swagger UI renders it as interactive documentation, generated from your code so it stays in step with the API.",
+  "detailedAnswer": "OpenAPI is a standard, machine-readable description of an API: its endpoints, request and response shapes, parameters and status codes. Swagger UI is the web page that renders that description so a developer can read it and try calls from the browser. In Spring Boot, the springdoc-openapi library generates the description automatically from your controllers, so the documentation cannot drift far from the code the way a hand-written wiki page can. Annotations refine what is generated: @Operation describes an endpoint, @Parameter documents a query or path parameter, and @Schema describes a request or response object, including examples and which fields are required. The generated UI is typically served alongside the application during development, which makes it the first thing a new teammate or a frontend developer opens. Keep it out of public production exposure unless it sits behind authentication, since it advertises every endpoint you have. The alternative approach is contract-first: write the OpenAPI file first and generate server stubs and clients from it, which suits teams where the API contract is agreed before the code exists.",
+  "followUps": [
+    "What is the difference between OpenAPI and Swagger UI?",
+    "How do you document a required field or an example response?",
+    "When would you write the OpenAPI file first instead of generating it?"
+  ],
+  "tips": [
+    "Stress the maintenance point: generated docs stay in step with the code, hand-written docs rot."
+  ],
+  "commonMistakes": [
+    "Exposing Swagger UI publicly in production without authentication.",
+    "Documenting the API in a wiki that nobody updates after the first release."
+  ],
+  "difficulty": "Easy",
+  "topicId": "logging-testing-docs",
+  "relatedTopics": [
+    "spring-mvc-rest",
+    "validation-exception-handling"
+  ]
+}
 ]

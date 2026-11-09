@@ -68,16 +68,30 @@ function loadJsonDir(dir) {
 const interviewQuestions = loadJsonDir(path.join(contentRoot, 'interview'))
 const practiceItems = loadJsonDir(path.join(contentRoot, 'practice'))
 
+// Split index (2026-11-09 chunk fix): the full interview + practice
+// bodies are ~850 KB of the ~1 MB index, and inlining them in the app
+// bundle pushed the initial chunk to ~1.15 MB, over the 800 KB warning
+// limit. So the app loads only a slim navigation index up front, and
+// lazy-loads the two heavy files on demand (see src/lib/content.ts).
+// The slim index keeps id-only lists so import validation and
+// LocalStorage sanitisation still work without the full text.
+const generatedAt = new Date().toISOString()
 const index = {
-  generatedAt: new Date().toISOString(),
+  generatedAt,
   tracks,
   paths,
   topics,
   cheatsheets,
-  interviewQuestions,
-  practiceItems,
+  interviewQuestionIds: interviewQuestions.map(q => q.id),
+  practiceItemIds: practiceItems.map(i => i.id),
 }
+const interviewFile = path.join(outDir, 'content-interview.json')
+const practiceFile = path.join(outDir, 'content-practice.json')
 
 fs.mkdirSync(outDir, { recursive: true })
 fs.writeFileSync(outFile, JSON.stringify(index, null, 2) + '\n')
-console.log(`Wrote ${outFile}: ${topics.length} topics, ${cheatsheets.length} cheatsheets, ${interviewQuestions.length} interview questions, ${practiceItems.length} practice items, ${tracks.length} tracks, ${paths.length} paths`)
+fs.writeFileSync(interviewFile, JSON.stringify({ generatedAt, interviewQuestions }, null, 2) + '\n')
+fs.writeFileSync(practiceFile, JSON.stringify({ generatedAt, practiceItems }, null, 2) + '\n')
+console.log(`Wrote ${outFile}: ${topics.length} topics, ${cheatsheets.length} cheatsheets, ${interviewQuestions.length} interview question ids, ${practiceItems.length} practice item ids, ${tracks.length} tracks, ${paths.length} paths`)
+console.log(`Wrote ${interviewFile}: ${interviewQuestions.length} interview questions`)
+console.log(`Wrote ${practiceFile}: ${practiceItems.length} practice items`)

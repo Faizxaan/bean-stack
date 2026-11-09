@@ -1,16 +1,17 @@
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Bookmark, Calendar, Flame, ArrowRight, BookOpen, Layers } from 'lucide-react'
-import { contentIndex, getTopic, orderedTopics } from '../lib/content'
+import { contentIndex, getTopic, orderedTopics, usePracticeItems } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { isDue, progressStats, studyStreak, topicUrl } from '../lib/utils'
 
 export function Home() {
   const { data, setInterviewDate } = useApp()
+  const { items: practiceItems, loaded: practiceLoaded } = usePracticeItems()
   const completeTopics = contentIndex.topics.filter(t => t.status === 'complete')
   const stats = progressStats(data.progress, completeTopics.map(t => t.id))
   const streak = studyStreak(data.activityDates)
-  const dueFlashcards = contentIndex.practiceItems.filter(i => i.type === 'flashcard').filter(i => {
+  const dueFlashcards = practiceItems.filter(i => i.type === 'flashcard').filter(i => {
     const st = data.flashcardStates[i.id]
     return !st || isDue(st.dueAt)
   }).length
@@ -57,7 +58,7 @@ export function Home() {
       <div className="grid grid-3">
         <div className="card"><div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Topics completed</div><div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{stats.completed} / {stats.total}</div><div className="progress-bar" style={{ marginTop: 8 }}><div style={{ width: `${stats.pct}%` }} /></div></div>
         <div className="card"><div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}><Flame size={14} /> Study streak</div><div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{streak} day{streak === 1 ? '' : 's'}</div><div style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{data.bookmarks.length} bookmarks · {data.favorites.length} favorites</div></div>
-        <div className="card"><div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Flashcards due today</div><div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{dueFlashcards}</div><Link to="/practice?tab=flashcards">Review flashcards →</Link></div>
+        <div className="card"><div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Flashcards due today</div><div style={{ fontSize: '1.8rem', fontWeight: 800 }}>{practiceLoaded ? dueFlashcards : '…'}</div><Link to="/practice?tab=flashcards">Review flashcards →</Link></div>
       </div>
 
       <div className="grid grid-2">

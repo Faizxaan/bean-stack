@@ -2,14 +2,14 @@
 
 This file is the resume point if a session is interrupted or its context is reset. Read it first, then run validation and the build before continuing.
 
-## Current state (2026-11-04, after completion run — all tracks filled)
+## Current state (2026-11-09, after second Modules batch + chunk fix — ready for one final push)
 
 - **Local directory:** `~/workspace/beanstack` (persistent, not /tmp)
 - **GitHub repo:** Faizxaan/bean-stack, branch `main`
 - **Repo before this work:** only `README.md` (12 bytes, initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92` on 2026-11-03). No other code existed to replace.
-- **App status:** Fully functional end-to-end SPA. Production build, type-check, validation script, and unit tests all pass (see Verification below).
-- **Content status:** 79 topics validated, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks (none Coming Soon), 6 paths. Interview modules 0–4 and Bonus Resume are complete; all 7 former placeholder tracks are now filled with full content (see Completed — completion run below).
-- **Push status:** See "Push log" at the bottom. Confirmed pushes: `81f00e1ec9604341ad630045a2d30067a41ee895` (76 files, foundation + Java) and `58f7c4522ce7551a4712b869e4aefd2d000635b4` (21 files, interview/practice/cheatsheets/polish). The completion run in this file is validated locally and prepared in a fresh manifest, but NOT pushed in this run — do not claim it is on GitHub until a new confirmed commit SHA is recorded.
+- **App status:** Fully functional end-to-end SPA. Production build, type-check, validation script, and unit tests all pass with no chunk-size warning (see Verification below).
+- **Content status:** 96 topics validated, 19 cheatsheets, 366 interview questions, 183 practice items, 10 tracks (none Coming Soon), 6 paths. Interview modules 0–4 and Bonus Resume are complete; all 7 former placeholder tracks are now filled with full content (see Completed — completion run below).
+- **Push status:** See "Push log" at the bottom. Confirmed pushes on `main`, in order: `81f00e1e…` (foundation + Java), `58f7c452…` (interview/practice/cheatsheets/polish), `666e536d…` (complete all tracks), `c5c4fd2c…` (PROGRESS log sync), `e4be9bdd…` (clickable topic arrows), `5b899e8e…` (critic audit), `d87d9ac0…` (PROGRESS log sync), `89459fe1…` (Desktop Modules interview import, 93 new questions), `ee0da341…` (PROGRESS log sync). The second deeper Modules batch (manifest-11, 26 files) and this chunk-fix run are validated locally and prepared in a combined manifest, but NOT yet pushed — do not claim them on GitHub until a new confirmed commit SHA is recorded.
 
 ## Completed
 
@@ -77,7 +77,7 @@ This file is the resume point if a session is interrupted or its context is rese
 - [x] Central validation fix: 19 new practice items lacked a validator-required prompt/title field; a prompt derived from each item's own front/first-sentence description was added (see DECISIONS.md). No answers or solutions changed.
 - [x] Accessibility/mobile walkthrough (code, not a live-device test): :focus-visible outline present, sidebar aria-label, labelled command-palette dialog with Ctrl/Cmd+K toggle and Escape to close, keyboard-operable flashcard flip, mobile layout stacking sidebar above content at ≤900px with grids collapsing to one column, print CSS hiding nav/topbar, reduced-motion setting respected.
 
-## Completed — critic audit run (2026-11-04, navigation / robustness / tone, NOT yet pushed)
+## Completed — critic audit run (2026-11-04, navigation / robustness / tone, PUSHED 2026-11-05)
 
 - [x] Navigation (worker): fixed side chevrons overlapped content at 1400–1487px — gate raised to 1520px; topic article/TOC grid now collapses to one column ≤900px with TOC first; TOC scroll-spy fixed to MarkdownView's real heading ids and to the actually displayed body in Quick Revision Mode; track/path progress + resume added to Learn index, Track page, and Home (resume now targets the most recently viewed unfinished topic); back-to-top (floating after 600px, reduced-motion aware, plus bottom-row button); bottom dead end fixed (Back-to-track, Browse another track); sidebar tracks hidden on mobile, sidebar links now NavLink active states; shared Breadcrumb component; topic copy-link with clipboard fallback and feedback; palette destinations expanded; tables in a horizontal-scroll wrapper; tap targets enlarged; stale "Coming Soon" copy removed.
 - [x] Robustness (worker): LocalStorage sanitisation on load/import/every settings write (`sanitizeUserData`/`sanitizeSettings`, unknown ids and invalid enums dropped, never throws); import validation completed for all id lists/values, 5 MB guard, distinct invalid-JSON message, error truncation to 20 + "…and N more", file-input reset, "your current data was not changed" on rejection; note cap 10,000 chars, attempts cap 5,000, activity dates cap 730; unknown Practice tab falls back to mcq; real "Retry wrong only" toggle; flashcard due-today caught-up state and box clamping 1–5; unscorable MCQ/output cards and empty flashcard/coding states handled; mock interview empty-state guard; streak/Leitner now use local dates (not UTC), calendar validation, corrupt dueAt = due now, future activity ignored; removed-id bookmarks/favorites/notes degrade to "no longer available" rows, accuracy no longer buckets removed items as "general"; search normalisation (case/accents/whitespace, punctuation-only = no results); system-theme listener; corrupt lastExportedAt and Invalid Date handled. New tests: `src/lib/robustness.test.ts` (15 tests).
@@ -95,6 +95,16 @@ This file is the resume point if a session is interrupted or its context is rese
 - [x] Topic page now scrolls to the top when the topic changes, so clicking next/previous from the bottom of a long topic does not leave the new topic scrolled to the bottom.
 - [x] Verification for this change: `npm run validate-content` OK, `npm run build-content-index` OK (79 topics, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks, 6 paths), `npm run typecheck` OK, `npm test` 10 passed, `npm run build` OK in ~10s (main index chunk 722 KB, unchanged).
 
+## Completed — chunk fix + finalise run (2026-11-09, NOT yet pushed)
+
+- [x] Chunk-size regression fixed: the production build's main `index-*.js` chunk was 1,153.99 KB with the 800 KB warning (regression from the second Modules batch: 96 topics + 366 questions inlined in the generated index). The generated index is now split by `scripts/build-content-index.mjs` into three committed files: slim `src/generated/content-index.json` (~118 KB: tracks, paths, topics, cheatsheets, plus id-only `interviewQuestionIds` / `practiceItemIds`), `src/generated/content-interview.json` (366 questions, ~737 KB), and `src/generated/content-practice.json` (183 items, ~165 KB). `src/lib/content.ts` loads the slim index synchronously and lazy-loads the other two via cached dynamic `import()` (`loadInterviewQuestions`, `loadPracticeItems`, `loadFullContent`, plus `useInterviewQuestions` / `usePracticeItems` / `useFullContent` hooks). Pages that need the heavy data (Interview, Practice, Library, Search, command palette) load it on demand and show a loading state until it arrives, never an empty "no content" state. The palette loads it only when opened. `AppContext` sanitisation and Settings import validation use the id-only lists, so they work without the full text.
+- [x] Result: main chunk 1,153.99 KB → **339.92 KB** (gzip ~97 KB), **no chunk-size warning**. Interview data is a separate 681.85 KB chunk and practice data a separate 148.56 KB chunk, loaded only when those pages are visited. The warning limit was NOT raised to hide the problem (still 800 KB in `vite.config.ts`).
+- [x] New tests: `src/lib/content.test.ts` (5 tests) — slim index has no full bodies, lazy loaders return 366 / 183 items with ids matching the slim lists, loaders are cached (same array on repeat calls), `loadFullContent` loads both. Total tests now 30 (was 25).
+- [x] Stale-log correction (2026-11-09): three sections in this file wrongly described already-pushed batches as "NOT pushed" — the completion run (actually pushed as `666e536d…`), the critic audit run heading (actually pushed as `5b899e8e…` on 2026-11-05), and the first Desktop Modules import (actually pushed as `89459fe1…`). All three are corrected above; the "Current state" header and Push log now list the full confirmed push history in order.
+- [x] Final check in this run: full build output inspected — no warnings and no errors; no `console.*` calls in `src/` code (only `console.log` inside practice-question content strings, which are quiz data, not code); all 17 new topics from the second Modules batch are present in the regenerated index and every prerequisite/related id in all 96 topics resolves; no `genzcareer`/`goalkicker` strings in `content/` or `src/`; no new content topics, interview questions, or features added in this run (fix-and-finalise only).
+- [x] Still pending, deliberately not done: Spring Batch / Spring Kafka topics and @Lazy / Runners expansions (candidates for a later batch); LocalStorage quota-failure banner; duplicate-heading id disambiguation; JDK compile-check (no JDK installed); live Vercel deploy (needs the user's Vercel import).
+- NOT yet pushed, by instruction. Combined manifest (manifest-11 files + this run's files, deduplicated) to be prepared by the parent for one final push. GitHub head to be verified by the parent.
+
 ## Remaining — content batches
 
 - [x] All former placeholder tracks filled in the completion run (see Completed — completion run below). No track remains Coming Soon.
@@ -107,13 +117,13 @@ This file is the resume point if a session is interrupted or its context is rese
 - [ ] Live Vercel deploy verification (import repo, confirm deep-link refresh works) — NOT performed: requires the user's Vercel account action/import. Notes only: vercel.json SPA rewrites to /index.html present, build command `npm run build`, output `dist`, no env vars/backend/database required. This is the one deployment item that could not be closed to 100% in this run.
 - [ ] After all content batches: final summary (what was built, key decisions, anything left as placeholder, how to run/deploy)
 
-## Verification (last run, 2026-11-04, after completion run)
+## Verification (last run, 2026-11-09, after chunk fix + finalise run)
 
-- `npm run validate-content` — OK (79 topic files, 79 unique topic ids, 10 tracks)
-- `npm run build-content-index` — OK (79 topics, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks, 6 paths)
+- `npm run validate-content` — OK (96 topic files, 96 unique topic ids, 10 tracks)
+- `npm run build-content-index` — OK (96 topics, 19 cheatsheets, 366 interview questions, 183 practice items, 10 tracks, 6 paths; slim index + content-interview.json + content-practice.json)
 - `npm run typecheck` — OK
-- `npm test` — 10 tests passed
-- `npm run build` — OK (built in ~9s; main index chunk 722 KB / gzip ~215 KB, under the configured 800 KB warning limit; topic/cheatsheet bodies split per file; no chunk-size warning)
+- `npm test` — 30 tests passed (3 files: utils 10, robustness 15, content 5 new)
+- `npm run build` — OK (built in ~8s; main index chunk 339.92 KB / gzip ~97 KB, under the configured 800 KB warning limit; NO chunk-size warning; interview chunk 681.85 KB and practice chunk 148.56 KB are separate lazy-loaded chunks; topic/cheatsheet bodies split per file)
 - JDK compile-check: NOT performed — no JDK installed (see Remaining — polish). Snippets manually reviewed only.
 
 ## Push log
@@ -124,13 +134,199 @@ This file is the resume point if a session is interrupted or its context is rese
 - 2026-11-04, CONFIRMED PUSH: "Beanstack: interview modules 2-4, Module 0, resume, practice + cheatsheets, bundle polish", 21 files, manifest at `~/workspace/beanstack-manifest-3.txt`, commit SHA `58f7c4522ce7551a4712b869e4aefd2d000635b4` on branch `main`, verified by re-reading the repo head. Totals after this push: 34 topics, 10 cheatsheets, 83 interview questions, 73 practice items, 10 tracks, 3 paths.
 - 2026-11-04, CONFIRMED PUSH: "Beanstack: complete all tracks to 100% — frontend, databases, system design, DSA, DevOps, testing, behavioral", 74 files, manifest at `~/workspace/beanstack-manifest-4.txt`, commit SHA `666e536ddd941b6dda1fc4de6a43aff5524ac9d7` on branch `main`, verified by re-reading the repo head. Totals after this push: 79 topics, 18 cheatsheets, 168 interview questions, 183 practice items, 10 tracks, 6 paths. All tracks complete; no Coming Soon tracks remain.
 
-- 2026-11-04, completion run: NOT pushed in this run, by instruction. A fresh manifest for all new/changed files in this run was prepared (see parent report for the exact manifest path and count). GitHub head at the time of this run was still 58f7c4522ce7551a4712b869e4aefd2d000635b4; do NOT claim the completion batch is on GitHub until a new confirmed commit SHA is recorded.
+- 2026-11-04, completion run: PUSHED (correction 2026-11-09 — this section wrongly said "NOT pushed"). Confirmed push: "Beanstack: complete all tracks to 100% — frontend, databases, system design, DSA, DevOps, testing, behavioral", 74 files, manifest at `~/workspace/beanstack-manifest-4.txt`, commit SHA `666e536ddd941b6dda1fc4de6a43aff5524ac9d7` on branch `main`, verified by re-reading the repo head. A follow-up PROGRESS log sync was pushed as `c5c4fd2cae110465cc085e7f067698bb86d3c588`.
 
-## Completed — Desktop Modules interview import (2026-11-09, NOT yet pushed)
+## Completed — Desktop Modules interview import (2026-11-09, PUSHED)
 
 - Source: Faizan's Desktop `modules` folder, copied locally to `~/workspace/modules-source/` (6 .txt files, NOT committed to GitHub and NOT copied into this repo). Module 1 (0-3 yrs, 11 resources, ~499 questions inventoried), Module 2 (3-5 yrs, 20 resources, ~965 headings / ~950 distinct), Module 3 (5-8 yrs, 26 resources, ~1,029 questions), Module 4 (8-15 yrs, 29 resources, ~1,387 questions). Module 0 (revision notes, 7 resources — not 8 as first assumed; handwritten-note OCR is garbled, inventory from headings/contents only). Bonus (586 bytes: resume tips + a Canva link only).
 - Added, all written fresh in Beanstack's own words (see DECISIONS.md copyright rule): Module 0 +5 (21 -> 26: SQL fundamentals, SQL joins/subqueries/window functions/CTEs, Java data types/variables/operators, Spring AOP, testing with JUnit/Mockito/MockMvc), Module 1 +24 (8 -> 32), Module 2 +24 after central dedupe (14 -> 38), Module 3 +20 after central dedupe (14 -> 34), Module 4 +21 after central dedupe (14 -> 34). Bonus +0 (existing 12 resume items already cover it).
 - Central dedupe removed 10 near-duplicates the per-module workers had added in parallel: DispatcherServlet flow (kept Module 1), first non-repeated character with streams (kept Module 2; removed Module 3 and Module 4 versions), Spring Boot caching (kept Module 2), Kafka ordering/exactly-once (kept Module 2), OAuth2 authorization code flow (kept Module 2), stateless JWT flow (kept Module 2), Kafka partitions/delivery (kept Module 2), multiple DataSources (kept Module 3), deep vs shallow copy (kept Module 3). Net new: 93 questions. Totals now: 79 topics, 18 cheatsheets, 261 interview questions, 183 practice items, 10 tracks, 6 paths.
 - Skipped: thousands of source items as within-source repeats (e.g. Spring Security Level II duplicated verbatim in Module 3), repeats across modules (same 25 coding + stream tasks in every module), near-duplicates of the existing 168 Beanstack questions, or too basic for the module's experience level. Category mapping: Spring Security/Kafka/Design Patterns/Lead have no dedicated Beanstack category, so they were mapped to the closest allowed category (Spring Boot / Microservices / Java / Scenario-based) or skipped; Maven/Git/Gradle and JUnit/Mockito were mostly skipped in Modules 2-4 (already covered by the DevOps/Testing interview files, no DevOps/Testing category in module files).
 - Verification (central, 2026-11-09): `npm run validate-content` OK, `npm run build-content-index` OK (261 interview questions), `npm run typecheck` OK, `npm test` 25 passed, `npm run build` OK in ~7s. All 261 interview ids unique; no source PDF URLs in module files (checked). Coding solutions manually reviewed only; no JDK compile-check claimed.
-- NOT pushed in this run, by instruction. Manifest at `~/workspace/beanstack-manifest-9.txt`. GitHub head verified 2026-11-09: `d87d9ac07d4560b7dafc9abb0f6838cc15e7272f` ("Beanstack: record critic-audit push in PROGRESS.md"). Do NOT claim this batch is on GitHub until a new confirmed commit SHA is recorded.
+- PUSHED (correction 2026-11-09 — this section wrongly said "NOT pushed"). Confirmed push: "Beanstack: add Desktop Modules interview questions — 93 new, modules 0-4", 8 files, manifest at `~/workspace/beanstack-manifest-9.txt`, commit SHA `89459fe1313e2c6a82f09daaf52f9c0be9ef5c53` on branch `main`, verified by re-reading the repo head. A follow-up PROGRESS log sync was pushed as `ee0da341f88dab52baaa66f86f0c5ddd49e0c735`.
+
+## Completed — Second deeper Modules batch (2026-11-09, NOT yet pushed)
+
+- Source: same Desktop `modules` files in `~/workspace/modules-source/` (NOT committed, NOT copied into this repo). Copyright rule as in DECISIONS.md: inventory only, everything written fresh in Beanstack's own words, no verbatim copying, no source URLs.
+- Deep topic-gap comparison: every Module 0 chapter/heading was compared against all 79 existing topics by title, frontmatter, and Overview/Key Concepts, not titles alone. Result: 17 new topics added (79 -> 96), listed in the gap table below. The user's OOP example was confirmed: the four pillars were one combined topic (`oop-principles`, 958 words, pillars in a single subsection); they are now separate topics (`oop-encapsulation`, `oop-inheritance`, `oop-polymorphism`, `oop-abstraction`), with the combined topic kept.
+- Second interview batch: Module 1 +24 (32 -> 56), Module 2 +25 (38 -> 63), Module 3 +25 (34 -> 59), Module 4 +20 (34 -> 54). Module 0 +11 (26 -> 37: SQL indexes/transactions, @Transactional, scheduling, RestTemplate/WebClient, filter vs interceptor, Kafka basics, Spring Cloud, abstract vs interface, static/final, Flyway, Swagger/OpenAPI). Bonus +0 (source is only a Canva template-gallery tip, already covered by the existing 12 resume items). New cheatsheet: messaging-spring-cloud (Kafka, discovery, resilience) — 18 -> 19 cheatsheets.
+- Central dedupe: all 366 interview ids unique, zero duplicate question texts (normalised check). No cross-worker duplicates found.
+- Totals now: 96 topics, 19 cheatsheets, 366 interview questions, 183 practice items, 10 tracks, 6 paths.
+- Verification (central, 2026-11-09): `npm run validate-content` OK (96 topics), `npm run build-content-index` OK (96 topics, 19 cheatsheets, 366 interview questions, 183 practice items, 10 tracks, 6 paths), `npm run typecheck` OK, `npm test` 25 passed, `npm run build` OK in ~7.5s BUT the main index chunk is now ~1.2 MB and the build emits the 800 KB chunk-size warning again (was 729 KB). Cause: the statically imported generated index grew with 17 topics + 105 questions. Splitting the index itself would be an architecture change and was NOT done in this run; recorded in DECISIONS.md. Coding solutions manually reviewed only; no JDK compile-check claimed.
+- NOT pushed in this run, by instruction. Manifest at `~/workspace/beanstack-manifest-11.txt`. GitHub head to be verified by the parent against GitHub (this VM has no .git in the source dir).
+
+# Module 0 deep topic-gap comparison — Worker A (topics only)
+
+Date: 2026-11-09. Local source: `~/workspace/beanstack`. GitHub head could NOT be verified locally: `~/workspace/beanstack` has no `.git` directory (only a `.gitignore`), so the stated head `ee0da341f88dab52baaa66f86f0c5ddd49e0c735` was not confirmed from this machine. Baseline before this work: 79 topics (verified by file count), 18 cheatsheets, 261 interview questions, 183 practice items, 10 tracks, 6 paths (totals as given by parent; topic count verified).
+
+## Module 0 inventory (7 source documents in `~/workspace/modules-source/`)
+
+Used ONLY as a topic inventory. All new topics below are written in Beanstack's own words, plain-language tone; no source passage, code block, or handwritten-note text was reproduced, no source URLs are included.
+
+| # | Source document | Lines | Contents (chapters / headings) |
+| --- | --- | --- | --- |
+| 1 | SQL PDF Notes (GenZ Career / Rishabh Mishra) | 6–1195 | 16 chapters: intro/SQL & DB, data types/keys/constraints, CREATE TABLE/DB, INSERT/UPDATE/DELETE/ALTER, SELECT & WHERE, CSV import, functions & string functions, aggregate functions, GROUP BY/HAVING, timestamps/EXTRACT, JOINS, SELF JOIN/UNION/UNION ALL, subqueries, window functions, CASE, CTEs |
+| 2 | SQL handwritten notes | 1196–1400 | Garbled OCR of the same SQL basics (SELECT, WHERE, operators, CREATE/INSERT/UPDATE/DELETE, NULL, LIMIT, aliases). No distinct topics beyond doc 1. |
+| 3 | Spring Framework Notes (GoalKicker, 18 chapters) | 1401–4092 | Getting started, Spring Core, SpEL, SqlRowSet/SimpleJdbcCall, creating/using beans, bean scopes, conditional bean registration, JSR-303 validation, ApplicationContext config, RestTemplate, task execution & scheduling, lazy init, property source, DI/IoC, JdbcTemplate, SOAP WS, profiles, dispatcher-servlet.xml |
+| 4 | Spring Boot PDF Notes (tutorialspoint-style, 49 chapters) | 4093–15996 | Intro, quick start, bootstrapping, Tomcat deployment, build systems, code structure, beans & DI, runners, application properties, logging, RESTful services, exception handling, interceptor, servlet filter, Tomcat port, RestTemplate, file handling, service components, Thymeleaf, consuming REST, CORS, i18n, scheduling, HTTPS, Eureka, service registration, Zuul, Cloud Config server/client, Actuator, Admin server/client, Swagger2, Docker image, tracing, Flyway, email, Hystrix, WebSocket, batch, Kafka, Twilio, unit tests, REST controller unit test, database handling, securing web apps, OAuth2/JWT, GCP, Google OAuth2 sign-in |
+| 5 | Spring ALL handwritten notes | 15997–27493 | Garbled OCR of a Spring Core course (modules, IoC/DI, BeanFactory, scopes, lifecycle, JdbcTemplate, AOP, profiles). No distinct topics beyond docs 3–4. |
+| 6 | Java PDF Notes (javatpoint-style) | 27494–29838 | Features of Java, first program, JDK/JRE/JVM, variables, data types, Unicode, operators, keywords, control flow/loops, OOP concepts (object, class, inheritance, polymorphism, abstraction, encapsulation, coupling, cohesion, association, aggregation, composition), constructors, singleton, static, inheritance, aggregation, overloading, overriding, covariant return, super, instance initializer, final, binding, instanceof, abstract class/interface, encapsulation, packages, access modifiers, arrays, Object class, cloning, Math, wrappers, autoboxing, strictfp, String/StringBuffer/StringBuilder, toString, StringTokenizer, exceptions, multithreading (lifecycle, Thread class, scheduler, join, priority, daemon, thread pool, ThreadGroup, shutdown hook), GC, Runtime class, collections (ArrayList, LinkedList, List, HashSet, LinkedHashSet, TreeMap, TreeSet, Queue, PriorityQueue, Deque, Hashtable, Map, HashMap, EnumSet, LinkedHashMap, Collections class, Comparable/Comparator, ArrayList vs Vector, Vector, Stack), JDBC (drivers, 5 steps), Reflection API |
+| 7 | Java handwritten notes | 29839–30731 | Garbled OCR of a Java course (syllabus, OOP pillars, programs, data types, arrays, overloading, static, abstract classes, packages, exceptions, String, ArrayList, HashSet/TreeSet). No distinct topics beyond doc 6. |
+
+Method: every Module 0 chapter/heading above was checked against the 79 existing topics by title, frontmatter, and Overview/Key Concepts content (including keyword counts across all topic bodies), not by title alone. Example findings: `oop-principles` is ONE combined topic (958 words, the four pillars in a single `###` subsection plus constructors); SQL window functions / CTEs had zero mentions anywhere; `CASE` appeared only incidentally in an unrelated topic.
+
+## New topics added by Worker A (17)
+
+| New topic id | File | Track / section (order) |
+| --- | --- | --- |
+| `oop-encapsulation` | `content/topics/java-core/oop/encapsulation.md` | java-core / oop (2) |
+| `oop-inheritance` | `content/topics/java-core/oop/inheritance.md` | java-core / oop (3) |
+| `oop-polymorphism` | `content/topics/java-core/oop/polymorphism.md` | java-core / oop (4) |
+| `oop-abstraction` | `content/topics/java-core/oop/abstraction.md` | java-core / oop (5) |
+| `sql-window-functions` | `content/topics/databases/sql/sql-window-functions.md` | databases / sql (4) |
+| `sql-cte` | `content/topics/databases/sql/sql-cte.md` | databases / sql (5) |
+| `sql-case-expressions` | `content/topics/databases/sql/sql-case-expressions.md` | databases / sql (6) |
+| `sql-functions` | `content/topics/databases/sql/sql-functions.md` | databases / sql (7) |
+| `thread-lifecycle-control` | `content/topics/java-advanced/concurrency/thread-lifecycle-control.md` | java-advanced / concurrency (4) |
+| `spring-spel` | `content/topics/spring-boot/spring-core/spring-spel.md` | spring-boot / spring-core (3) |
+| `spring-jdbctemplate` | `content/topics/spring-boot/data-jpa/spring-jdbctemplate.md` | spring-boot / data-jpa (2) |
+| `spring-rest-clients` | `content/topics/spring-boot/mvc-rest/spring-rest-clients.md` | spring-boot / mvc-rest (3) |
+| `spring-interceptors-filters` | `content/topics/spring-boot/mvc-rest/spring-interceptors-filters.md` | spring-boot / mvc-rest (4) |
+| `spring-file-handling` | `content/topics/spring-boot/mvc-rest/spring-file-handling.md` | spring-boot / mvc-rest (5) |
+| `spring-task-scheduling` | `content/topics/spring-boot/spring-boot-core/spring-task-scheduling.md` | spring-boot / spring-boot-core (3) |
+| `spring-build-systems` | `content/topics/spring-boot/spring-boot-core/spring-build-systems.md` | spring-boot / spring-boot-core (4) |
+| `spring-cloud-basics` | `content/topics/spring-boot/testing-ops/spring-cloud-basics.md` | spring-boot / testing-ops (3) |
+
+All 17 have status `complete`, `lastUpdated: 2026-11-09`, and all nine required sections in order (Overview, Theory, Key Concepts, Code Examples, Best Practices, Common Mistakes, Interview Importance, Interview Questions, Revision Summary). No existing topic was edited or deleted; `content/tracks.json` and `content/paths.json` were NOT changed (all new topics fit existing sections; no section/order change was needed). No interview JSON, cheatsheet, practice, or generated file was touched. `build-content-index` was NOT run (parent to run centrally). Nothing was pushed.
+
+## Gap-comparison table (Module 0 topic → outcome)
+
+### SQL (docs 1–2)
+
+| Module 0 topic | Outcome |
+| --- | --- |
+| Introduction to SQL, what is SQL & database, SQL vs NoSQL, types of SQL commands (DDL/DML/DCL), Excel vs database | Already covered — `db-sql-fundamentals` (relational model, statement families, DDL/DML), `db-choosing-nosql` (SQL vs NoSQL, CAP) |
+| Data types, primary/foreign keys, constraints | Already covered — `db-sql-fundamentals` (tables, keys, constraints) |
+| Create Table / Create Database | Already covered — `db-sql-fundamentals` |
+| INSERT, UPDATE, DELETE, ALTER, DROP, TRUNCATE | Already covered — `db-sql-fundamentals` |
+| SELECT, WHERE, operators, LIMIT, ORDER BY | Already covered — `db-sql-fundamentals` |
+| Import CSV file to SQL; install PostgreSQL/pgAdmin | Deliberately NOT added — tooling/setup task, not an interview topic; a one-off admin operation |
+| Functions in SQL & string functions | **Newly added — `sql-functions`** (no dedicated topic; only passing mentions before) |
+| Aggregate functions (COUNT/SUM/AVG/MIN/MAX) | Already covered — `db-sql-fundamentals` |
+| GROUP BY and HAVING | Already covered — `db-sql-fundamentals` |
+| Timestamp, EXTRACT, date/time functions | **Newly added — `sql-functions`** (date/time functions had no dedicated topic; Java `date-time-regex` is `java.time`, not SQL) |
+| SQL JOINS — types & syntax (inner/left/right/full) | Already covered — `db-joins-indexes-transactions` |
+| SELF JOIN, UNION & UNION ALL | Already covered — `db-joins-indexes-transactions` (self join), `db-sql-fundamentals` (UNION/UNION ALL) |
+| Subquery | Already covered — `db-sql-fundamentals` (subquery example + coverage) |
+| Window functions (ranking, aggregate, analytic; OVER/PARTITION BY) | **Newly added — `sql-window-functions`** (zero mentions in all 79 topics before) |
+| CASE statement/expression | **Newly added — `sql-case-expressions`** (only one incidental mention before, in an unrelated topic) |
+| CTE — Common Table Expression (incl. recursive) | **Newly added — `sql-cte`** (zero mentions in all 79 topics before) |
+| NULL values, IS NULL / IS NOT NULL | Already covered — `db-sql-fundamentals` |
+| SQL handwritten notes (SELECT/WHERE/operators/CRUD/NULL/LIMIT/aliases) | Already covered — duplicates of doc 1; see rows above |
+
+### Java (docs 6–7)
+
+| Module 0 topic | Outcome |
+| --- | --- |
+| Features of Java, first program, platform independence | Already covered — `jdk-jre-jvm`, `language-basics-syntax` |
+| JDK, JRE, JVM difference | Already covered — `jdk-jre-jvm` |
+| Variables (local/instance/static), data types, Unicode | Already covered — `variables-operators-control-flow`, `wrapper-classes` |
+| Operators, keywords, control flow, loops, jump statements | Already covered — `variables-operators-control-flow`, `language-basics-syntax` |
+| OOP concepts overview (object, class) | Already covered — `oop-principles` |
+| Encapsulation (pillar) | **Newly added — `oop-encapsulation`** (was one subsection of the combined `oop-principles`; access modifiers/packages also covered here) |
+| Inheritance (pillar; types, IS-A) | **Newly added — `oop-inheritance`** (was one subsection of the combined `oop-principles`; covers `super`/`this`, constructor chaining, `final`) |
+| Polymorphism (pillar; overloading/overriding, binding, upcasting, instanceof, covariant return) | **Newly added — `oop-polymorphism`** (was one subsection of the combined `oop-principles`; covers overloading vs overriding, dynamic dispatch, static vs dynamic binding, downcasting/pattern matching) |
+| Abstraction (pillar; abstract class vs interface) | **Newly added — `oop-abstraction`** (was one subsection of the combined `oop-principles`; covers abstract class vs interface table, default methods, sealed classes) |
+| Coupling, cohesion, association, aggregation, composition | Already covered — `sd-class-design` (association/aggregation/composition), `oop-principles` (composition over inheritance); `design-patterns-solid` (coupling/cohesion in design context) |
+| Constructors, constructor overloading, constructor vs method, private constructor, singleton | Already covered — `oop-principles` (constructors/initialisation order), `design-patterns-solid` + `bean-scopes-lifecycle` (singleton) |
+| static keyword, final keyword | Already covered in outline — `language-basics-syntax`, `modern-java-features`, `oop-principles` (final/initialisation); folded into new `oop-inheritance` (`final`, `static` hiding) and `oop-encapsulation` (static context). No separate keyword topic: too narrow for a full topic |
+| Object class, toString, equals/hashCode | Already covered — `collections-deep-dive` (hash/equals contract), `strings` (toString), `modern-java-features` (records) |
+| Object cloning | Deliberately NOT added — niche/legacy (`Cloneable` is widely considered broken design); not a core interview topic |
+| Math class | Deliberately NOT added — a utility-class API list, not an interview topic; no design content |
+| Wrapper classes, autoboxing/unboxing | Already covered — `wrapper-classes` |
+| strictfp keyword | Deliberately NOT added — obsolete (a no-op since Java 17; floating-point is always strict now) |
+| String, immutable String, StringBuffer vs StringBuilder, StringTokenizer | Already covered — `strings` (immutability, StringBuffer vs StringBuilder). StringTokenizer deliberately NOT added — legacy class; `String.split()` is the modern answer |
+| Exception handling (checked/unchecked, try-catch-finally, throw/throws, custom exceptions, final vs finally vs finalize) | Already covered — `exception-handling`, `generics-deep-dive` |
+| Multithreading basics, thread creation (Thread vs Runnable), executors | Already covered — `concurrency-basics`, `executors-completablefuture` |
+| Thread lifecycle / Thread states, start vs run, sleep/join/yield/interrupt, daemon threads, priorities, ThreadGroup, shutdown hook, thread scheduler | **Newly added — `thread-lifecycle-control`** (states were only named in `concurrency-basics` Interview Importance; no dedicated coverage of the six states, sleep vs wait, interruption, daemon threads, or shutdown hooks) |
+| Thread pool | Already covered — `executors-completablefuture`, `concurrency-basics` |
+| Garbage collection, Runtime class | Already covered — `garbage-collection` |
+| Collections framework (ArrayList, LinkedList, HashSet, LinkedHashSet, TreeSet, TreeMap, HashMap, LinkedHashMap, Hashtable, Vector, Stack, Queue/Deque/PriorityQueue, EnumSet, Comparable/Comparator, Collections class) | Already covered — `collections-framework`, `collections-deep-dive` (incl. HashMap internals, Comparable/Comparator, legacy Vector/Hashtable/Stack) |
+| Java arrays (incl. jagged arrays, Arrays utility) | Already covered — `dsa-arrays-strings` (Java arrays: fixed length, `Arrays.copyOf`/`equals`, jagged arrays) plus `variables-operators-control-flow` |
+| Java packages | Already covered in outline — `language-basics-syntax` (packages/imports) and new `oop-encapsulation` (package-private access) |
+| JDBC (5 steps, drivers) | Already covered — `jdbc-networking`, `db-sql-java-developers`. The four JDBC driver types are a small gap noted here, not a full topic: they are trivia-level and covered in outline by `jdbc-networking` |
+| Reflection API | Already covered — `reflection-serialization` |
+| Java handwritten notes (syllabus, OOP, arrays, String, collections) | Already covered — duplicates of doc 6; see rows above |
+
+### Spring Framework (doc 3, GoalKicker)
+
+| Module 0 topic | Outcome |
+| --- | --- |
+| Getting started with Spring, what is Spring / why use it, XML setup | Already covered — `spring-ioc-di` (IoC/DI, container, `@Bean` vs `@Component`), `spring-boot-autoconfig` |
+| Spring Core, how Spring manages dependencies | Already covered — `spring-ioc-di` |
+| Spring Expression Language (SpEL) | **Newly added — `spring-spel`** (zero real mentions before; only false positives in unrelated topics) |
+| SqlRowSet / SimpleJdbcCall | Deliberately NOT added — narrow legacy JDBC helper API; `spring-jdbctemplate` (new) is the current data-access topic |
+| Creating and using beans (autowiring, @Qualifier, FactoryBean, generic autowiring, prototype-in-singleton) | Already covered — `spring-ioc-di`, `bean-scopes-lifecycle` (incl. prototype-in-singleton) |
+| Bean scopes (singleton, prototype, web scopes) | Already covered — `bean-scopes-lifecycle` |
+| Conditional bean registration | Already covered — `spring-boot-autoconfig` (conditional configuration) |
+| Spring JSR-303 Bean Validation | Already covered — `validation-exception-handling` |
+| ApplicationContext configuration (autowiring, bootstrapping, Java config, XML config) | Already covered — `spring-ioc-di`, `spring-boot-autoconfig`, `configuration-profiles` |
+| RestTemplate (headers, generics, auth, large files) | **Newly added — `spring-rest-clients`** (only passing mentions before; covers RestTemplate + modern RestClient + WebClient) |
+| Task execution and scheduling (@Scheduled, cron, fixed delay/rate) | **Newly added — `spring-task-scheduling`** (zero mentions before) |
+| Spring lazy initialization (@Lazy) | Deliberately NOT added as a standalone topic — too narrow for a full topic; candidate for a future expansion of `bean-scopes-lifecycle` |
+| Property Source (@PropertySource, PropertyPlaceholderConfigurer) | Already covered — `configuration-profiles` (configuration sources/precedence, `@Value` vs `@ConfigurationProperties`) |
+| Dependency Injection / IoC (XML, Java config, manual injection) | Already covered — `spring-ioc-di` |
+| JdbcTemplate (basic queries, List of Maps, SQLRowSet, batch, NamedParameterJdbcTemplate) | **Newly added — `spring-jdbctemplate`** (only one passing mention before, in `design-patterns-solid`) |
+| SOAP WS consumption | Deliberately NOT added — legacy protocol; Beanstack's API coverage is REST (`spring-mvc-rest`, new `spring-rest-clients`); SOAP is not a target-stack interview topic |
+| Spring profiles | Already covered — `configuration-profiles` |
+| dispatcher-servlet.xml / DispatcherServlet | Already covered — `spring-mvc-rest` |
+| Spring handwritten notes (IoC/DI, BeanFactory, scopes, lifecycle, JdbcTemplate, AOP) | Already covered — duplicates of docs 3–4; see rows above |
+
+### Spring Boot (doc 4, 49 chapters)
+
+| Module 0 topic | Outcome |
+| --- | --- |
+| Introduction, quick start, bootstrapping | Already covered — `spring-boot-autoconfig` |
+| Tomcat deployment, Tomcat port number | Already covered in outline — `configuration-profiles` (`server.port`), `actuator-microservices-deployment` (deployment) |
+| Build systems (Maven, Gradle) | **Newly added — `spring-build-systems`** (only passing mentions before; no dedicated topic) |
+| Code structure | Already covered in outline — `spring-boot-autoconfig` (minimal Boot application), `sd-class-design`; not a standalone interview topic |
+| Spring beans and dependency injection | Already covered — `spring-ioc-di`, `bean-scopes-lifecycle` |
+| Runners (ApplicationRunner / CommandLineRunner) | Deliberately NOT added as a standalone topic — too narrow (one small API); candidate for a future expansion of `spring-boot-autoconfig` |
+| Application properties | Already covered — `configuration-profiles` |
+| Logging | Already covered — `logging-testing-docs` |
+| Building RESTful web services | Already covered — `spring-mvc-rest` |
+| Exception handling | Already covered — `validation-exception-handling`, `spring-mvc-rest` |
+| Interceptor | **Newly added — `spring-interceptors-filters`** (zero mentions of interceptors before; also covers servlet filters and CORS) |
+| Servlet filter | **Newly added — `spring-interceptors-filters`** (filters previously appeared only in the `security-jwt` context) |
+| File handling (upload/download) | **Newly added — `spring-file-handling`** (no real coverage before) |
+| Service components (@Service/@Repository/@Controller) | Already covered — `spring-ioc-di` (`@Bean` vs `@Component`, stereotype annotations) |
+| Thymeleaf | Deliberately NOT added — server-side templating superseded by the React frontend in this stack (`frontend` track); niche for Java+React full-stack interviews |
+| Consuming RESTful web services | **Newly added — `spring-rest-clients`** (see Spring Framework row) |
+| CORS support | **Newly added — `spring-interceptors-filters`** (zero mentions before) |
+| Internationalization (i18n) | Deliberately NOT added — niche; not a core interview topic for the target roles |
+| Scheduling | **Newly added — `spring-task-scheduling`** (see Spring Framework row) |
+| Enabling HTTPS | Already covered in outline — `security-jwt`, `configuration-profiles` (TLS/SSL properties); not a standalone topic |
+| Eureka server, service registration with Eureka | **Newly added — `spring-cloud-basics`** (only passing mentions in `actuator-microservices-deployment` before) |
+| Zuul proxy server and routing | **Newly added — `spring-cloud-basics`** (covers Zuul as the retired predecessor of Spring Cloud Gateway; no dedicated topic before) |
+| Spring Cloud Config server / client | **Newly added — `spring-cloud-basics`** (zero mentions before) |
+| Actuator | Already covered — `actuator-microservices-deployment` |
+| Admin server / Admin client | Deliberately NOT added — niche admin UI on top of Actuator (already covered in `actuator-microservices-deployment`); not an interview topic |
+| Enabling Swagger2 / API documentation | Already covered — `logging-testing-docs` (OpenAPI/springdoc) |
+| Creating Docker image | Already covered — `dv-dockerfiles-images`, `actuator-microservices-deployment`, `dv-deploying-java-aws` |
+| Tracing microservice logs | **Newly added — `spring-cloud-basics`** (distributed tracing section; Micrometer Tracing/Zipkin) |
+| Flyway database (migrations) | Already covered in outline — `dv-deploying-java-aws` (Flyway/Liquibase as the migration approach) |
+| Sending email (JavaMailSender) | Deliberately NOT added — niche utility; not a core interview topic |
+| Hystrix (circuit breaker) | **Newly added — `spring-cloud-basics`** (covers Resilience4j as the current implementation and Hystrix as retired) |
+| WebSocket | Deliberately NOT added — niche; only passing mentions in `bean-scopes-lifecycle` (websocket scope) and `sd-designing-real-systems` |
+| Batch service (Spring Batch) | Deliberately NOT added — enterprise batch processing, niche for the target full-stack web roles; the weakest of the candidate gaps. Candidate for a later batch if Faizan wants it. |
+| Spring for Apache Kafka | Deliberately NOT added — messaging is covered at system-design level (`sd-caching-queues-databases`); a Spring-Kafka client topic is a candidate for later, not a Module 0 core gap |
+| Twilio | Deliberately NOT added — a single vendor's SMS API, not an interview topic |
+| Unit test cases, REST controller unit test | Already covered — `tst-junit-mockito-fundamentals`, `tst-spring-boot-tests`, `logging-testing-docs` |
+| Database handling (Spring Data JPA, transactions) | Already covered — `spring-data-jpa`, `db-sql-java-developers` |
+| Securing web applications, OAuth2 with JWT | Already covered — `security-jwt` |
+| Google Cloud Platform, Google OAuth2 sign-in | Deliberately NOT added — cloud-vendor-specific; GCP deployment is covered in outline by `dv-deploying-java-aws` (AWS) and OAuth2 by `security-jwt` |
+
+## Validation
+
+`npm run validate-content` — **passed**: `Validation OK: 96 topic files, 96 unique topic ids, 10 tracks` (79 + 17 new). No errors, no warnings. `build-content-index` was NOT run (parent to run centrally). Nothing was pushed.
+

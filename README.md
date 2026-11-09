@@ -34,7 +34,7 @@ Key points:
 
 - **Content is separate from UI.** All study content lives in `content/` as Markdown with frontmatter (topics, cheatsheets) or JSON (interview questions, practice items). UI code in `src/` never hardcodes study content.
 - **One source of truth for hierarchy.** `content/tracks.json` defines tracks and sections; topic files declare their track/section in frontmatter. Adding a topic means adding a file and regenerating the index.
-- **Build-time content index.** `scripts/build-content-index.mjs` scans `content/`, parses frontmatter, and writes `src/generated/content-index.json`, which the app imports for navigation and search. Topic bodies are lazy-loaded with Vite's `import.meta.glob` (`?raw`), so each Markdown file becomes its own chunk and the initial load stays fast as content grows.
+- **Build-time content index (split).** `scripts/build-content-index.mjs` scans `content/`, parses frontmatter, and writes three generated files: slim `src/generated/content-index.json` (tracks, paths, topics, cheatsheets, plus id-only interview/practice id lists — imported up front for navigation and search), `src/generated/content-interview.json` (all interview questions), and `src/generated/content-practice.json` (all practice items). The two heavy files are lazy-loaded on demand (see `src/lib/content.ts`), so the initial bundle stays under the 800 KB chunk-size warning. Topic bodies are lazy-loaded with Vite's `import.meta.glob` (`?raw`), so each Markdown file becomes its own chunk and the initial load stays fast as content grows.
 - **Validation.** `scripts/validate-content.mjs` checks for duplicate ids, missing metadata, broken prerequisite/related ids, empty required sections, malformed files, and invalid JSON references. Run it after every content batch.
 - **User data.** React Context + LocalStorage, schema version 1, key `beanstack-user-data-v1`. See Settings for export/import and resets.
 
@@ -91,7 +91,9 @@ src/
   pages/                      # Home, Learn, Interview, Practice, Cheatsheets, Library, Settings
   lib/                        # Content loading, pure logic (progress, search, spaced repetition, import validation)
   store/                      # React Context + LocalStorage user data
-  generated/content-index.json # Generated — do not edit by hand
+  generated/content-index.json # Generated (slim nav index) — do not edit by hand
+  generated/content-interview.json # Generated (interview questions, lazy-loaded) — do not edit by hand
+  generated/content-practice.json # Generated (practice items, lazy-loaded) — do not edit by hand
 ```
 
 ## Status

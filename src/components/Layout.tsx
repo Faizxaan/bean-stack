@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BookOpen, Coffee, Home, Library, Search, Settings, Target, Layers, GraduationCap, PenLine, FileText } from 'lucide-react'
-import { contentIndex, getTrack } from '../lib/content'
+import { contentIndex, getTrack, useFullContent } from '../lib/content'
 import { searchScore, topicUrl } from '../lib/utils'
 
 const NAV = [
@@ -36,6 +36,9 @@ export function Layout() {
     return m ? m[1] : null
   }, [location.pathname])
 
+  // Heavy interview/practice data loads only when the palette is open,
+  // so the app shell's initial bundle stays slim (2026-11-09 chunk fix).
+  const { interviewQuestions, practiceItems, loaded: fullLoaded } = useFullContent(paletteOpen)
   const results = useMemo(() => {
     if (!query.trim()) return []
     const q = query.trim()
@@ -44,7 +47,7 @@ export function Layout() {
       const s = Math.max(searchScore(q, t.title), searchScore(q, t.summary), searchScore(q, t.tags.join(' ')))
       if (s > 0) scored.push({ label: t.title, detail: `${getTrack(t.track)?.title || t.track} · ${t.difficulty}`, to: topicUrl(t), score: s })
     }
-    for (const qq of contentIndex.interviewQuestions) {
+    for (const qq of interviewQuestions) {
       const s = searchScore(q, qq.question + ' ' + qq.category)
       if (s > 0) scored.push({ label: qq.question, detail: `Interview · ${qq.category}`, to: `/interview/question/${qq.id}`, score: s })
     }
@@ -52,12 +55,12 @@ export function Layout() {
       const s = searchScore(q, c.title)
       if (s > 0) scored.push({ label: c.title, detail: 'Cheatsheet', to: `/cheatsheets/${c.id}`, score: s })
     }
-    for (const item of contentIndex.practiceItems.filter(i => i.type === 'mcq')) {
+    for (const item of practiceItems.filter(i => i.type === 'mcq')) {
       const s = searchScore(q, (item.prompt || '') + ' ' + (item.title || ''))
       if (s > 0) scored.push({ label: item.prompt || item.title, detail: 'Practice MCQ', to: '/practice?tab=mcq', score: s })
     }
     return scored.sort((a, b) => b.score - a.score).slice(0, 20)
-  }, [query])
+  }, [query, interviewQuestions, practiceItems])
 
   return (
     <div className="app-shell">
@@ -130,7 +133,8 @@ export function Layout() {
                   <span><strong>{r.label}</strong><br /><span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '0.85rem' }}>{r.detail}</span></span>
                 </button>
               ))}
-              {query.trim() !== '' && results.length === 0 && <p style={{ color: 'var(--muted)' }}>No matches yet. Try a broader term, or browse Learn — new content is added section by section.</p>}
+              {query.trim() !== '' && !fullLoaded && <p style={{ color: 'var(--muted)' }}>Loading interview questions and practice MCQs…</p>}
+              {query.trim() !== '' && fullLoaded && results.length === 0 && <p style={{ color: 'var(--muted)' }}>No matches yet. Try a broader term, or browse Learn — new content is added section by section.</p>}
             </div>
           </div>
         </div>

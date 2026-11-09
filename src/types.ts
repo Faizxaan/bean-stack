@@ -106,6 +106,25 @@ export interface ContentIndex {
   practiceItems: PracticeItem[]
 }
 
+// Slim navigation index, loaded up front with the app shell. It carries
+// everything needed for navigation, the sidebar, Learn/Home, and for
+// validating/sanitising stored ids — but NOT the full interview-question
+// or practice-item bodies. Those live in content-interview.json and
+// content-practice.json and are lazy-loaded (see src/lib/content.ts),
+// because inlining them made the initial bundle ~1.15 MB and tripped
+// the 800 KB chunk-size warning (2026-11-09 chunk fix). The id-only
+// lists keep import validation and LocalStorage sanitisation working
+// without the full text.
+export interface NavContentIndex {
+  generatedAt: string
+  tracks: Track[]
+  paths: LearningPath[]
+  topics: TopicMeta[]
+  cheatsheets: CheatsheetMeta[]
+  interviewQuestionIds: string[]
+  practiceItemIds: string[]
+}
+
 export interface PracticeAttempt {
   itemId: string
   correct: boolean

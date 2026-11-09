@@ -57,8 +57,8 @@ export function Settings() {
         return
       }
       const knownTopics = new Set(contentIndex.topics.map(t => t.id))
-      const knownQuestions = new Set(contentIndex.interviewQuestions.map(q => q.id))
-      const knownPractice = new Set(contentIndex.practiceItems.map(i => i.id))
+      const knownQuestions = new Set(contentIndex.interviewQuestionIds)
+      const knownPractice = new Set(contentIndex.practiceItemIds)
       const result = validateImport(parsed, knownTopics, knownQuestions, knownPractice)
       if (!result.ok) {
         const { shown, hidden } = truncateImportErrors(result.errors)

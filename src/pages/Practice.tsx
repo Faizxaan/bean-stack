@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { contentIndex, getTopic } from '../lib/content'
+import { getTopic, usePracticeItems } from '../lib/content'
+import type { PracticeItem } from '../types'
 import { useApp } from '../store/AppContext'
 import { accuracyByTopic, isDue, topicUrl, weakTopics } from '../lib/utils'
 
-function McqCard({ item }: { item: typeof contentIndex.practiceItems[number] }) {
+function McqCard({ item }: { item: PracticeItem }) {
   const { recordAttempt } = useApp()
   const [selected, setSelected] = useState<number | null>(null)
   const [checked, setChecked] = useState(false)
@@ -48,7 +49,7 @@ function McqCard({ item }: { item: typeof contentIndex.practiceItems[number] }) 
   )
 }
 
-function FlashcardCard({ item }: { item: typeof contentIndex.practiceItems[number] }) {
+function FlashcardCard({ item }: { item: PracticeItem }) {
   const { data, setFlashcardBox, toggleList } = useApp()
   const [flipped, setFlipped] = useState(false)
   const state = data.flashcardStates[item.id]
@@ -70,7 +71,7 @@ function FlashcardCard({ item }: { item: typeof contentIndex.practiceItems[numbe
   )
 }
 
-function CodingCard({ item }: { item: typeof contentIndex.practiceItems[number] }) {
+function CodingCard({ item }: { item: PracticeItem }) {
   const [showSolution, setShowSolution] = useState(false)
   const [showHints, setShowHints] = useState(false)
   const topic = item.topicId ? getTopic(item.topicId) : undefined
@@ -104,13 +105,14 @@ export function Practice() {
   const [tab, setTab] = useState<PracticeTab>(initialTab)
   const [retryWrongOnly, setRetryWrongOnly] = useState(false)
   const [dueOnly, setDueOnly] = useState(false)
-  const [mock, setMock] = useState<{ items: typeof contentIndex.practiceItems; answers: Record<string, number>; finished: boolean; startedAt: number } | null>(null)
+  const [mock, setMock] = useState<{ items: PracticeItem[]; answers: Record<string, number>; finished: boolean; startedAt: number } | null>(null)
   const { data } = useApp()
-  const byType = (t: string) => contentIndex.practiceItems.filter(i => i.type === t)
-  const accuracy = accuracyByTopic(data.practiceAttempts, contentIndex.practiceItems)
-  const weak = weakTopics(data.practiceAttempts, contentIndex.practiceItems)
+  const { items: practiceItems, loaded } = usePracticeItems()
+  const byType = (t: string) => practiceItems.filter(i => i.type === t)
+  const accuracy = accuracyByTopic(data.practiceAttempts, practiceItems)
+  const weak = weakTopics(data.practiceAttempts, practiceItems)
   // Only wrong answers for items that still exist are retryable.
-  const knownPractice = new Set(contentIndex.practiceItems.map(i => i.id))
+  const knownPractice = new Set(practiceItems.map(i => i.id))
   const wrongIds = [...new Set(data.practiceAttempts.filter(a => !a.correct && knownPractice.has(a.itemId)).map(a => a.itemId))]
   const dueFlashcards = byType('flashcard').filter(i => { const st = data.flashcardStates[i.id]; return !st || isDue(st.dueAt) })
   const flashcardsShown = dueOnly ? dueFlashcards : byType('flashcard')
@@ -128,6 +130,7 @@ export function Practice() {
     <div>
       <h1>Practice</h1>
       <p style={{ color: 'var(--muted)' }}>Attempts are saved in this browser, so you can see accuracy per topic, weak areas, and retry what you got wrong.</p>
+      {!loaded && <div className="card"><p>Loading practice questions…</p></div>}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }} role="group" aria-label="Practice sections">
         {PRACTICE_TABS.map(t => (
           <button key={t} className="btn secondary" aria-pressed={tab === t} onClick={() => setTab(t)}>{t === 'mcq' ? 'MCQs' : t === 'flashcard' ? `Flashcards (${dueFlashcards.length} due)` : t === 'coding' ? 'Coding' : t === 'output' ? 'Output-Based' : t === 'scenario' ? 'Scenario-Based' : 'Mock Interview'} {tab === t ? '✓' : ''}</button>

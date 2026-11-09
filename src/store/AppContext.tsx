@@ -7,8 +7,10 @@ const STORAGE_KEY = 'beanstack-user-data-v1'
 
 export const KNOWN_IDS = {
   topics: new Set(contentIndex.topics.map(t => t.id)),
-  questions: new Set(contentIndex.interviewQuestions.map(q => q.id)),
-  practice: new Set(contentIndex.practiceItems.map(i => i.id)),
+  // Id-only lists from the slim index — the full interview/practice
+  // bodies are lazy-loaded, but sanitisation still needs the ids.
+  questions: new Set(contentIndex.interviewQuestionIds),
+  practice: new Set(contentIndex.practiceItemIds),
 }
 
 function loadInitial(): UserData {

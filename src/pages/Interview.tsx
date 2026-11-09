@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Bookmark, Copy, Eye, EyeOff } from 'lucide-react'
-import { contentIndex, getTopic } from '../lib/content'
+import { getTopic, useInterviewQuestions } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { topicUrl } from '../lib/utils'
 
@@ -20,8 +20,9 @@ export function InterviewIndex() {
   const [filterCategory, setFilterCategory] = useState('all')
   const [filterDifficulty, setFilterDifficulty] = useState('all')
   const { data } = useApp()
-  const categories = [...new Set(contentIndex.interviewQuestions.map(q => q.category))].sort()
-  const filtered = contentIndex.interviewQuestions.filter(q =>
+  const { questions: interviewQuestions, loaded } = useInterviewQuestions()
+  const categories = [...new Set(interviewQuestions.map(q => q.category))].sort()
+  const filtered = interviewQuestions.filter(q =>
     (filterModule === 'all' || q.module === filterModule) &&
     (filterCategory === 'all' || q.category === filterCategory) &&
     (filterDifficulty === 'all' || q.difficulty === filterDifficulty)
@@ -48,7 +49,8 @@ export function InterviewIndex() {
         <select className="select" style={{ width: 'auto' }} value={filterDifficulty} onChange={e => setFilterDifficulty(e.target.value)} aria-label="Filter by difficulty"><option value="all">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
       </div>
 
-      {filtered.length === 0 && <div className="card"><p>No interview questions match those filters. Try clearing the filters, or browse Learn for topics.</p><button className="btn secondary" onClick={() => { setFilterModule('all'); setFilterCategory('all'); setFilterDifficulty('all') }}>Clear all filters</button></div>}
+      {!loaded && <div className="card"><p>Loading interview questions…</p></div>}
+      {loaded && filtered.length === 0 && <div className="card"><p>No interview questions match those filters. Try clearing the filters, or browse Learn for topics.</p><button className="btn secondary" onClick={() => { setFilterModule('all'); setFilterCategory('all'); setFilterDifficulty('all') }}>Clear all filters</button></div>}
 
       {browseBy === 'module' ? (
         MODULES.map(mod => {
@@ -81,11 +83,13 @@ export function InterviewIndex() {
 
 export function InterviewQuestionPage() {
   const { questionId } = useParams()
-  const q = contentIndex.interviewQuestions.find(x => x.id === questionId)
+  const { questions: interviewQuestions, loaded } = useInterviewQuestions()
+  const q = interviewQuestions.find(x => x.id === questionId)
   const { data, toggleList, setInterviewReview } = useApp()
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copyFailed, setCopyFailed] = useState(false)
+  if (!loaded) return <div><h1>Loading question…</h1><p>Fetching this interview question.</p></div>
   if (!q) return <div><h1>Question not found</h1><p>That question id does not exist in the current interview content. It may have been removed, or planned for a later batch — your other data is unaffected.</p><p><Link to="/interview">← Back to Interview Prep</Link> · <Link to="/search">Search questions</Link> · <Link to="/learn">Browse Learn</Link></p></div>
   const topic = q.topicId ? getTopic(q.topicId) : undefined
   const copy = async () => {
