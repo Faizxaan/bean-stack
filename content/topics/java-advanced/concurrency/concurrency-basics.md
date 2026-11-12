@@ -10,13 +10,15 @@ tags: [Concurrency, Threads, Executors, synchronized]
 prerequisites: [collections-framework, streams-lambdas]
 related: [garbage-collection, spring-ioc-di]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Threads, executors, synchronization, and the Java Memory Model — the concurrency fundamentals interviewers expect from experienced Java developers.
 ---
 
 ## Overview
 
-Concurrency lets a program do more than one thing at a time, but shared mutable state — data that more than one thread can change — makes it hard to reason about. Picture two cooks sharing one kitchen: if both grab the same ingredients and stove at once, the result is unpredictable. Java's tools exist to manage that sharing: threads are the workers doing things in parallel, executors manage a pool of those workers, locks are the "one cook at a time" rule for a shared resource, and concurrent collections are containers built to be used safely by several threads at once. The core discipline is simple to state and hard to follow: share as little mutable state as possible, and synchronize the rest correctly.
+Concurrency lets a program do more than one thing at a time, but shared mutable state — data that more than one thread can change — makes it hard to reason about. Picture two cooks sharing one kitchen: if both grab the same ingredients and stove at once, the result is unpredictable.
+
+Java's tools exist to manage that sharing: threads are the workers doing things in parallel, executors manage a pool of those workers, locks are the "one cook at a time" rule for a shared resource, and concurrent collections are containers built to be used safely by several threads at once. The core discipline is simple to state and hard to follow: share as little mutable state as possible, and synchronize the rest correctly.
 
 ## Theory
 

@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { getTopic, usePracticeItems } from '../lib/content'
 import type { PracticeItem } from '../types'
 import { useApp } from '../store/AppContext'
-import { accuracyByTopic, isDue, topicUrl, weakTopics } from '../lib/utils'
+import { accuracyByTopic, isDue, smoothScrollBehavior, topicUrl, weakTopics } from '../lib/utils'
 
 function McqCard({ item }: { item: PracticeItem }) {
   const { recordAttempt } = useApp()
@@ -17,8 +17,8 @@ function McqCard({ item }: { item: PracticeItem }) {
   // stuck card. Say so plainly instead of rendering a dead control.
   if (options.length === 0 || !answerValid) {
     return (
-      <div className="card" style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
-        <strong>{item.title}</strong>
+      <div className="card" id={`practice-${item.id}`} style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
+        <h3 className="practice-title">{item.title}</h3>
         <p>{item.prompt}</p>
         <p style={{ color: 'var(--muted)' }}>This question cannot be answered yet: {options.length === 0 ? 'it has no options.' : 'its answer key is missing.'} It is not counted in your accuracy.</p>
         {topic && <p>Related topic: <Link to={topicUrl(topic)}>{topic.title}</Link></p>}
@@ -26,15 +26,17 @@ function McqCard({ item }: { item: PracticeItem }) {
     )
   }
   return (
-    <div className="card" style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
-      <strong>{item.title}</strong>
+    <div className="card" id={`practice-${item.id}`} style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
+      <h3 className="practice-title">{item.title}</h3>
       <p>{item.prompt}</p>
-      {item.code && <pre style={{ background: '#0f172a', color: '#e2e8f0', padding: 12, borderRadius: 8, overflowX: 'auto' }}>{item.code}</pre>}
-      {(item.options || []).map((opt, i) => (
-        <label key={i} style={{ display: 'block', margin: '6px 0' }}>
-          <input type="radio" name={item.id} checked={selected === i} onChange={() => setSelected(i)} disabled={checked} /> {opt}
-        </label>
-      ))}
+      {item.code && <pre tabIndex={0} style={{ background: '#0f172a', color: '#e2e8f0', padding: 12, borderRadius: 8, overflowX: 'auto', maxWidth: '100%' }}>{item.code}</pre>}
+      <div role="radiogroup" aria-label={item.title}>
+        {(item.options || []).map((opt, i) => (
+          <label key={i} style={{ display: 'block', margin: '6px 0', padding: '6px 0' }}>
+            <input type="radio" name={item.id} checked={selected === i} onChange={() => setSelected(i)} disabled={checked} /> {opt}
+          </label>
+        ))}
+      </div>
       {!checked ? (
         <button className="btn small" disabled={selected === null} onClick={() => { if (selected !== null) { setChecked(true); recordAttempt(item.id, selected === item.answerIndex) } }}>Check answer</button>
       ) : (
@@ -55,9 +57,9 @@ function FlashcardCard({ item }: { item: PracticeItem }) {
   const state = data.flashcardStates[item.id]
   const dueLabel = !state ? ' · due today' : Number.isNaN(new Date(state.dueAt).getTime()) ? ' · due today' : ` · due ${new Date(state.dueAt).toLocaleDateString()}`
   return (
-    <div className="card" style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
-      <strong>{item.title}</strong>
-      <div style={{ minHeight: 80, padding: 12, border: '1px solid var(--border)', borderRadius: 8, margin: '10px 0', cursor: 'pointer' }} onClick={() => setFlipped(!flipped)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlipped(!flipped) } }} tabIndex={0} role="button" aria-label={`Flip flashcard: ${item.title}`}>
+    <div className="card" id={`practice-${item.id}`} style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
+      <h3 className="practice-title">{item.title}</h3>
+      <div style={{ minHeight: 80, padding: 12, border: '1px solid var(--border)', borderRadius: 8, margin: '10px 0', cursor: 'pointer' }} onClick={() => setFlipped(!flipped)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlipped(!flipped) } }} tabIndex={0} role="button" aria-label={`Flip flashcard: ${item.title} — currently showing ${flipped ? 'back' : 'front'}`}>
         {flipped ? (item.back || 'Back not provided for this flashcard yet.') : (item.front || 'Front not provided for this flashcard yet.')}
         <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginTop: 8 }}>{flipped ? 'Back — click or press Enter to flip back' : 'Front — click or press Enter to flip'}</div>
       </div>
@@ -77,17 +79,18 @@ function CodingCard({ item }: { item: PracticeItem }) {
   const topic = item.topicId ? getTopic(item.topicId) : undefined
   return (
     <div className="card" style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
-      <strong>{item.title}</strong>
+      <h3 className="practice-title">{item.title}</h3>
       <p>{item.description || item.prompt}</p>
       {item.examples && item.examples.length > 0 && <><strong>Examples</strong><ul>{item.examples.map((e, i) => <li key={i}><code>{e}</code></li>)}</ul></>}
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button className="btn secondary small" onClick={() => setShowHints(!showHints)} aria-expanded={showHints}>{showHints ? 'Hide hints' : 'Show hints'}</button>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {item.hints && item.hints.length > 0 && <button className="btn secondary small" onClick={() => setShowHints(!showHints)} aria-expanded={showHints}>{showHints ? 'Hide hints' : 'Show hints'}</button>}
         <button className="btn small" onClick={() => setShowSolution(!showSolution)} aria-expanded={showSolution}>{showSolution ? 'Hide model solution' : 'Reveal model solution'}</button>
       </div>
+      <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Self-checked: compare your approach with the model solution. Coding and scenario questions are not scored and do not count towards your accuracy — only MCQs and output questions do.</p>
       {showHints && (!item.hints || item.hints.length === 0) && <p style={{ color: 'var(--muted)' }}>No hints provided for this question yet.</p>}
       {showHints && item.hints && <ul>{item.hints.map((h, i) => <li key={i}>{h}</li>)}</ul>}
       {showSolution && !item.solution && <p style={{ color: 'var(--muted)' }}>No model solution provided for this question yet.</p>}
-      {showSolution && item.solution && <pre style={{ background: '#0f172a', color: '#e2e8f0', padding: 12, borderRadius: 8, overflowX: 'auto' }}>{item.solution}</pre>}
+      {showSolution && item.solution && <pre tabIndex={0} style={{ background: '#0f172a', color: '#e2e8f0', padding: 12, borderRadius: 8, overflowX: 'auto', maxWidth: '100%' }}>{item.solution}</pre>}
       {topic && <p>Related topic: <Link to={topicUrl(topic)}>{topic.title}</Link></p>}
     </div>
   )
@@ -98,6 +101,7 @@ type PracticeTab = typeof PRACTICE_TABS[number]
 
 export function Practice() {
   const [params] = useSearchParams()
+  const location = useLocation()
   // An unknown ?tab= value used to render the tab bar with nothing
   // below it. Fall back to MCQs instead of a blank section.
   const paramTab = params.get('tab')
@@ -106,7 +110,7 @@ export function Practice() {
   const [retryWrongOnly, setRetryWrongOnly] = useState(false)
   const [dueOnly, setDueOnly] = useState(false)
   const [mock, setMock] = useState<{ items: PracticeItem[]; answers: Record<string, number>; finished: boolean; startedAt: number } | null>(null)
-  const { data } = useApp()
+  const { data, recordAttempt } = useApp()
   const { items: practiceItems, loaded } = usePracticeItems()
   const byType = (t: string) => practiceItems.filter(i => i.type === t)
   const accuracy = accuracyByTopic(data.practiceAttempts, practiceItems)
@@ -114,10 +118,16 @@ export function Practice() {
   // Only wrong answers for items that still exist are retryable.
   const knownPractice = new Set(practiceItems.map(i => i.id))
   const wrongIds = [...new Set(data.practiceAttempts.filter(a => !a.correct && knownPractice.has(a.itemId)).map(a => a.itemId))]
+  // The retry count on a tab must count only that tab's questions:
+  // the old shared count could say "Retry wrong only (3)" on the MCQ
+  // tab when all 3 wrong answers were output questions, and then show
+  // an empty list.
+  const wrongMcqIds = wrongIds.filter(id => byType('mcq').some(i => i.id === id))
+  const wrongOutputIds = wrongIds.filter(id => byType('output').some(i => i.id === id))
   const dueFlashcards = byType('flashcard').filter(i => { const st = data.flashcardStates[i.id]; return !st || isDue(st.dueAt) })
   const flashcardsShown = dueOnly ? dueFlashcards : byType('flashcard')
-  const mcqsShown = retryWrongOnly ? byType('mcq').filter(i => wrongIds.includes(i.id)) : byType('mcq')
-  const outputsShown = retryWrongOnly ? byType('output').filter(i => wrongIds.includes(i.id)) : byType('output')
+  const mcqsShown = retryWrongOnly ? byType('mcq').filter(i => wrongMcqIds.includes(i.id)) : byType('mcq')
+  const outputsShown = retryWrongOnly ? byType('output').filter(i => wrongOutputIds.includes(i.id)) : byType('output')
 
   const startMock = () => {
     const mcqs = byType('mcq').slice(0, 10)
@@ -125,23 +135,51 @@ export function Practice() {
     setMock({ items: mcqs, answers: {}, finished: false, startedAt: Date.now() })
   }
   const mockScore = mock ? mock.items.filter(i => mock.answers[i.id] === i.answerIndex).length : 0
+  const mockAnswered = mock ? Object.keys(mock.answers).length : 0
+  // Finishing a mock records each answered question as a practice
+  // attempt, so mock answers count towards accuracy and "retry wrong"
+  // — previously a finished mock vanished without a trace.
+  const finishMock = () => {
+    if (!mock) return
+    for (const item of mock.items) {
+      const chosen = mock.answers[item.id]
+      if (typeof chosen === 'number') recordAttempt(item.id, chosen === item.answerIndex)
+    }
+    setMock({ ...mock, finished: true })
+  }
+
+  // Deep links from Search / the command palette use
+  // #practice-<itemId>. Scroll to that card once its tab has loaded —
+  // without this, a search result landed at the top of a long list and
+  // the user had to hunt for the question they had just clicked.
+  useEffect(() => {
+    if (!loaded || !location.hash.startsWith('#practice-')) return
+    // The card only exists when its tab is showing.
+    const t = setTimeout(() => document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }), 50)
+    return () => clearTimeout(t)
+  }, [loaded, location.hash, tab])
 
   return (
     <div>
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/">Home</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">Practice</span></span>
+      </nav>
       <h1>Practice</h1>
-      <p style={{ color: 'var(--muted)' }}>Attempts are saved in this browser, so you can see accuracy per topic, weak areas, and retry what you got wrong.</p>
+      <p style={{ color: 'var(--muted)' }}>Attempts are saved in this browser, so you can see accuracy per topic, weak areas, and retry what you got wrong. Only MCQs and output questions are scored — coding and scenario questions are self-checked against a model solution.</p>
       {!loaded && <div className="card"><p>Loading practice questions…</p></div>}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }} role="group" aria-label="Practice sections">
         {PRACTICE_TABS.map(t => (
-          <button key={t} className="btn secondary" aria-pressed={tab === t} onClick={() => setTab(t)}>{t === 'mcq' ? 'MCQs' : t === 'flashcard' ? `Flashcards (${dueFlashcards.length} due)` : t === 'coding' ? 'Coding' : t === 'output' ? 'Output-Based' : t === 'scenario' ? 'Scenario-Based' : 'Mock Interview'} {tab === t ? '✓' : ''}</button>
+          <button key={t} className="btn secondary" aria-pressed={tab === t} onClick={() => setTab(t)}>{t === 'mcq' ? `MCQs (${byType('mcq').length})` : t === 'flashcard' ? `Flashcards (${dueFlashcards.length} due of ${byType('flashcard').length})` : t === 'coding' ? `Coding (${byType('coding').length})` : t === 'output' ? `Output-Based (${byType('output').length})` : t === 'scenario' ? `Scenario-Based (${byType('scenario').length})` : 'Mock Interview (10 questions)'} {tab === t ? '✓' : ''}</button>
         ))}
       </div>
       {(tab === 'mcq' || tab === 'output') && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
           <button className="btn secondary small" aria-pressed={retryWrongOnly} onClick={() => setRetryWrongOnly(!retryWrongOnly)}>
-            {retryWrongOnly ? 'Show all questions' : `Retry wrong only (${wrongIds.length})`}
+            {retryWrongOnly ? 'Show all questions' : `Retry wrong only (${tab === 'mcq' ? wrongMcqIds.length : wrongOutputIds.length})`}
           </button>
-          {retryWrongOnly && wrongIds.length === 0 && <span style={{ color: 'var(--muted)', alignSelf: 'center' }}>You have no wrong answers to retry yet — answer some questions first.</span>}
+          {retryWrongOnly && (tab === 'mcq' ? wrongMcqIds.length === 0 : wrongOutputIds.length === 0) && <span style={{ color: 'var(--muted)', alignSelf: 'center' }}>You have no wrong answers to retry yet in this section — answer some questions first.</span>}
         </div>
       )}
       {tab === 'flashcard' && (
@@ -151,10 +189,11 @@ export function Practice() {
           </button>
         </div>
       )}
+      {tab === 'flashcard' && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Flashcards use Leitner boxes: a card you get right moves up a box and comes back later (Box 1: tomorrow, Box 2: in 3 days, Box 3: in 7 days, Box 4: in 14 days, Box 5: in 30 days). A card you forget goes back to Box 1. New cards count as due until you have tried them once.</p>}
 
       {data.practiceAttempts.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
-          <strong>Your accuracy</strong>
+          <h2 className="practice-section-title">Your accuracy</h2>
           <ul>{accuracy.map(a => { const t = getTopic(a.topicId); return <li key={a.topicId}>{t ? t.title : a.topicId === 'general' ? 'General' : 'Removed topic'}: {a.correct}/{a.total} ({a.pct}%)</li> })}</ul>
           {weak.length > 0 && <p><strong>Weak areas to revisit:</strong> {weak.map(w => { const t = getTopic(w.topicId); return t ? t.title : w.topicId === 'general' ? 'General' : 'Removed topic' }).join(', ')}</p>}
           {wrongIds.length > 0 && <p>Retry what you got wrong: {wrongIds.length} item(s) — use “Retry wrong only” in MCQs / Output questions.</p>}
@@ -163,27 +202,45 @@ export function Practice() {
 
       {tab === 'mock' && (
         <div>
-          {!mock && <div className="card"><p>Mock interview: choose this mode once core practice is solid. It uses MCQs from the current practice set, timed by your own pace, with a scored summary at the end.</p>{byType('mcq').length === 0 ? <p style={{ color: 'var(--muted)' }}>No MCQs are available yet, so a mock interview cannot start. Try the other practice sections, or browse Learn.</p> : <button className="btn" onClick={startMock}>Start mock interview ({Math.min(10, byType('mcq').length)} questions)</button>}</div>}
+          {!mock && <div className="card"><p>Mock interview: 10 MCQs drawn from the current practice set, in the order they appear there. There is no time limit — answer at your own pace — and you will see a scored summary plus a review of every answer at the end. Your mock answers count towards your accuracy and “retry wrong”.</p>{byType('mcq').length === 0 ? <p style={{ color: 'var(--muted)' }}>No MCQs are available yet, so a mock interview cannot start. Try the other practice sections, or browse Learn.</p> : <button className="btn" onClick={startMock}>Start mock interview ({Math.min(10, byType('mcq').length)} questions)</button>}</div>}
           {mock && mock.items.length === 0 && <div className="card"><p>No questions in this mock interview.</p><button className="btn secondary" onClick={() => setMock(null)}>Back to mock setup</button></div>}
           {mock && !mock.finished && (
             <div>
-              {mock.items.map(item => (
+              <p style={{ color: 'var(--muted)' }}>You have answered {mockAnswered} of {mock.items.length} questions. Answer all of them, then press “Finish &amp; see score”.</p>
+              {mock.items.map((item, qi) => (
                 <div key={item.id} className="card" style={{ marginBottom: 12 }}>
-                  <strong>{item.title}</strong><p>{item.prompt}</p>
-                  {(item.options || []).map((opt, i) => (
-                    <label key={i} style={{ display: 'block', margin: '6px 0' }}><input type="radio" name={item.id} checked={mock.answers[item.id] === i} onChange={() => setMock(m => m ? { ...m, answers: { ...m.answers, [item.id]: i } } : m)} /> {opt}</label>
-                  ))}
+                  <h3 className="practice-title">Question {qi + 1} of {mock.items.length}: {item.title}</h3><p>{item.prompt}</p>
+                  <div role="radiogroup" aria-label={`Mock question ${qi + 1}: ${item.title}`}>
+                    {(item.options || []).map((opt, i) => (
+                      <label key={i} style={{ display: 'block', margin: '6px 0', padding: '6px 0' }}><input type="radio" name={item.id} checked={mock.answers[item.id] === i} onChange={() => setMock(m => m ? { ...m, answers: { ...m.answers, [item.id]: i } } : m)} /> {opt}</label>
+                    ))}
+                  </div>
                 </div>
               ))}
-              <button className="btn" onClick={() => setMock(m => m ? { ...m, finished: true } : m)}>Finish &amp; see score</button>
+              <button className="btn" onClick={finishMock}>Finish &amp; see score</button>
             </div>
           )}
           {mock && mock.finished && (
             <div className="card">
               <h2>Mock summary</h2>
               <p>Score: {mockScore} / {mock.items.length} ({mock.items.length ? Math.round((mockScore / mock.items.length) * 100) : 0}%)</p>
-              <p>Time: {Math.round((Date.now() - mock.startedAt) / 1000)} seconds (self-paced timer)</p>
-              <button className="btn secondary" onClick={() => setMock(null)}>Start another mock</button>
+              <p>Time: {Math.round((Date.now() - mock.startedAt) / 1000)} seconds (self-paced — there is no time limit)</p>
+              <h3>Review your answers</h3>
+              {mock.items.map((item, qi) => {
+                const chosen = mock.answers[item.id]
+                const correct = chosen === item.answerIndex
+                const topic = item.topicId ? getTopic(item.topicId) : undefined
+                return (
+                  <div key={item.id} style={{ borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 10 }}>
+                    <p style={{ margin: '0 0 4px' }}><strong>Question {qi + 1}: {correct ? 'Correct ✓' : 'Not correct'}</strong> — {item.prompt}</p>
+                    <p style={{ margin: '0 0 4px' }}>Your answer: {typeof chosen === 'number' ? item.options?.[chosen] : 'No answer given'}</p>
+                    {!correct && <p style={{ margin: '0 0 4px' }}>Correct answer: {typeof item.answerIndex === 'number' ? item.options?.[item.answerIndex] : '—'}</p>}
+                    {item.explanation && <p style={{ color: 'var(--muted)', margin: '0 0 4px' }}>{item.explanation}</p>}
+                    {topic && <p style={{ margin: 0 }}>Revise: <Link to={topicUrl(topic)}>{topic.title}</Link></p>}
+                  </div>
+                )
+              })}
+              <p style={{ marginTop: 16 }}><button className="btn secondary" onClick={() => setMock(null)}>Start another mock</button> <Link className="btn secondary" to="/practice?tab=mcq">Practise MCQs</Link></p>
             </div>
           )}
         </div>

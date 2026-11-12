@@ -10,13 +10,15 @@ tags: [Git, Version Control]
 prerequisites: []
 related: [dv-git-branching-merging, dv-cicd-pipelines]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How Git tracks changes as snapshots, what the working tree staging area and repository are, and the everyday commands every Java developer uses.
 ---
 
 ## Overview
 
-Git is the version control system almost every Java team uses, and it is the foundation for everything else in this track: pull requests, code review, continuous integration, and safe releases all assume you can use Git well. At its heart, Git does not store a list of file differences. It stores snapshots. Each commit is a snapshot of your whole project at a point in time, plus a message, an author, a timestamp, and a pointer to the previous commit. That design is what makes branching cheap, history readable, and mistakes recoverable.
+Git is the version control system almost every Java team uses, and it is the foundation for everything else in this track: pull requests, code review, continuous integration, and safe releases all assume you can use Git well. At its heart, Git does not store a list of file differences.
+
+It stores snapshots. Each commit is a snapshot of your whole project at a point in time, plus a message, an author, a timestamp, and a pointer to the previous commit. That design is what makes branching cheap, history readable, and mistakes recoverable.
 
 For a Java developer, Git is not a separate "DevOps skill" that lives apart from coding. You commit a Spring Boot feature, push it, open a pull request, and a CI pipeline builds and tests exactly that commit. If you understand commits, the staging area, and remotes, the rest of the DevOps track becomes much easier to follow.
 

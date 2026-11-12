@@ -10,13 +10,15 @@ tags: [Spring Boot, MultipartFile, file upload, download, Resource]
 prerequisites: [spring-mvc-rest, validation-exception-handling]
 related: [spring-rest-clients, configuration-profiles, file-io-nio]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: Accepting file uploads with MultipartFile and serving downloads with Resource, safely.
 ---
 
 ## Overview
 
-Most applications eventually handle files: a user uploads a profile picture, a spreadsheet, or a document, and later downloads a report or an export. In Spring Boot, uploads arrive as `multipart/form-data` requests and are bound to a `MultipartFile` parameter; downloads are served by returning a `Resource` with the right content type and a `Content-Disposition` header. In plain terms: the framework turns the uploaded file into an object you can inspect and store, and turns a stored file back into a downloadable response — and your job is the decisions around it: size limits, validation, where the bytes live, and security.
+Most applications eventually handle files: a user uploads a profile picture, a spreadsheet, or a document, and later downloads a report or an export. In Spring Boot, uploads arrive as `multipart/form-data` requests and are bound to a `MultipartFile` parameter; downloads are served by returning a `Resource` with the right content type and a `Content-Disposition` header.
+
+In plain terms: the framework turns the uploaded file into an object you can inspect and store, and turns a stored file back into a downloadable response — and your job is the decisions around it: size limits, validation, where the bytes live, and security.
 
 ## Theory
 

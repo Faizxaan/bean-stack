@@ -10,13 +10,15 @@ tags: [Spring, JDBC, JdbcTemplate, RowMapper, SQL]
 prerequisites: [spring-ioc-di, jdbc-networking, db-sql-fundamentals]
 related: [spring-data-jpa, db-sql-java-developers, validation-exception-handling]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: Spring's JdbcTemplate — raw JDBC without the boilerplate, plus RowMapper, named parameters, and batch updates.
 ---
 
 ## Overview
 
-`JdbcTemplate` is Spring's answer to raw JDBC: it keeps full control of the SQL while removing the repetitive code — opening and closing connections, creating statements, handling `SQLException`s, and closing result sets. In plain terms: you write the SQL and a small piece of code that turns a result row into an object, and Spring does everything else. It sits between raw JDBC (maximum control, maximum boilerplate) and Spring Data JPA (minimum SQL, but an ORM with its own rules): with `JdbcTemplate` you own the SQL, which makes it the right choice when queries are complex, hand-tuned, or read-only reports that do not fit an entity model.
+`JdbcTemplate` is Spring's answer to raw JDBC: it keeps full control of the SQL while removing the repetitive code — opening and closing connections, creating statements, handling `SQLException`s, and closing result sets. In plain terms: you write the SQL and a small piece of code that turns a result row into an object, and Spring does everything else.
+
+It sits between raw JDBC (maximum control, maximum boilerplate) and Spring Data JPA (minimum SQL, but an ORM with its own rules): with `JdbcTemplate` you own the SQL, which makes it the right choice when queries are complex, hand-tuned, or read-only reports that do not fit an entity model.
 
 ## Theory
 

@@ -10,13 +10,15 @@ tags: [Spring MVC, REST, Validation, Exception Handling]
 prerequisites: [spring-boot-autoconfig, spring-ioc-di]
 related: [spring-data-jpa, design-patterns-solid]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Controllers, request mapping, validation, exception handling, and ResponseEntity — how to build clean, interview-ready REST APIs with Spring.
 ---
 
 ## Overview
 
-A REST API is a web service other programs talk to over HTTP, and Spring MVC is the part that routes each incoming request to the right method — think of a controller method as the waiter who takes a specific order. It converts JSON to Java objects (via Jackson, the translator between JSON text and Java objects) and back, validates input, and lets you control status codes and headers precisely with `ResponseEntity` (the envelope around your response, carrying both the body and the status). A good REST API is predictable: resources are nouns, methods have their standard meanings, errors are consistent, and validation failures return useful messages instead of stack traces.
+A REST API is a web service other programs talk to over HTTP, and Spring MVC is the part that routes each incoming request to the right method — think of a controller method as the waiter who takes a specific order.
+
+It converts JSON to Java objects (via Jackson, the translator between JSON text and Java objects) and back, validates input, and lets you control status codes and headers precisely with `ResponseEntity` (the envelope around your response, carrying both the body and the status). A good REST API is predictable: resources are nouns, methods have their standard meanings, errors are consistent, and validation failures return useful messages instead of stack traces.
 
 ## Theory
 

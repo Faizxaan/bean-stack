@@ -10,13 +10,15 @@ tags: [Exceptions, Generics, try-with-resources]
 prerequisites: [oop-principles]
 related: [collections-framework, streams-lambdas]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Checked vs unchecked exceptions, try-with-resources, custom exceptions, and generics with wildcards — the safety nets interviewers check.
 ---
 
 ## Overview
 
-Think of an exception as Java's way of raising its hand when something goes wrong — instead of returning a magic value like `-1` and hoping the caller notices. A checked exception is one the compiler forces you to deal with, by handling it or declaring it; an unchecked exception (a runtime exception or an error, typically a programming bug) does not have to be declared. Generics add compile-time type safety so a `List<String>` cannot accidentally hold an `Integer` — the compiler catches it instead of the runtime throwing a `ClassCastException`.
+Think of an exception as Java's way of raising its hand when something goes wrong — instead of returning a magic value like `-1` and hoping the caller notices.
+
+A checked exception is one the compiler forces you to deal with, by handling it or declaring it; an unchecked exception (a runtime exception or an error, typically a programming bug) does not have to be declared. Generics add compile-time type safety so a `List<String>` cannot accidentally hold an `Integer` — the compiler catches it instead of the runtime throwing a `ClassCastException`.
 
 ## Theory
 

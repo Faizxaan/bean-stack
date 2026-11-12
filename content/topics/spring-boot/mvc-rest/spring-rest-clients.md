@@ -10,13 +10,15 @@ tags: [Spring, RestTemplate, RestClient, WebClient, HTTP, REST client]
 prerequisites: [spring-mvc-rest, spring-ioc-di]
 related: [spring-interceptors-filters, security-jwt, logging-testing-docs]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: Calling other services over HTTP from Spring Boot — which client to pick and how to use it safely.
 ---
 
 ## Overview
 
-A Spring Boot application rarely works alone: it calls other services — a payment gateway, another microservice, a public API. Spring offers three clients for that, from three generations. `RestTemplate` is the original blocking client; `RestClient` (Spring 6.1, Spring Boot 3.2+) is its modern blocking replacement with a fluent API; `WebClient` is the non-blocking, reactive client. In plain terms: they all send HTTP requests and turn responses into Java objects, but they differ in style, in whether they block a thread while waiting, and in which one Spring recommends for new code.
+A Spring Boot application rarely works alone: it calls other services — a payment gateway, another microservice, a public API. Spring offers three clients for that, from three generations. `RestTemplate` is the original blocking client; `RestClient` (Spring 6.1, Spring Boot 3.2+) is its modern blocking replacement with a fluent API; `WebClient` is the non-blocking, reactive client.
+
+In plain terms: they all send HTTP requests and turn responses into Java objects, but they differ in style, in whether they block a thread while waiting, and in which one Spring recommends for new code.
 
 The server side of REST — writing controllers — is covered in `spring-mvc-rest`. This topic is the other half: calling someone else's REST API from your code.
 

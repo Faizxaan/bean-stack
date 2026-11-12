@@ -7,16 +7,18 @@ order: 1
 difficulty: Advanced
 importance: 5
 tags: [Java 21, Records, Sealed Classes, Pattern Matching, Virtual Threads]
-prerequisites: [streams-lambdas, garbage-collection]
+prerequisites: [streams-lambdas]
 related: [streams-lambdas, concurrency-basics]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Records, sealed classes, pattern matching, virtual threads, and sequenced collections change how modern Java code is written, and knowing which version introduced each one matters in interviews.
 ---
 
 ## Overview
 
-Java stopped standing still after Java 8. The six-month release cadence brought a steady stream of language features, and the long-term support versions, 8, 11, 17, and 21, are the milestones interviewers tend to ask about. This topic covers the features that change everyday code the most: records for simple data carriers, sealed classes for closed hierarchies, pattern matching for cleaner type tests, virtual threads for scalable blocking code, and sequenced collections for ordered collections. It also maps each feature to the version that introduced it, so you can answer version questions accurately instead of guessing.
+Java stopped standing still after Java 8. The six-month release cadence brought a steady stream of language features, and the long-term support versions, 8, 11, 17, and 21, are the milestones interviewers tend to ask about.
+
+This topic covers the features that change everyday code the most: records for simple data carriers, sealed classes for closed hierarchies, pattern matching for cleaner type tests, virtual threads for scalable blocking code, and sequenced collections for ordered collections. It also maps each feature to the version that introduced it, so you can answer version questions accurately instead of guessing.
 
 ## Theory
 
@@ -54,7 +56,9 @@ Java 21 added the `SequencedCollection`, `SequencedSet`, and `SequencedMap` inte
 
 ### Other version landmarks worth knowing
 
-Text blocks, final in Java 15, let you write multi-line strings without escaping every newline. `var` for local variables arrived in Java 10, and improves readability when the type is obvious from the right-hand side, though it is not a substitute for clear naming or for API signatures, where explicit types still belong. The `HttpClient` API arrived in Java 11, as did running a single-file program without compiling it first. Records, text blocks, and pattern matching for `instanceof` were finalized in Java 15 and 16, sealed classes became final in Java 17, and Java 21 added virtual threads, sequenced collections, and pattern matching for switch. Java 8 itself remains the baseline many codebases compare against, with lambdas, streams, and the `java.time` API as its defining features.
+Text blocks, final in Java 15, let you write multi-line strings without escaping every newline. `var` for local variables arrived in Java 10, and improves readability when the type is obvious from the right-hand side, though it is not a substitute for clear naming or for API signatures, where explicit types still belong. The `HttpClient` API arrived in Java 11, as did running a single-file program without compiling it first.
+
+Records, text blocks, and pattern matching for `instanceof` were finalized in Java 15 and 16, sealed classes became final in Java 17, and Java 21 added virtual threads, sequenced collections, and pattern matching for switch. Java 8 itself remains the baseline many codebases compare against, with lambdas, streams, and the `java.time` API as its defining features.
 
 ### Version map
 

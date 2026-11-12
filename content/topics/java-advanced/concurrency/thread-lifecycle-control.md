@@ -10,13 +10,15 @@ tags: [Concurrency, threads, Thread.State, join, interrupt, daemon]
 prerequisites: [concurrency-basics, java-memory-model]
 related: [executors-completablefuture, garbage-collection]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: The six thread states, and how to start, pause, join, interrupt, and shut down threads safely.
 ---
 
 ## Overview
 
-Every thread in Java is always in one of six states, and knowing those states is how you read a thread dump, explain why a program hangs, or answer the classic interview question "what is the life cycle of a thread?". This topic covers the states, the transitions between them, and the control methods — `start`, `sleep`, `join`, `yield`, and `interrupt` — plus daemon threads, priorities, and shutdown hooks: the machinery that decides when threads run and when the JVM is allowed to exit.
+Every thread in Java is always in one of six states, and knowing those states is how you read a thread dump, explain why a program hangs, or answer the classic interview question "what is the life cycle of a thread?".
+
+This topic covers the states, the transitions between them, and the control methods — `start`, `sleep`, `join`, `yield`, and `interrupt` — plus daemon threads, priorities, and shutdown hooks: the machinery that decides when threads run and when the JVM is allowed to exit.
 
 The everyday advice has not changed: in application code you should usually work through an `ExecutorService` (see `concurrency-basics` and `executors-completablefuture`), not raw threads. But executors are built on these primitives, and interviews test the primitives directly.
 

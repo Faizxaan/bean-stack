@@ -10,13 +10,15 @@ tags: [SQL, functions, string functions, date functions, NULL, COALESCE]
 prerequisites: [db-sql-fundamentals]
 related: [sql-case-expressions, sql-window-functions, date-time-regex]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: The built-in functions you use in almost every query — transforming text, working with dates, and handling NULL safely.
 ---
 
 ## Overview
 
-Most queries do more than fetch columns as stored: they clean up text, pull the year out of a date, or replace a missing value with a sensible default. That is what built-in SQL functions are for. They fall into two groups. **Scalar functions** work on one value at a time — `UPPER('asha')` returns `'ASHA'` for that one value. **Aggregate functions** work on a set of rows — `SUM(amount)` adds up a whole group (covered in `db-sql-fundamentals`). This topic covers the scalar functions a Java developer uses most: string functions, date and time functions, and the functions that handle `NULL`.
+Most queries do more than fetch columns as stored: they clean up text, pull the year out of a date, or replace a missing value with a sensible default. That is what built-in SQL functions are for.
+
+They fall into two groups. **Scalar functions** work on one value at a time — `UPPER('asha')` returns `'ASHA'` for that one value. **Aggregate functions** work on a set of rows — `SUM(amount)` adds up a whole group (covered in `db-sql-fundamentals`). This topic covers the scalar functions a Java developer uses most: string functions, date and time functions, and the functions that handle `NULL`.
 
 One warning up front: function names and details differ between databases. The examples here use PostgreSQL, the database the Module 0 notes use. `SUBSTRING`, `COALESCE`, and `EXTRACT` are standard and work almost everywhere; `DATE_TRUNC` and `AGE` are PostgreSQL-specific, and MySQL or SQL Server spell the same ideas differently. In an interview, name the function and say which database you mean.
 

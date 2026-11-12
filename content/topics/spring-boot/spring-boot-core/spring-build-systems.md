@@ -10,13 +10,15 @@ tags: [Maven, Gradle, build, dependencies, Spring Boot plugin]
 prerequisites: [spring-boot-autoconfig, jdk-jre-jvm]
 related: [dv-cicd-pipelines, actuator-microservices-deployment, configuration-profiles]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: How Maven and Gradle build a Spring Boot application — dependencies, lifecycle, and the executable jar.
 ---
 
 ## Overview
 
-A build system turns source code into something you can run: it downloads dependencies, compiles the code, runs the tests, and packages the result. For Java, the two build systems are Maven and Gradle, and every Spring Boot project uses one of them. In plain terms: Maven says "describe what you want in a `pom.xml` and I will do it my way", while Gradle says "describe what you want in a build script and I will do it fast and flexibly". Interviewers ask about both because choosing dependencies, understanding the build lifecycle, and packaging the application are everyday work, not theory.
+A build system turns source code into something you can run: it downloads dependencies, compiles the code, runs the tests, and packages the result. For Java, the two build systems are Maven and Gradle, and every Spring Boot project uses one of them.
+
+In plain terms: Maven says "describe what you want in a `pom.xml` and I will do it my way", while Gradle says "describe what you want in a build script and I will do it fast and flexibly". Interviewers ask about both because choosing dependencies, understanding the build lifecycle, and packaging the application are everyday work, not theory.
 
 ## Theory
 
@@ -28,7 +30,9 @@ Maven is configured in a `pom.xml` (Project Object Model). You declare the proje
 
 Running `mvn package` compiles, tests, and packages; `mvn install` additionally puts the artifact in your local repository (`~/.m2`) so other local projects can depend on it; `mvn deploy` publishes it to a shared repository. Plugins attach goals to phases: the compiler plugin compiles, the Surefire plugin runs tests, and the Spring Boot plugin repackages the jar.
 
-Dependencies have a **scope** that decides where they are available: `compile` (default, everywhere), `test` (tests only, for example JUnit), `provided` (needed to compile but supplied at runtime, for example the servlet API), and `runtime` (needed at runtime but not to compile). A dependency also brings its own dependencies — **transitive dependencies** — which is how a starter pulls in a whole stack (see `spring-boot-autoconfig`). When two versions of the same library arrive transitively, Maven picks the one nearest to your project in the dependency tree ("nearest wins"), and `mvn dependency:tree` shows you exactly what was chosen. Version conflicts are the most common Maven debugging task, and the fix is usually an explicit dependency or an `<exclusion>`.
+Dependencies have a **scope** that decides where they are available: `compile` (default, everywhere), `test` (tests only, for example JUnit), `provided` (needed to compile but supplied at runtime, for example the servlet API), and `runtime` (needed at runtime but not to compile). A dependency also brings its own dependencies — **transitive dependencies** — which is how a starter pulls in a whole stack (see `spring-boot-autoconfig`).
+
+When two versions of the same library arrive transitively, Maven picks the one nearest to your project in the dependency tree ("nearest wins"), and `mvn dependency:tree` shows you exactly what was chosen. Version conflicts are the most common Maven debugging task, and the fix is usually an explicit dependency or an `<exclusion>`.
 
 Spring Boot projects normally inherit from `spring-boot-starter-parent`, which sets dependency versions (dependency management), Java version, and plugin defaults — so a starter can be declared without a version number and still resolve consistently.
 

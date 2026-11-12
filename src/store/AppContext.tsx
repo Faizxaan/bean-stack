@@ -33,6 +33,11 @@ function loadInitial(): UserData {
 
 interface AppContextValue {
   data: UserData
+  // True when the last LocalStorage write failed (quota / private
+  // mode). Previously the failure was swallowed silently and the user
+  // kept studying while nothing was being saved.
+  storageError: boolean
+  dismissStorageError: () => void
   setProgress: (topicId: string, status: ProgressStatus) => void
   toggleList: (key: 'bookmarks' | 'favorites' | 'questionBookmarks' | 'flashcardBookmarks', id: string) => void
   setNote: (topicId: string, text: string) => void
@@ -51,10 +56,17 @@ const Ctx = createContext<AppContextValue | null>(null)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<UserData>(loadInitial)
+  const [storageError, setStorageError] = useState(false)
 
   useEffect(() => {
-    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data)) } catch {
-      // Quota / private mode: fail silently, app still works in-memory
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+      setStorageError(false)
+    } catch {
+      // Quota / private mode: the app still works in-memory, but the
+      // user must be told — otherwise progress silently vanishes on
+      // reload. Layout renders the banner from storageError.
+      setStorageError(true)
     }
     // Apply theme + font size + width to document
     const root = document.documentElement
@@ -81,6 +93,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AppContextValue>(() => ({
     data,
+    storageError,
+    dismissStorageError: () => setStorageError(false),
     setProgress: (topicId, status) => setData(d => {
       if (status !== 'not-started' && status !== 'in-progress' && status !== 'completed') return d
       return { ...d, progress: { ...d.progress, [topicId]: status }, activityDates: [...new Set([...d.activityDates, todayIso()])].slice(-MAX_ACTIVITY_DATES) }
@@ -119,7 +133,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return d
     }),
     replaceData: (next) => setData(sanitizeUserData(next, KNOWN_IDS)),
-  }), [data])
+  }), [data, storageError])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

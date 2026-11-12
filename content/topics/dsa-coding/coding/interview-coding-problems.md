@@ -10,7 +10,7 @@ tags: [Interview, Coding Problems, Problem Solving, Communication]
 prerequisites: [dsa-arrays-strings, dsa-trees-graphs, dsa-dynamic-programming, dsa-patterns, dsa-complexities]
 related: [dsa-patterns, dsa-dynamic-programming]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "How to approach interview coding problems end to end: clarifying, choosing a pattern, coding cleanly, testing, and handling follow-ups, illustrated with classic problems."
 ---
 
@@ -24,7 +24,9 @@ This topic teaches that process and illustrates it with classic problems that in
 
 ### A reliable problem-solving process
 
-First, restate the problem in your own words and confirm it with examples. Second, clarify constraints: input size, sorted or unsorted, duplicates, negative numbers, what to return when there is no answer, and whether the input may be mutated. Third, work a small example by hand and look for the pattern — this is where two pointers, sliding window, or a HashMap usually reveals itself. Fourth, state the brute force and its complexity, then improve it; interviewers want to see that you can produce a working solution before optimising, and the brute force is your safety net if time runs short. Fifth, code the improved solution while explaining each step, then test it on the examples, edge cases, and one tricky case. Finally, state the complexity and invite follow-ups.
+First, restate the problem in your own words and confirm it with examples. Second, clarify constraints: input size, sorted or unsorted, duplicates, negative numbers, what to return when there is no answer, and whether the input may be mutated. Third, work a small example by hand and look for the pattern — this is where two pointers, sliding window, or a HashMap usually reveals itself.
+
+Fourth, state the brute force and its complexity, then improve it; interviewers want to see that you can produce a working solution before optimising, and the brute force is your safety net if time runs short. Fifth, code the improved solution while explaining each step, then test it on the examples, edge cases, and one tricky case. Finally, state the complexity and invite follow-ups.
 
 Time management matters: in a typical 45-minute problem, aim for roughly 5 minutes clarifying and designing, 15–20 minutes coding, 5–10 minutes testing and fixing, and the remainder on follow-ups. If you are stuck for more than a few minutes, say so and ask for a hint — interviewers would rather see you recover with a hint than sit silently. If you spot a better approach mid-coding, finish the working version first, then mention the improvement.
 

@@ -10,13 +10,15 @@ tags: [AWS, Deployment, Spring Boot]
 prerequisites: [dv-aws-core-services, dv-dockerfiles-images, dv-cicd-pipelines]
 related: [dv-kubernetes-pods-services-deployments, dv-testing-in-ci]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How to take a Spring Boot service from a container image to a running production deployment on AWS, with database, configuration, and rollback.
 ---
 
 ## Overview
 
-Knowing individual AWS services is not the same as deploying an application on them. This topic walks through the full path for a Spring Boot service: packaging it as a container image, storing the image in a registry, running it on a managed container platform, connecting it to a managed database, passing configuration and secrets safely, exposing it behind a load balancer, and updating it without downtime. The same pattern appears whether the platform is ECS, EKS, or Elastic Beanstalk, with different amounts of detail visible to you, so understanding the pattern matters more than memorising one service's console screens.
+Knowing individual AWS services is not the same as deploying an application on them. This topic walks through the full path for a Spring Boot service: packaging it as a container image, storing the image in a registry, running it on a managed container platform, connecting it to a managed database, passing configuration and secrets safely, exposing it behind a load balancer, and updating it without downtime.
+
+The same pattern appears whether the platform is ECS, EKS, or Elastic Beanstalk, with different amounts of detail visible to you, so understanding the pattern matters more than memorising one service's console screens.
 
 The deployment story has one rule running through it: the same image that passed CI is the image that runs in production, and the only things that change between environments are configuration values supplied at run time. Everything else in this topic is a consequence of that rule.
 

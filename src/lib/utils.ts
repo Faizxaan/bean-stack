@@ -329,6 +329,34 @@ export function todayIso(): string {
   return localDateString()
 }
 
+// Days from today (local calendar) until a YYYY-MM-DD date: 0 means
+// today, 1 tomorrow, negative means past. The old Home countdown did
+// `new Date('2026-11-14')`, which parses as midnight UTC — in IST
+// that is 05:30 local, so the count could be off by a day around
+// midnight. Parsing as local midnight keeps the count honest.
+export function daysUntilLocal(dateStr: string | null | undefined): number | null {
+  if (!dateStr || !isValidCalendarDate(dateStr)) return null
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const target = new Date(y, m - 1, d)
+  target.setHours(0, 0, 0, 0)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Math.round((target.getTime() - today.getTime()) / 86400000)
+}
+
+// Scroll behaviour that respects reduced motion, whether the user set
+// it in Beanstack settings (dataset flag) or in their OS. Used by
+// every smooth-scroll call site so a "smooth" scroll never overrides
+// a reduced-motion preference.
+export function smoothScrollBehavior(): ScrollBehavior {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return 'auto'
+  if (document.documentElement.dataset.reducedMotion === 'true') return 'auto'
+  try {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'auto'
+  } catch { /* matchMedia unavailable — fall through to smooth */ }
+  return 'smooth'
+}
+
 export function topicUrl(topic: TopicMeta): string {
   return `/learn/${topic.track}/${topic.section}/${topic.id}`
 }

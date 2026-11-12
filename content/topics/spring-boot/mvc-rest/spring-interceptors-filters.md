@@ -10,13 +10,15 @@ tags: [Spring MVC, interceptor, filter, CORS, HandlerInterceptor]
 prerequisites: [spring-mvc-rest, spring-ioc-di]
 related: [spring-rest-clients, security-jwt, validation-exception-handling]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: The request pipeline — servlet filters, HandlerInterceptors, and cross-origin (CORS) configuration.
 ---
 
 ## Overview
 
-Before a request reaches your controller, it passes through a pipeline of components that can inspect it, change it, or reject it. Two kinds of component do that work in Spring MVC, and interviews expect you to know both and how they differ. A **servlet filter** runs at the servlet-container level, before Spring MVC even sees the request; a **`HandlerInterceptor`** runs inside Spring MVC, around the controller method, with access to the handler that will run. And **CORS** — Cross-Origin Resource Sharing — is the browser rule that decides whether a web page from one origin may call your API from another, which you configure in Spring rather than in your controller code.
+Before a request reaches your controller, it passes through a pipeline of components that can inspect it, change it, or reject it. Two kinds of component do that work in Spring MVC, and interviews expect you to know both and how they differ.
+
+A **servlet filter** runs at the servlet-container level, before Spring MVC even sees the request; a **`HandlerInterceptor`** runs inside Spring MVC, around the controller method, with access to the handler that will run. And **CORS** — Cross-Origin Resource Sharing — is the browser rule that decides whether a web page from one origin may call your API from another, which you configure in Spring rather than in your controller code.
 
 In plain terms: filters guard the door to the whole application, interceptors sit beside the controller, and CORS answers the browser's question "is this web page allowed to call you?".
 

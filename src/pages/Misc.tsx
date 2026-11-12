@@ -28,7 +28,9 @@ export function SearchPage() {
     }
     for (const item of practiceItems.filter(i => i.type === 'mcq')) {
       const s = searchScore(q, (item.prompt || '') + ' ' + (item.title || ''))
-      if (s > 0) scored.push({ label: item.prompt || item.title, detail: `Practice MCQ · ${item.topicId ? (getTopic(item.topicId)?.title || item.topicId) : 'General'}`, to: '/practice?tab=mcq', score: s })
+      // Deep-link to the card itself (see Practice.tsx): the old generic
+      // /practice?tab=mcq landed at the top of a 60-question list.
+      if (s > 0) scored.push({ label: item.prompt || item.title, detail: `Practice MCQ · ${item.topicId ? (getTopic(item.topicId)?.title || item.topicId) : 'General'}`, to: `/practice?tab=mcq#practice-${item.id}`, score: s })
     }
     for (const c of contentIndex.cheatsheets) {
       const s = searchScore(q, c.title)
@@ -38,12 +40,18 @@ export function SearchPage() {
   }, [q, interviewQuestions, practiceItems, revisionPrompts])
   return (
     <div>
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/">Home</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">Search</span></span>
+      </nav>
       <h1>Search</h1>
       <input className="input" autoFocus placeholder="Search topics, interview questions, revision prompts, MCQs and cheatsheets…" value={q} onChange={e => setQ(e.target.value)} aria-label="Search" />
       <p style={{ color: 'var(--muted)' }}>Searches topics, interview questions, one-minute revision prompts, practice MCQs, and cheatsheets. Press Ctrl/Cmd+K anywhere for the command palette.</p>
       {q.trim() === '' && <div className="card">Type a term above — for example “streams”, “JPA”, or “system design” — or browse <Link to="/learn">Learn</Link>.</div>}
       {q.trim() !== '' && !allLoaded && <div className="card">Loading interview questions and practice MCQs…</div>}
       {q.trim() !== '' && allLoaded && results.length === 0 && <div className="card">No results for “{q}”. Try a broader term, or browse <Link to="/learn">Learn</Link>.</div>}
+      {q.trim() !== '' && allLoaded && results.length > 0 && <p style={{ color: 'var(--muted)' }}>{results.length} result{results.length === 1 ? '' : 's'} for “{q}”{results.length === 50 ? ' (showing the top 50 — narrow your search for more)' : ''}.</p>}
       <div className="grid" style={{ marginTop: 12 }}>{results.map(r => <div key={r.to + r.label} className="card"><Link to={r.to}><strong>{r.label}</strong></Link><div style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{r.detail}</div></div>)}</div>
     </div>
   )
@@ -52,12 +60,19 @@ export function SearchPage() {
 export function NotFound() {
   return (
     <div>
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/">Home</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">Page not found</span></span>
+      </nav>
       <h1>Page not found</h1>
-      <p>That page does not exist in Beanstack. It has not been redirected — you are seeing Beanstack&apos;s own 404 page.</p>
-      <p>Try:</p>
+      <p>That page does not exist in Beanstack. It has not been redirected — you are seeing Beanstack&apos;s own 404 page. Check the address, or pick one of these:</p>
       <ul>
         <li><Link to="/">Home dashboard</Link></li>
         <li><Link to="/learn">Learn — tracks and topics</Link></li>
+        <li><Link to="/interview">Interview Prep</Link></li>
+        <li><Link to="/practice">Practice</Link></li>
+        <li><Link to="/cheatsheets">Revision &amp; Cheatsheets</Link></li>
         <li><Link to="/search">Search</Link></li>
       </ul>
     </div>

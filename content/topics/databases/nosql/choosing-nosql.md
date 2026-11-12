@@ -10,7 +10,7 @@ tags: [NoSQL, system design, CAP, data modelling, polyglot persistence]
 prerequisites: [db-sql-fundamentals, db-document-stores, db-key-value-caching]
 related: [db-joins-indexes-transactions, db-sql-java-developers]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "A decision framework for SQL versus NoSQL, the NoSQL families, CAP and consistency trade-offs, and polyglot persistence in real Java systems."
 ---
 
@@ -28,11 +28,15 @@ Four questions decide most choices. First, shape: is the data naturally tabular 
 
 ### The four NoSQL families, briefly
 
-Document stores (MongoDB, Couchbase) hold nested JSON-like documents and suit aggregates, catalogues, and content. Key-value stores (Redis, DynamoDB in its simplest use, etcd for configuration) hold opaque values by key and suit caching, sessions, and high-speed lookups. Wide-column stores (Cassandra, ScyllaDB, HBase) hold rows with many columns grouped into families, partitioned across nodes, and suit massive write-heavy, time-series, and event data where queries are known in advance. Graph databases (Neo4j) hold nodes and edges as first-class data and suit fraud rings, recommendations, and permission graphs — data where the relationships are the query. Search engines (Elasticsearch, OpenSearch) are sometimes counted as a fifth family: they are document stores optimised for full-text search and analytics, not for primary storage.
+Document stores (MongoDB, Couchbase) hold nested JSON-like documents and suit aggregates, catalogues, and content. Key-value stores (Redis, DynamoDB in its simplest use, etcd for configuration) hold opaque values by key and suit caching, sessions, and high-speed lookups. Wide-column stores (Cassandra, ScyllaDB, HBase) hold rows with many columns grouped into families, partitioned across nodes, and suit massive write-heavy, time-series, and event data where queries are known in advance.
+
+Graph databases (Neo4j) hold nodes and edges as first-class data and suit fraud rings, recommendations, and permission graphs — data where the relationships are the query. Search engines (Elasticsearch, OpenSearch) are sometimes counted as a fifth family: they are document stores optimised for full-text search and analytics, not for primary storage.
 
 ### CAP and the consistency spectrum
 
-The CAP theorem says a distributed data store cannot simultaneously guarantee consistency (every read sees the latest write), availability (every request gets a response), and partition tolerance (the system keeps working despite network partitions). Since partitions happen, the real choice in practice is between consistency and availability during a partition. That choice is not binary: consistency is a spectrum from strong (linearizable) through read-your-writes and monotonic reads to eventual consistency, where replicas converge but may lag. Most applications tolerate eventual consistency for some data — a social feed, a product rating — and demand strong consistency for other data — a bank balance, an inventory count. Naming which data falls in which bucket is the design work.
+The CAP theorem says a distributed data store cannot simultaneously guarantee consistency (every read sees the latest write), availability (every request gets a response), and partition tolerance (the system keeps working despite network partitions). Since partitions happen, the real choice in practice is between consistency and availability during a partition.
+
+That choice is not binary: consistency is a spectrum from strong (linearizable) through read-your-writes and monotonic reads to eventual consistency, where replicas converge but may lag. Most applications tolerate eventual consistency for some data — a social feed, a product rating — and demand strong consistency for other data — a bank balance, an inventory count. Naming which data falls in which bucket is the design work.
 
 PACELC sharpens the picture: if there is a Partition, choose Availability or Consistency; Else, choose Latency or Consistency. Even without partitions, strongly consistent reads often cost a round trip to a leader, while reading a nearby replica is faster but possibly stale. Java developers meet this concretely in Cassandra's tunable consistency (ONE, QUORUM, ALL) and in MongoDB's read preferences (primary versus secondary).
 

@@ -10,13 +10,15 @@ tags: [SQL, JDBC, JPA, Hibernate, connection pool, N+1]
 prerequisites: [db-sql-fundamentals, db-joins-indexes-transactions, jdbc-networking]
 related: [spring-data-jpa, db-document-stores]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "How Java applications really talk to SQL databases: JDBC, connection pools, JPA and Hibernate, the N+1 problem, and transactions in Spring."
 ---
 
 ## Overview
 
-A Java developer rarely writes raw SQL all day, but the database is never far away. JDBC is the standard low-level way Java talks to a database, connection pools such as HikariCP keep a set of ready database connections to lend out cheaply instead of opening a new one each time, and JPA with Hibernate maps objects to tables so most queries are derived or written in JPQL (a query language over your entity classes, rather than over raw tables). The catch is that every abstraction leaks: an innocent-looking loop over entities can fire hundreds of queries, a lazy collection can explode outside a transaction, and a missing transaction boundary can leave half-written data.
+A Java developer rarely writes raw SQL all day, but the database is never far away. JDBC is the standard low-level way Java talks to a database, connection pools such as HikariCP keep a set of ready database connections to lend out cheaply instead of opening a new one each time, and JPA with Hibernate maps objects to tables so most queries are derived or written in JPQL (a query language over your entity classes, rather than over raw tables).
+
+The catch is that every abstraction leaks: an innocent-looking loop over entities can fire hundreds of queries, a lazy collection can explode outside a transaction, and a missing transaction boundary can leave half-written data.
 
 This topic connects the SQL you already know to the Java stack that runs it, so you can spot those leaks, fix them, and explain them in interviews.
 
@@ -28,7 +30,9 @@ JDBC gives Java a uniform way to talk to any relational database through a drive
 
 ### Connection pools: why opening a connection per request is too slow
 
-Establishing a database connection involves a network handshake and authentication, far too expensive to repeat per request. A pool keeps a set of open connections ready and lends them out. HikariCP, the default pool in Spring Boot, is tuned for low overhead: a small pool, fast handoff, and aggressive timeout detection. Pool sizing is a real design decision: too few connections and requests queue; too many and the database itself becomes the bottleneck, because each connection costs memory and the database can only do so much work at once. A common starting point is a pool roughly sized to the number of CPU cores available to the database, then tuned by measurement, not by guessing a large number.
+Establishing a database connection involves a network handshake and authentication, far too expensive to repeat per request. A pool keeps a set of open connections ready and lends them out. HikariCP, the default pool in Spring Boot, is tuned for low overhead: a small pool, fast handoff, and aggressive timeout detection.
+
+Pool sizing is a real design decision: too few connections and requests queue; too many and the database itself becomes the bottleneck, because each connection costs memory and the database can only do so much work at once. A common starting point is a pool roughly sized to the number of CPU cores available to the database, then tuned by measurement, not by guessing a large number.
 
 ### JPA and Hibernate: objects, entities, and the persistence context
 
@@ -38,7 +42,9 @@ Fetching strategy decides when associations load. `@ManyToOne` defaults to EAGER
 
 ### The N+1 problem, precisely
 
-N+1 happens when one query loads N parents and then one additional query per parent loads a collection or association — N+1 queries in total. It is easy to miss in development, where N is small, and devastating in production, where N is thousands. The fixes, in order of preference, are a JOIN FETCH query that loads parents and children in one query, an `@EntityGraph` that declares what to fetch for a repository method, a DTO projection that selects exactly the columns a use case needs, or batch fetching that loads collections in batches rather than one by one. What you should not do is mark the association EAGER: that merely moves the extra loading everywhere, including use cases that do not need it.
+N+1 happens when one query loads N parents and then one additional query per parent loads a collection or association — N+1 queries in total. It is easy to miss in development, where N is small, and devastating in production, where N is thousands.
+
+The fixes, in order of preference, are a JOIN FETCH query that loads parents and children in one query, an `@EntityGraph` that declares what to fetch for a repository method, a DTO projection that selects exactly the columns a use case needs, or batch fetching that loads collections in batches rather than one by one. What you should not do is mark the association EAGER: that merely moves the extra loading everywhere, including use cases that do not need it.
 
 ### Transactions in Spring
 

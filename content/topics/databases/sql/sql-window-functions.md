@@ -10,13 +10,15 @@ tags: [SQL, window functions, OVER, ranking, analytics]
 prerequisites: [db-sql-fundamentals, db-joins-indexes-transactions]
 related: [sql-cte, sql-case-expressions, db-sql-java-developers]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: Computing rankings, running totals, and comparisons across rows without collapsing them, using OVER and PARTITION BY.
 ---
 
 ## Overview
 
-A normal aggregate such as `SUM` or `COUNT` collapses many rows into one: `GROUP BY` gives you one row per group and the individual rows disappear. A window function does the opposite — it computes a value across a set of related rows (the "window") but keeps every row in the result, adding the computed value as a new column. In plain terms: grouping answers "what is the total per region?", while a window function answers "what is this row's total, and how does it compare with the total for its region?" — in the same result.
+A normal aggregate such as `SUM` or `COUNT` collapses many rows into one: `GROUP BY` gives you one row per group and the individual rows disappear. A window function does the opposite — it computes a value across a set of related rows (the "window") but keeps every row in the result, adding the computed value as a new column.
+
+In plain terms: grouping answers "what is the total per region?", while a window function answers "what is this row's total, and how does it compare with the total for its region?" — in the same result.
 
 The classic uses are rankings (top N per group), running totals, and comparing a row with its neighbours (the previous month's sales, the next order). Interviewers love window functions because they separate people who know SQL from people who only know `GROUP BY`.
 

@@ -10,13 +10,15 @@ tags: [Kubernetes, Pods, Deployments]
 prerequisites: [dv-docker-containers, dv-dockerfiles-images]
 related: [dv-cicd-pipelines, dv-deploying-java-aws]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How Kubernetes schedules pods, exposes them with services, and rolls out new versions with deployments for a containerised Java service.
 ---
 
 ## Overview
 
-Docker lets you run a container on one machine. Kubernetes answers the next question: how do you run many containers across many machines, keep them healthy, expose them to traffic, and update them without downtime? Kubernetes is a container orchestrator. You describe the desired state, how many copies of your application should run, which image they use, and how they should be reached, and Kubernetes continuously works to make the actual state match that description, replacing failed containers and rescheduling work when a node dies.
+Docker lets you run a container on one machine. Kubernetes answers the next question: how do you run many containers across many machines, keep them healthy, expose them to traffic, and update them without downtime? Kubernetes is a container orchestrator.
+
+You describe the desired state, how many copies of your application should run, which image they use, and how they should be reached, and Kubernetes continuously works to make the actual state match that description, replacing failed containers and rescheduling work when a node dies.
 
 For a Java developer, Kubernetes is where your Spring Boot container goes after CI builds it. You rarely write Kubernetes internals, but you do write the manifests for your service, understand why a pod restarted, read service networking, and design your application to be a good Kubernetes citizen: stateless, health-checkable, and quick to start and stop.
 

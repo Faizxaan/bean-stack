@@ -10,13 +10,15 @@ tags: [Spring Boot, scheduling, Scheduled, cron, Async]
 prerequisites: [spring-boot-autoconfig, executors-completablefuture]
 related: [spring-cloud-basics, logging-testing-docs, actuator-microservices-deployment]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: Running code on a schedule with @Scheduled and in the background with @Async — and the thread-pool traps.
 ---
 
 ## Overview
 
-Some work does not happen because a user asked for it — it happens because the clock says so: a nightly report, an hourly cache refresh, a cleanup job that deletes expired sessions. Spring Boot runs that work with `@Scheduled`, and runs slow work in the background with `@Async` so the caller does not wait. In plain terms: `@Scheduled` says "run this method repeatedly", `@Async` says "run this method on another thread and let me carry on". Both are one annotation away, and both have a thread-pool trap that bites in production if you do not know it is there.
+Some work does not happen because a user asked for it — it happens because the clock says so: a nightly report, an hourly cache refresh, a cleanup job that deletes expired sessions. Spring Boot runs that work with `@Scheduled`, and runs slow work in the background with `@Async` so the caller does not wait.
+
+In plain terms: `@Scheduled` says "run this method repeatedly", `@Async` says "run this method on another thread and let me carry on". Both are one annotation away, and both have a thread-pool trap that bites in production if you do not know it is there.
 
 ## Theory
 

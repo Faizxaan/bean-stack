@@ -3,11 +3,19 @@
   --surface: #ffffff;
   --surface-2: #f1f5f9;
   --text: #0f172a;
-  --muted: #64748b;
+  /* Slate-600, not slate-500: the old #64748b was 4.76:1 on white but
+     only 4.34:1 on --surface-2 (badge / muted-block backgrounds), so
+     small muted text and default badges failed WCAG AA (4.5:1). */
+  --muted: #475569;
   --border: #e2e8f0;
   --accent: #0f766e;
   --accent-2: #14b8a6;
   --accent-soft: #ccfbf1;
+  /* Text on the primary button. Light mode: white on teal (5.47:1).
+     Dark mode used to reuse white text on the light-teal --accent
+     (#2dd4bf), which is 1.86:1 — effectively unreadable. Dark text
+     on that teal is 7.77:1. */
+  --on-accent: #ffffff;
   --warn: #b45309;
   --danger: #dc2626;
   --radius: 12px;
@@ -24,6 +32,7 @@
   --accent: #2dd4bf;
   --accent-2: #5eead4;
   --accent-soft: #134e4a;
+  --on-accent: #042f2e;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 [data-font-size="small"] { font-size: 14px; }
@@ -36,15 +45,32 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
+/* A disabled button must look disabled, not just be inert: the MCQ
+   "Check answer" button was disabled with no visual change. */
+button:disabled, .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
 :focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; border-radius: 4px; }
+/* Type scale: previously h1/h2/h3 were browser defaults, so a topic
+   title and a card title could look the same size. Headings are
+   tighter than body copy and never run wider than the measure. */
+h1 { font-size: 1.75rem; line-height: 1.25; margin: 0.4em 0 0.5em; overflow-wrap: break-word; }
+h2 { font-size: 1.35rem; line-height: 1.3; margin: 1.2em 0 0.5em; overflow-wrap: break-word; }
+h3 { font-size: 1.15rem; line-height: 1.35; margin: 1em 0 0.4em; overflow-wrap: break-word; }
+h1:first-child, h2:first-child, h3:first-child { margin-top: 0; }
+p, li { overflow-wrap: break-word; }
+/* Skip link: keyboard users previously had to Tab through the whole
+   sidebar (7 nav links + the active track tree) on every page before
+   reaching the content. Hidden until focused. */
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 100; background: var(--surface); color: var(--text); border: 2px solid var(--accent); border-radius: 8px; padding: 10px 16px; font-weight: 700; transition: top 0.15s ease; }
+.skip-link:focus { top: 12px; text-decoration: none; }
 .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); padding: 16px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; color: var(--text); }
 .brand span { color: var(--accent); }
 .main { min-width: 0; }
-.topbar { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; gap: 12px; align-items: center; }
-.container { max-width: var(--max-width); margin: 0 auto; padding: 24px 20px 64px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+.topbar { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.container { max-width: var(--max-width); margin: 0 auto; padding: 24px 20px 64px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; overflow-wrap: break-word; min-width: 0; }
 .grid { display: grid; gap: 16px; }
 .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -62,31 +88,47 @@ button { cursor: pointer; }
   .topic-layout { grid-template-columns: minmax(0, 1fr); }
   .toc { position: static; order: -1; }
 }
-.btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white; border: 1px solid var(--accent); padding: 8px 14px; border-radius: 8px; font-weight: 600; }
+/* Buttons: one style, one height. Primary buttons were ~36px tall and
+   .btn.small ~32px — below a comfortable touch target. 44px primary /
+   40px small, centred text so wrapped labels stay readable. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent); padding: 8px 14px; border-radius: 8px; font-weight: 600; min-height: 44px; text-align: center; }
 .btn.secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
-.btn.danger { background: var(--danger); border-color: var(--danger); }
-.btn.small { padding: 7px 12px; font-size: 0.9rem; }
-.input, .select, .textarea { width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; }
-.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); }
+.btn.danger { background: var(--danger); border-color: var(--danger); color: #ffffff; }
+.btn.small { padding: 7px 12px; font-size: 0.9rem; min-height: 40px; }
+.input, .select, .textarea { width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; min-height: 44px; }
+.textarea { min-height: 0; line-height: 1.6; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 600; line-height: 1.4; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); max-width: 100%; overflow-wrap: anywhere; }
 .badge.accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
 .badge.warn { background: #fef3c7; color: var(--warn); }
 [data-theme="dark"] .badge.warn { background: #78350f; color: #fde68a; }
 .progress-bar { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
 .progress-bar > div { height: 100%; background: var(--accent); }
-.nav-link { display: block; padding: 9px 10px; border-radius: 8px; color: var(--text); }
+/* Nav links were ~37px tall; 44px minimum keeps them tappable and
+   gives keyboard focus a roomier target. */
+.nav-link { display: flex; align-items: center; padding: 12px 10px; border-radius: 8px; color: var(--text); min-height: 44px; }
 .nav-link:hover { background: var(--surface-2); text-decoration: none; }
 .nav-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+/* Reading measure: at the wide setting a topic column ran to ~100+
+   characters per line. 75ch keeps prose comfortable without
+   narrowing cards or lists elsewhere. */
+.topic-body { max-width: 75ch; line-height: 1.7; }
 .topic-body h2 { margin-top: 28px; border-bottom: 1px solid var(--border); padding-bottom: 6px; scroll-margin-top: 80px; }
-.table-scroll { overflow-x: auto; margin: 12px 0; }
-.table-scroll table { margin: 0; }
-.topic-body h3 { margin-top: 20px; }
-.topic-body pre { background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 0.9rem; }
+.table-scroll { overflow-x: auto; margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; }
+.table-scroll table { margin: 0; border: none; }
+.topic-body h3 { margin-top: 20px; scroll-margin-top: 80px; }
+/* Code blocks: keyboard-scrollable (see MarkdownView tabIndex) and
+   never wider than their container; long lines scroll inside the
+   block instead of pushing the whole page sideways. */
+.topic-body pre { background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.55; tab-size: 2; max-width: 100%; }
 [data-theme="dark"] .topic-body pre { background: #020617; }
 .topic-body code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.topic-body :not(pre) > code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
-.topic-body table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-.topic-body th, .topic-body td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+.topic-body :not(pre) > code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+.topic-body table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }
+.topic-body th, .topic-body td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+.topic-body th { background: var(--surface-2); font-weight: 700; }
 .topic-body blockquote { border-left: 4px solid var(--accent); margin: 14px 0; padding: 8px 14px; background: var(--surface-2); border-radius: 0 8px 8px 0; }
+.topic-body ul, .topic-body ol { padding-left: 24px; }
+.topic-body li { margin-bottom: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .breadcrumb { display: flex; flex-wrap: wrap; gap: 2px; color: var(--muted); font-size: 0.9rem; margin-bottom: 4px; }
 .breadcrumb-item { min-width: 0; }
@@ -100,13 +142,17 @@ button { cursor: pointer; }
 @media (max-width: 600px) {
   .topic-nav-top .topic-nav-label { max-width: 110px; }
   .topbar .kbd { display: none; }
+  .container { padding: 20px 16px 48px; }
+  h1 { font-size: 1.5rem; }
+  .card { padding: 16px; }
+  .topbar { padding: 10px 12px; }
 }
 .topic-nav-bottom { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
 .topic-nav-bottom > * { min-width: 0; overflow-wrap: anywhere; }
 .topic-bottom-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
 .topic-layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 20px; }
 .topic-layout > * { min-width: 0; }
-.back-to-top { position: fixed; right: 16px; bottom: 16px; z-index: 30; display: inline-flex; align-items: center; gap: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow); padding: 10px 16px; font-weight: 600; cursor: pointer; }
+.back-to-top { position: fixed; right: 16px; bottom: 16px; z-index: 30; display: inline-flex; align-items: center; gap: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow); padding: 10px 16px; font-weight: 600; cursor: pointer; min-height: 44px; }
 .back-to-top:hover { background: var(--accent-soft); }
 .topic-arrows { display: none; }
 /* Fixed chevrons were gated at 1400px, but at 1400–1487px the 1080px
@@ -122,14 +168,25 @@ button { cursor: pointer; }
   .topic-arrow.disabled { opacity: 0.35; }
 }
 .toc { position: sticky; top: 76px; }
-.toc a { display: block; padding: 4px 0; color: var(--muted); font-size: 0.9rem; }
+.toc a { display: block; padding: 8px 0; color: var(--muted); font-size: 0.9rem; }
 .toc a.active { color: var(--accent); font-weight: 700; }
 .skeleton { background: var(--surface-2); border-radius: 8px; animation: pulse 1.4s ease-in-out infinite; min-height: 18px; }
 @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 [data-reduced-motion="true"] * { animation: none !important; transition: none !important; }
+/* The user's toggle is not the only signal: honour the OS setting
+   too, even when the in-app toggle is off. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
 .palette-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50; display: flex; align-items: flex-start; justify-content: center; padding-top: 12vh; }
-.palette { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: min(640px, 92vw); max-height: 70vh; overflow: auto; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+.palette { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: min(640px, 92vw); max-height: 70vh; overflow: auto; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); overscroll-behavior: contain; }
 .kbd { font-family: ui-monospace, monospace; font-size: 0.78rem; background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+/* Storage-save failure banner (AppContext reports a LocalStorage
+   write failure; Layout renders this). It must be impossible to miss
+   and must offer the fix — export — not just the bad news. */
+.save-error-banner { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: var(--radius); padding: 12px 16px; margin: 16px 20px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+[data-theme="dark"] .save-error-banner { background: #450a0a; border-color: #7f1d1d; color: #fecaca; }
+.save-error-banner a { color: inherit; font-weight: 700; }
 /* Interview Prep redesign (2026-11-12): module cards, topic groups and
    question cards. Reuses the existing variables/cards/badges/buttons,
    so light and dark mode both work without a second design system. */
@@ -156,7 +213,10 @@ button { cursor: pointer; }
 .area-topic-label:first-child { margin-top: 4px; }
 .iv-area-jump { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
 .topic-group-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.topic-group-toggle { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--text); font: inherit; text-align: left; padding: 4px 0; min-width: 0; }
+/* The area-group heading is an h2 wrapping the disclosure button, so
+   heading navigation works; the button itself is the tap target. */
+.topic-group-heading { margin: 0; font-size: 1.05rem; line-height: 1.35; min-width: 0; flex: 1; }
+.topic-group-toggle { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--text); font: inherit; text-align: left; padding: 8px 0; min-width: 0; min-height: 44px; }
 .topic-group-toggle:hover { color: var(--accent); }
 .topic-group-track { color: var(--muted); font-weight: 400; }
 .topic-group-count { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
@@ -166,17 +226,25 @@ button { cursor: pointer; }
 .cat-heading { margin: 0 0 10px; font-size: 1rem; }
 .q-list { display: grid; gap: 12px; }
 .q-card { padding: 16px; }
-.q-question { margin: 0 0 8px; font-size: 1.05rem; line-height: 1.4; }
-.q-badges { margin: 0 0 10px; color: var(--muted); }
-.q-try, .q-preview { color: var(--muted); margin: 0 0 12px; }
+.q-question { margin: 0 0 8px; font-size: 1.05rem; line-height: 1.4; overflow-wrap: break-word; }
+/* Badges used to be one long unwrapped line that could overflow a
+   phone screen when a topic title was long. They wrap now. */
+.q-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 10px; color: var(--muted); }
+.q-try, .q-preview { color: var(--muted); margin: 0 0 12px; max-width: 75ch; line-height: 1.7; }
 .q-answer { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 8px; }
+.q-answer h2 { font-size: 1.1rem; margin: 14px 0 4px; }
+.q-answer h2:first-child { margin-top: 8px; }
 .q-answer h4 { margin: 14px 0 4px; }
 .q-answer h4:first-child { margin-top: 8px; }
-.q-answer p { margin: 0 0 8px; white-space: pre-wrap; }
+.q-answer p { margin: 0 0 8px; white-space: pre-wrap; max-width: 75ch; line-height: 1.7; }
 .q-answer ul { margin: 0 0 8px; }
 .q-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .q-page { margin-top: 8px; }
 .iv-empty { margin-bottom: 16px; }
+/* Practice card titles were <strong>, invisible to heading
+   navigation. They are h3 now, styled to look the same. */
+.practice-title { margin: 0 0 4px; font-size: 1.05rem; line-height: 1.4; overflow-wrap: break-word; }
+.practice-section-title { margin-top: 0; font-size: 1.1rem; }
 @media (max-width: 900px) {
   .iv-howto { grid-template-columns: 1fr; }
   .iv-filter .select { min-width: 0; width: 100%; }
@@ -188,4 +256,6 @@ button { cursor: pointer; }
   .sidebar, .topbar { display: none !important; }
   .app-shell { display: block; }
   .card { box-shadow: none; }
+  .topic-body pre, .card { break-inside: avoid; }
+  a { color: var(--text); }
 }

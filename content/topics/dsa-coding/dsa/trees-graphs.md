@@ -10,7 +10,7 @@ tags: [Trees, Graphs, BFS, DFS, Binary Search Tree]
 prerequisites: [dsa-arrays-strings, collections-framework]
 related: [dsa-dynamic-programming, dsa-patterns]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "Binary trees, binary search trees, and graphs in Java, with BFS, DFS, traversal orders, and the recursion and cycle pitfalls interviewers probe."
 ---
 
@@ -24,7 +24,9 @@ In interviews, tree questions test recursion and traversal order; graph question
 
 ### Trees
 
-A binary tree node has at most two children, conventionally called left and right. A binary search tree (BST) adds an ordering invariant: every value in the left subtree is smaller than the node's value, and every value in the right subtree is larger (with a stated rule for duplicates). That invariant makes search, insertion, and deletion O(h), where h is the height — O(log n) for a balanced tree, O(n) for a degenerate tree that is effectively a linked list. Java's `TreeMap` and `TreeSet` are balanced BSTs (red-black trees) and guarantee O(log n) operations; they are not a substitute for writing a tree node class in an interview, but they are the right tool in production code.
+A binary tree node has at most two children, conventionally called left and right. A binary search tree (BST) adds an ordering invariant: every value in the left subtree is smaller than the node's value, and every value in the right subtree is larger (with a stated rule for duplicates).
+
+That invariant makes search, insertion, and deletion O(h), where h is the height — O(log n) for a balanced tree, O(n) for a degenerate tree that is effectively a linked list. Java's `TreeMap` and `TreeSet` are balanced BSTs (red-black trees) and guarantee O(log n) operations; they are not a substitute for writing a tree node class in an interview, but they are the right tool in production code.
 
 Traversal orders matter and are defined by when the node itself is visited relative to its children: preorder (node, left, right), inorder (left, node, right), and postorder (left, right, node). Inorder traversal of a BST yields values in sorted order — a fact interviewers love to ask. Level-order traversal visits nodes level by level, which is BFS on a tree and needs a queue. Depth of a node is its distance from the root; height of a tree is the longest root-to-leaf path. A complete binary tree can be stored in an array (a heap does this); a general tree needs node objects with references.
 

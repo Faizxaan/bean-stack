@@ -10,13 +10,15 @@ tags: [Git, Branching, Merging]
 prerequisites: [dv-git-fundamentals]
 related: [dv-cicd-pipelines]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How branches, merges, rebases, and pull requests work in practice, and how Java teams keep a main branch releasable.
 ---
 
 ## Overview
 
-Branching is the feature that makes Git workflows possible. Because a branch is just a pointer to a commit, creating one is instant, and a team can give every feature, bug fix, and experiment its own branch without copying any code. Work happens in isolation, gets reviewed through a pull request, is checked by CI, and only then joins the main branch. This topic explains the mechanics of branching, merging, and rebasing, and the team conventions that keep those mechanics from turning into chaos.
+Branching is the feature that makes Git workflows possible. Because a branch is just a pointer to a commit, creating one is instant, and a team can give every feature, bug fix, and experiment its own branch without copying any code.
+
+Work happens in isolation, gets reviewed through a pull request, is checked by CI, and only then joins the main branch. This topic explains the mechanics of branching, merging, and rebasing, and the team conventions that keep those mechanics from turning into chaos.
 
 For a Java developer, this is daily work, not theory. You will branch for a Spring Boot endpoint, rebase onto the latest main, resolve a conflict in a service class, and open a pull request that a teammate reviews before merge. Interviewers care about this topic because it reveals whether you can work safely in a shared codebase.
 

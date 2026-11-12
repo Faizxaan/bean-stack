@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { accuracyByTopic, isDue, nextDueDate, progressStats, searchScore, studyStreak, validateImport, weakTopics } from './utils'
+import { accuracyByTopic, formatDate, isDue, nextDueDate, progressStats, searchScore, studyStreak, validateImport, weakTopics } from './utils'
 
 describe('progressStats', () => {
   it('computes completed / in-progress / percent', () => {
@@ -52,6 +52,20 @@ describe('studyStreak', () => {
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
     expect(studyStreak([today, yesterday])).toBe(2)
     expect(studyStreak(['2000-01-01'])).toBe(0)
+  })
+})
+
+describe('formatDate', () => {
+  it('renders an ISO timestamp as a readable date, never the raw timestamp', () => {
+    // Topic pages used to print "Updated 2026-11-04T00:00:00.000Z".
+    const out = formatDate('2026-11-04T00:00:00.000Z')
+    expect(out).not.toContain('T00:00:00')
+    expect(out).toContain('2026')
+    expect(out).toContain('Nov')
+  })
+  it('returns an em dash for missing or invalid input', () => {
+    expect(formatDate(null)).toBe('—')
+    expect(formatDate('not-a-date')).toBe('—')
   })
 })
 

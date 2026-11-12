@@ -10,13 +10,15 @@ tags: [Design Patterns, SOLID, Architecture]
 prerequisites: [oop-principles, collections-framework]
 related: [spring-ioc-di, spring-mvc-rest]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: SOLID in plain language, plus the patterns interviewers actually ask about — Singleton, Factory, Builder, Strategy, Observer, and Decorator — with Java examples.
 ---
 
 ## Overview
 
-Design patterns are reusable solutions to recurring design problems, not code to copy blindly. SOLID is a set of five principles that help you judge whether a design will stay maintainable as it changes: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion — each explained in the Theory section below. Interviewers rarely want a recitation of all 23 Gang of Four patterns — they want to see whether you can pick the right pattern for a problem and explain its trade-offs.
+Design patterns are reusable solutions to recurring design problems, not code to copy blindly. SOLID is a set of five principles that help you judge whether a design will stay maintainable as it changes: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion — each explained in the Theory section below.
+
+Interviewers rarely want a recitation of all 23 Gang of Four patterns — they want to see whether you can pick the right pattern for a problem and explain its trade-offs.
 
 ## Theory
 

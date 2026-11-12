@@ -20,7 +20,7 @@ describe('split content index', () => {
     // Module 0 revision prompts, which moved to content/revision.
     expect(contentIndex.interviewQuestionIds.length).toBe(329)
     expect(contentIndex.revisionPromptIds.length).toBe(37)
-    expect(contentIndex.practiceItemIds.length).toBe(183)
+    expect(contentIndex.practiceItemIds.length).toBe(184)
     // Full bodies must not be properties of the slim index at all.
     expect('interviewQuestions' in contentIndex).toBe(false)
     expect('practiceItems' in contentIndex).toBe(false)
@@ -53,7 +53,7 @@ describe('split content index', () => {
 
   it('lazy practice loader returns all items and the ids match the slim index', async () => {
     const items = await loadPracticeItems()
-    expect(items.length).toBe(183)
+    expect(items.length).toBe(184)
     expect(new Set(items.map(i => i.id))).toEqual(new Set(contentIndex.practiceItemIds))
   })
 
@@ -67,6 +67,6 @@ describe('split content index', () => {
   it('loadFullContent loads both collections together', async () => {
     const full = await loadFullContent()
     expect(full.interviewQuestions.length).toBe(329)
-    expect(full.practiceItems.length).toBe(183)
+    expect(full.practiceItems.length).toBe(184)
   })
 })

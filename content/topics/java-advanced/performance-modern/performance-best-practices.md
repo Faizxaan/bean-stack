@@ -10,7 +10,7 @@ tags: [Performance, Profiling, JVM, Optimization]
 prerequisites: [garbage-collection, concurrency-basics]
 related: [garbage-collection, concurrency-basics]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Measure first with a profiler, then fix the real bottleneck, which is usually allocation, I/O, locking, or an algorithm rather than a micro-optimization.
 ---
 
@@ -32,15 +32,21 @@ No amount of tuning rescues a poor algorithm. A linear scan inside a loop become
 
 ### Allocation, strings, and boxing
 
-Allocation is cheap in Java, but it is not free. Every object allocated must eventually be collected, and high allocation rates increase garbage collection work and pause pressure. The usual culprits are objects created inside hot loops, temporary strings built by concatenation in a loop, and boxed numbers. Concatenating strings with `+` inside a loop creates a new string on each iteration, while `StringBuilder` accumulates into one buffer. Prefer primitives to boxed types in hot code, because boxing allocates an object per value and unboxing on every use adds work. Streams and lambdas are readable and often fast enough, but they create objects for pipelines and lambdas, so a hot inner loop may still be better written as a plain loop after profiling shows it matters. None of this means avoiding objects everywhere; it means not allocating them where profiling shows the cost is real.
+Allocation is cheap in Java, but it is not free. Every object allocated must eventually be collected, and high allocation rates increase garbage collection work and pause pressure. The usual culprits are objects created inside hot loops, temporary strings built by concatenation in a loop, and boxed numbers. Concatenating strings with `+` inside a loop creates a new string on each iteration, while `StringBuilder` accumulates into one buffer.
+
+Prefer primitives to boxed types in hot code, because boxing allocates an object per value and unboxing on every use adds work. Streams and lambdas are readable and often fast enough, but they create objects for pipelines and lambdas, so a hot inner loop may still be better written as a plain loop after profiling shows it matters. None of this means avoiding objects everywhere; it means not allocating them where profiling shows the cost is real.
 
 ### Garbage collection and memory
 
-Garbage collection tuning starts with understanding the collector and the heap, not with copying flags from a blog post. The default collectors in modern Java handle most workloads well, and the first tuning step is usually sizing the heap appropriately and checking that the application is not retaining memory it no longer needs. Long-lived caches need bounds and eviction, listeners and static collections need removal when they are no longer used, and large objects such as byte arrays should be reused or streamed rather than held in memory whole. Watch for allocation rate and pause times rather than total heap size alone, because a large heap that fills with garbage still collects, just less often and for longer.
+Garbage collection tuning starts with understanding the collector and the heap, not with copying flags from a blog post. The default collectors in modern Java handle most workloads well, and the first tuning step is usually sizing the heap appropriately and checking that the application is not retaining memory it no longer needs.
+
+Long-lived caches need bounds and eviction, listeners and static collections need removal when they are no longer used, and large objects such as byte arrays should be reused or streamed rather than held in memory whole. Watch for allocation rate and pause times rather than total heap size alone, because a large heap that fills with garbage still collects, just less often and for longer.
 
 ### I/O, concurrency, and locking
 
-In most server applications, the bottleneck is not the CPU but waiting: database queries, HTTP calls, and file I/O. Batch database work instead of issuing one query per row, fetch only the columns you need, and avoid the pattern where one query returns a list and then each item triggers another query. On the concurrency side, a lock held during a slow operation serializes everything that needs that lock, so keep critical sections short and never call unknown or slow code while holding a lock. Contended locks show up in profilers as blocked threads, and the fix is usually finer-grained locking, a concurrent collection, or restructuring so shared mutable state is not needed at all. For I/O-bound workloads, virtual threads in Java 21 let many blocking tasks run concurrently without the complexity of asynchronous pipelines.
+In most server applications, the bottleneck is not the CPU but waiting: database queries, HTTP calls, and file I/O. Batch database work instead of issuing one query per row, fetch only the columns you need, and avoid the pattern where one query returns a list and then each item triggers another query.
+
+On the concurrency side, a lock held during a slow operation serializes everything that needs that lock, so keep critical sections short and never call unknown or slow code while holding a lock. Contended locks show up in profilers as blocked threads, and the fix is usually finer-grained locking, a concurrent collection, or restructuring so shared mutable state is not needed at all. For I/O-bound workloads, virtual threads in Java 21 let many blocking tasks run concurrently without the complexity of asynchronous pipelines.
 
 ### Caching and common sense limits
 

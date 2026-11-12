@@ -10,13 +10,15 @@ tags: [SQL, joins, indexes, transactions, ACID, isolation]
 prerequisites: [db-sql-fundamentals]
 related: [db-sql-java-developers, spring-data-jpa]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "How joins combine tables, how indexes speed up reads at a cost to writes, and how transactions and isolation levels keep concurrent work correct."
 ---
 
 ## Overview
 
-Three ideas decide whether a relational database is fast and correct under real load: joins, which combine rows from multiple tables; indexes, which let the database find rows without scanning whole tables; and transactions, which bundle several statements into one atomic unit. Each is simple in isolation and full of traps in combination — a wrong join silently drops or multiplies rows, an index that helps one query slows another, and a transaction at the wrong isolation level lets two users corrupt each other's work.
+Three ideas decide whether a relational database is fast and correct under real load: joins, which combine rows from multiple tables; indexes, which let the database find rows without scanning whole tables; and transactions, which bundle several statements into one atomic unit.
+
+Each is simple in isolation and full of traps in combination — a wrong join silently drops or multiplies rows, an index that helps one query slows another, and a transaction at the wrong isolation level lets two users corrupt each other's work.
 
 This topic explains each idea, how they interact, and what to say in interviews when asked to design for correctness first and speed second.
 
@@ -24,7 +26,9 @@ This topic explains each idea, how they interact, and what to say in interviews 
 
 ### Joins: combining tables by a shared key
 
-A join pairs rows from two tables where a condition holds, usually equality between a foreign key and a primary key. INNER JOIN keeps only pairs that match on both sides. LEFT JOIN keeps every row from the left table and fills the right side with NULLs where nothing matches — the standard way to find "customers with no orders". RIGHT JOIN is the mirror image and is rarely used in practice; most developers swap the table order and use LEFT JOIN. FULL OUTER JOIN keeps unmatched rows from both sides. CROSS JOIN pairs every row with every row, producing a Cartesian product, and is almost always a mistake unless you genuinely want all combinations. A self-join joins a table to itself, for example an employees table joined on manager_id to find each employee's manager.
+A join pairs rows from two tables where a condition holds, usually equality between a foreign key and a primary key. INNER JOIN keeps only pairs that match on both sides. LEFT JOIN keeps every row from the left table and fills the right side with NULLs where nothing matches — the standard way to find "customers with no orders".
+
+RIGHT JOIN is the mirror image and is rarely used in practice; most developers swap the table order and use LEFT JOIN. FULL OUTER JOIN keeps unmatched rows from both sides. CROSS JOIN pairs every row with every row, producing a Cartesian product, and is almost always a mistake unless you genuinely want all combinations. A self-join joins a table to itself, for example an employees table joined on manager_id to find each employee's manager.
 
 The classic silent bug is a join that multiplies rows. If you join orders to order_items and then SUM the order total, the total is counted once per item, not once per order. Aggregate before joining, or aggregate over distinct keys, whenever the join fans out to many rows per parent.
 
@@ -38,7 +42,9 @@ Indexes are not free. Every INSERT, UPDATE, and DELETE must maintain every index
 
 A transaction is a sequence of statements that succeeds or fails as a unit. ACID describes its guarantees: Atomicity (all statements apply or none do), Consistency (the database moves from one valid state to another, with constraints intact), Isolation (concurrent transactions do not visibly interfere), and Durability (once committed, the result survives crashes, via the write-ahead log).
 
-Isolation is a spectrum, not a switch. The SQL standard defines four levels, from weakest to strongest: READ UNCOMMITTED allows dirty reads of uncommitted data and is almost never used; READ COMMITTED, the default in PostgreSQL and Oracle, sees only committed data but can see different data if it re-reads a row (non-repeatable reads) and can see new rows appear (phantom reads); REPEATABLE READ prevents non-repeatable reads but may still allow phantoms depending on the database; SERIALIZABLE prevents all three anomalies and behaves as if transactions ran one after another, at the cost of aborts under contention. MySQL's InnoDB default is REPEATABLE READ. Lost updates — two transactions reading the same balance and both writing back a stale result — are prevented by locking the row (SELECT ... FOR UPDATE) or by optimistic locking with a version column, both of which Java developers meet through JPA's `@Version`.
+Isolation is a spectrum, not a switch. The SQL standard defines four levels, from weakest to strongest: READ UNCOMMITTED allows dirty reads of uncommitted data and is almost never used; READ COMMITTED, the default in PostgreSQL and Oracle, sees only committed data but can see different data if it re-reads a row (non-repeatable reads) and can see new rows appear (phantom reads); REPEATABLE READ prevents non-repeatable reads but may still allow phantoms depending on the database; SERIALIZABLE prevents all three anomalies and behaves as if transactions ran one after another, at the cost of aborts under contention.
+
+MySQL's InnoDB default is REPEATABLE READ. Lost updates — two transactions reading the same balance and both writing back a stale result — are prevented by locking the row (SELECT ... FOR UPDATE) or by optimistic locking with a version column, both of which Java developers meet through JPA's `@Version`.
 
 ## Key Concepts
 

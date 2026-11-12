@@ -10,13 +10,15 @@ tags: [TypeScript, Generics, Utility Types]
 prerequisites: [fe-ts-types]
 related: [fe-ts-react]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How generics let one function or type work safely over many types, with constraints, defaults, and the utility types used every day.
 ---
 
 ## Overview
 
-Without generics, a reusable helper faces a bad choice: write it once per type, or write it once with `any` and lose all type safety. Generics are the third option: write the helper once, parameterise it by type, and let each caller supply the concrete type. The compiler then checks each use as if a specialised version had been written. Generics appear everywhere in real code — arrays, promises, React hooks, and API helpers — so fluency here pays off immediately.
+Without generics, a reusable helper faces a bad choice: write it once per type, or write it once with `any` and lose all type safety. Generics are the third option: write the helper once, parameterise it by type, and let each caller supply the concrete type.
+
+The compiler then checks each use as if a specialised version had been written. Generics appear everywhere in real code — arrays, promises, React hooks, and API helpers — so fluency here pays off immediately.
 
 ## Theory
 

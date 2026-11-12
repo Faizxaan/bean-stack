@@ -10,13 +10,15 @@ tags: [Arrays, Strings, Two Pointers, Sliding Window]
 prerequisites: [collections-framework, strings]
 related: [dsa-patterns, dsa-complexities]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "How arrays and strings work in Java, and the two-pointer, sliding-window, and prefix techniques that solve most interview problems on them."
 ---
 
 ## Overview
 
-Arrays and strings are the starting point of almost every coding interview, because almost every harder problem is built on them. In Java, an array is a fixed-size, contiguous block of elements of one type, accessed by index in constant time. A `String` is an immutable sequence of characters backed by a byte array in modern Java, which means every "modification" really creates a new string. If you understand those two facts — fast index access for arrays, and immutability for strings — most array and string problems become a question of choosing the right scan, not of remembering tricks.
+Arrays and strings are the starting point of almost every coding interview, because almost every harder problem is built on them. In Java, an array is a fixed-size, contiguous block of elements of one type, accessed by index in constant time.
+
+A `String` is an immutable sequence of characters backed by a byte array in modern Java, which means every "modification" really creates a new string. If you understand those two facts — fast index access for arrays, and immutability for strings — most array and string problems become a question of choosing the right scan, not of remembering tricks.
 
 This topic covers the core techniques: two pointers, sliding window, prefix sums, and in-place manipulation, plus the Java-specific pitfalls around strings, character handling, and array copying.
 

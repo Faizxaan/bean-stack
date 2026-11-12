@@ -10,13 +10,15 @@ tags: [Complexity, Big O, Analysis, Performance]
 prerequisites: [collections-framework]
 related: [dsa-arrays-strings, dsa-patterns]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "Big O, Big Theta, and Big Omega explained plainly, with a complexity table for common structures and operations and the analysis mistakes interviewers watch for."
 ---
 
 ## Overview
 
-Complexity analysis is the language interviewers use to compare solutions. Saying "my solution is fast" means nothing; saying "it is O(n log n) time and O(n) space, versus O(n squared) for the brute force" tells the interviewer exactly what scales and what does not. This topic explains asymptotic notation without unnecessary formalism, gives the complexities of the operations you will actually use in Java, and covers the analysis mistakes that cost marks: confusing worst case with average case, forgetting hidden costs such as string concatenation or HashMap resizing, and quoting a complexity without stating what n means.
+Complexity analysis is the language interviewers use to compare solutions. Saying "my solution is fast" means nothing; saying "it is O(n log n) time and O(n) space, versus O(n squared) for the brute force" tells the interviewer exactly what scales and what does not.
+
+This topic explains asymptotic notation without unnecessary formalism, gives the complexities of the operations you will actually use in Java, and covers the analysis mistakes that cost marks: confusing worst case with average case, forgetting hidden costs such as string concatenation or HashMap resizing, and quoting a complexity without stating what n means.
 
 Big O is not about exact running time on one machine. It describes how running time or memory grows as the input grows, ignoring constant factors and lower-order terms, because those stop mattering at scale. An O(n) algorithm with a large constant can be slower than an O(n squared) algorithm for tiny inputs — and interviewers expect you to know that, and to still prefer the better asymptotic complexity for production-scale data.
 
@@ -24,7 +26,9 @@ Big O is not about exact running time on one machine. It describes how running t
 
 ### The three notations
 
-Big O, O(f(n)), is an upper bound: the running time grows at most like f(n), up to constant factors, for large n. It is what people usually mean when they say "complexity", and interviewers normally ask for the worst-case Big O. Big Omega is a lower bound: the running time grows at least like f(n). Big Theta is a tight bound: the running time grows like f(n) both above and below, so Theta is the precise statement when upper and lower bounds coincide. In practice, say "O" for the worst case unless the interviewer asks for a tight bound, and be ready to distinguish worst, average, and best cases: quicksort is O(n squared) worst case but O(n log n) average case, and binary search is O(log n) worst case but O(1) best case (the middle element matches immediately).
+Big O, O(f(n)), is an upper bound: the running time grows at most like f(n), up to constant factors, for large n. It is what people usually mean when they say "complexity", and interviewers normally ask for the worst-case Big O. Big Omega is a lower bound: the running time grows at least like f(n).
+
+Big Theta is a tight bound: the running time grows like f(n) both above and below, so Theta is the precise statement when upper and lower bounds coincide. In practice, say "O" for the worst case unless the interviewer asks for a tight bound, and be ready to distinguish worst, average, and best cases: quicksort is O(n squared) worst case but O(n log n) average case, and binary search is O(log n) worst case but O(1) best case (the middle element matches immediately).
 
 Formally, O(f(n)) means there exist constants c and n0 such that the running time is at most c times f(n) for all n beyond n0. The constants are why O(2n) is written O(n) and O(n squared + n) is written O(n squared): lower-order terms and constant factors are dropped. That simplification is a feature, not sloppiness — it is what makes complexities comparable across machines and implementations.
 

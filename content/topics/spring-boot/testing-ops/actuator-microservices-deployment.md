@@ -10,13 +10,15 @@ tags: [Spring Boot, Actuator, Microservices, Docker, Deployment]
 prerequisites: [spring-boot-autoconfig, spring-data-jpa]
 related: [configuration-profiles, logging-testing-docs, security-jwt]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How Actuator exposes production-ready endpoints, how microservices split a system, and how a Spring Boot application is containerized and deployed.
 ---
 
 ## Overview
 
-Shipping an application is only half the job; running it is the other half. Spring Boot Actuator gives you built-in endpoints for health, metrics, and configuration so operations can see what a running service is doing. Microservices take that further by splitting a system into independently deployable services. And containerization — packaging the application with its runtime into a Docker image — is how most teams actually deploy those services today. These three ideas belong together because they answer the same question: what does it take to run this thing in production?
+Shipping an application is only half the job; running it is the other half. Spring Boot Actuator gives you built-in endpoints for health, metrics, and configuration so operations can see what a running service is doing. Microservices take that further by splitting a system into independently deployable services.
+
+And containerization — packaging the application with its runtime into a Docker image — is how most teams actually deploy those services today. These three ideas belong together because they answer the same question: what does it take to run this thing in production?
 
 ## Theory
 

@@ -10,13 +10,15 @@ tags: [JDBC, SQL, Networking, Sockets, HTTP]
 prerequisites: [exception-handling]
 related: [exception-handling, collections-framework]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: JDBC connects Java code to relational databases with SQL and prepared statements, while sockets and HTTP clients connect it to services over a network.
 ---
 
 ## Overview
 
-Most Java applications talk to two kinds of external system: a database and a network service. JDBC is the standard Java API for relational databases, giving you connections, statements, and result sets in a database-independent way. Networking in plain Java is built on sockets for raw TCP communication and on `HttpClient` for HTTP. In modern Spring applications you will usually work through Spring Data JPA or a web client rather than raw JDBC or sockets, but understanding this layer explains connection handling, transactions, and failure modes that higher-level frameworks hide from you.
+Most Java applications talk to two kinds of external system: a database and a network service. JDBC is the standard Java API for relational databases, giving you connections, statements, and result sets in a database-independent way. Networking in plain Java is built on sockets for raw TCP communication and on `HttpClient` for HTTP.
+
+In modern Spring applications you will usually work through Spring Data JPA or a web client rather than raw JDBC or sockets, but understanding this layer explains connection handling, transactions, and failure modes that higher-level frameworks hide from you.
 
 ## Theory
 
@@ -40,7 +42,9 @@ Transaction isolation levels control what one transaction can observe of concurr
 
 ### Sockets
 
-A socket is one endpoint of a two-way network connection. A client creates a `Socket` to a host and port, and a server creates a `ServerSocket` that listens on a port and accepts incoming connections, each producing its own `Socket` for that client. Data travels as streams, so you wrap the socket's input and output streams in readers and writers or buffered streams. Sockets are blocking by default, and a server that handles one client at a time will stall other clients, so real servers accept connections in a loop and hand each one to a thread or a virtual thread. Since Java 21, a virtual thread per connection is a natural fit for this pattern.
+A socket is one endpoint of a two-way network connection. A client creates a `Socket` to a host and port, and a server creates a `ServerSocket` that listens on a port and accepts incoming connections, each producing its own `Socket` for that client. Data travels as streams, so you wrap the socket's input and output streams in readers and writers or buffered streams.
+
+Sockets are blocking by default, and a server that handles one client at a time will stall other clients, so real servers accept connections in a loop and hand each one to a thread or a virtual thread. Since Java 21, a virtual thread per connection is a natural fit for this pattern.
 
 ### HTTP with HttpClient
 
@@ -48,7 +52,9 @@ A socket is one endpoint of a two-way network connection. A client creates a `So
 
 ### Errors and resources in network code
 
-Database and network calls fail in ways local code does not: connections drop, servers time out, and a query can deadlock with another transaction. JDBC reports failures as `SQLException`, a checked exception carrying a SQL state code and a vendor code, and often a chain of causes. Network code throws `IOException` and its subclasses, such as `SocketTimeoutException`. Handle these at a boundary where you can decide whether to retry, and only retry operations that are safe to repeat. A retried insert that is not idempotent can create duplicate rows. Timeouts matter here too: a request with no timeout can hang forever on a dead connection, so set connect and read timeouts on HTTP clients and query timeouts where your driver supports them.
+Database and network calls fail in ways local code does not: connections drop, servers time out, and a query can deadlock with another transaction. JDBC reports failures as `SQLException`, a checked exception carrying a SQL state code and a vendor code, and often a chain of causes. Network code throws `IOException` and its subclasses, such as `SocketTimeoutException`.
+
+Handle these at a boundary where you can decide whether to retry, and only retry operations that are safe to repeat. A retried insert that is not idempotent can create duplicate rows. Timeouts matter here too: a request with no timeout can hang forever on a dead connection, so set connect and read timeouts on HTTP clients and query timeouts where your driver supports them.
 
 ## Key Concepts
 

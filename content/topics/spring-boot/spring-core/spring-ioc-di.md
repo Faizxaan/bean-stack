@@ -7,10 +7,10 @@ order: 1
 difficulty: Intermediate
 importance: 5
 tags: [Spring, IoC, DI, Beans]
-prerequisites: [oop-principles, design-patterns-solid]
+prerequisites: [oop-principles]
 related: [spring-boot-autoconfig, spring-mvc-rest]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Inversion of Control in plain language, how Spring creates and wires beans, bean scopes and lifecycle, and why constructor injection is preferred.
 ---
 

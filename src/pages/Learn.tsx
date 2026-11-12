@@ -4,7 +4,9 @@ import { Bookmark, Star, ArrowLeft, ArrowRight, ArrowUp, Clock, ChevronDown, Che
 import { contentIndex, extractSection, getTopic, getTrack, loadTopicBody, orderedTopics, prevNextTopic, stripFrontmatter, topicsForSection } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { MarkdownView } from '../components/MarkdownView'
-import { progressStats, topicUrl } from '../lib/utils'
+import { progressStats, topicUrl, formatDate, smoothScrollBehavior } from '../lib/utils'
+import { MAX_NOTE_LENGTH } from '../lib/utils'
+import { ProgressBar } from '../components/ProgressBar'
 
 // Shared breadcrumb: Home / Learn [/ Track [/ Topic]]. The current page is
 // plain text with aria-current, never a link to itself.
@@ -40,6 +42,11 @@ export function LearnIndex() {
       <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Learn' }]} />
       <h1>Learn</h1>
       <p style={{ color: 'var(--muted)' }}>Tracks, sections, and topics — {contentIndex.tracks.length} tracks, {contentIndex.topics.length} topics. Progress below is your own, derived from your saved progress, not from the content.</p>
+      <p style={{ color: 'var(--muted)' }}>
+        <strong>New here? Start with the Beginner Roadmap</strong> in the paths section below — it takes you through six topics in order, starting with JDK, JRE &amp; JVM.
+        A <strong>track</strong> is one subject area (for example Core Java); a <strong>path</strong> is a short ordered list of topics across tracks for one goal (for example a job interview).
+        Stars (★★★★★) show how often interviewers ask about a topic — five stars means it comes up most.
+      </p>
       <div className="grid grid-2">
         {contentIndex.tracks.map(track => {
           const topics = orderedTopics(track.id)
@@ -51,7 +58,7 @@ export function LearnIndex() {
               <p style={{ color: 'var(--muted)' }}>{track.description}</p>
               {topics.length > 0 && (
                 <div style={{ marginBottom: 10 }}>
-                  <div className="progress-bar"><div style={{ width: `${s.pct}%` }} /></div>
+                  <ProgressBar pct={s.pct} label={`${s.pct}% complete in ${track.title}`} />
                   <small>{s.completed}/{s.total} complete{s.inProgress > 0 ? ` · ${s.inProgress} in progress` : ''} · {s.pct}%</small>
                 </div>
               )}
@@ -73,10 +80,11 @@ export function LearnIndex() {
             <div key={p.id} style={{ marginBottom: 20 }}>
               <strong>{p.title}</strong> — {p.description}
               <div style={{ marginTop: 6 }}>
-                <div className="progress-bar"><div style={{ width: `${s.pct}%` }} /></div>
+                <ProgressBar pct={s.pct} label={`${s.pct}% complete in ${p.title}`} />
                 <small>{s.completed}/{s.total} complete · {s.pct}%{nextUp ? <> · Next up: <Link to={topicUrl(nextUp)}>{nextUp.title}</Link></> : ' · All complete — nice work.'}</small>
               </div>
               <ol>{p.topicIds.map(id => { const t = getTopic(id); return t ? <li key={id}><Link to={topicUrl(t)}>{t.title}</Link>{data.progress[t.id] === 'completed' ? ' ✓' : ''}</li> : null })}</ol>
+              {p.id === 'beginner-roadmap' && nextUp && <p><Link className="btn" to={topicUrl(nextUp)}>Start here: {nextUp.title} →</Link></p>}
             </div>
           )
         })}
@@ -97,12 +105,12 @@ export function TrackPage() {
   return (
     <div>
       <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Learn', to: '/learn' }, { label: track.title }]} />
-      <p><Link to="/learn">← Learn</Link></p>
       <h1>{track.title} {track.comingSoon && <span className="badge warn">Coming Soon</span>}</h1>
       <p style={{ color: 'var(--muted)' }}>{track.description}</p>
+      <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Work through the sections in order. Stars (★★★★★) show how often interviewers ask about a topic — five stars means it comes up most. “Not started / In progress / Completed” is your own progress; every topic here is ready to read.</p>
       {allTopics.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
-          <div className="progress-bar"><div style={{ width: `${stats.pct}%` }} /></div>
+          <ProgressBar pct={stats.pct} label={`${stats.pct}% complete in ${track.title}`} />
           <p style={{ margin: '8px 0 0' }}>{stats.completed}/{stats.total} complete{stats.inProgress > 0 ? ` · ${stats.inProgress} in progress` : ''} · {stats.pct}%</p>
           {nextUp
             ? <Link className="btn" to={topicUrl(nextUp)}>{stats.completed === 0 && stats.inProgress === 0 ? 'Start learning: ' : 'Continue: '}{nextUp.title} →</Link>
@@ -128,7 +136,7 @@ export function TrackPage() {
                 <ul>{topics.map(t => {
                   const st = data.progress[t.id]
                   return (
-                    <li key={t.id}><Link to={topicUrl(t)}>{t.title}</Link> — {t.difficulty} · {'★'.repeat(t.importance)} · {t.readingMinutes} min · <span className="badge">{t.status}</span>{' '}<span style={{ color: st === 'completed' ? 'var(--accent)' : 'var(--muted)', fontSize: '0.9rem' }}>{userStatusLabel(st)}</span></li>
+                    <li key={t.id}><Link to={topicUrl(t)}>{t.title}</Link> — {t.difficulty} · <span title="How often interviewers ask about this topic"><span aria-hidden="true">{'★'.repeat(t.importance)}{'☆'.repeat(5 - t.importance)}</span><span className="sr-only">Importance {t.importance} of 5</span></span> · {t.readingMinutes} min · <span style={{ color: st === 'completed' ? 'var(--accent)' : 'var(--muted)', fontSize: '0.9rem' }}>{userStatusLabel(st)}</span></li>
                   )
                 })}</ul>
               )}
@@ -147,12 +155,13 @@ export function TrackPage() {
 
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen)
+  const panelId = `section-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`
   return (
     <section style={{ marginBottom: 8 }}>
-      <button className="btn secondary" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => setOpen(!open)} aria-expanded={open}>
+      <button className="btn secondary" style={{ width: '100%', justifyContent: 'space-between' }} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls={panelId}>
         <span>{title}</span><ChevronDown size={16} style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
       </button>
-      {open && <div style={{ padding: '8px 4px' }}>{children}</div>}
+      {open && <div id={panelId} style={{ padding: '8px 4px' }}>{children}</div>}
     </section>
   )
 }
@@ -181,8 +190,7 @@ export function TopicPage() {
   }, [])
 
   const scrollToTop = () => {
-    const reduced = document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+    window.scrollTo({ top: 0, behavior: smoothScrollBehavior() })
   }
 
   const copyTopicLink = async () => {
@@ -283,10 +291,9 @@ export function TopicPage() {
       <h1 style={{ marginBottom: 4 }}>{topic.title}</h1>
       <p style={{ color: 'var(--muted)', marginTop: 0 }}>
         <span className="badge">{topic.difficulty}</span> {' '}
-        <span title="Interview importance"><Star size={14} /> {'★'.repeat(topic.importance)}{'☆'.repeat(5 - topic.importance)}</span> {' '}
+        <span title="Interview importance"><Star size={14} aria-hidden="true" /> <span aria-hidden="true">{'★'.repeat(topic.importance)}{'☆'.repeat(5 - topic.importance)}</span><span className="sr-only">Importance {topic.importance} of 5</span></span> {' '}
         <span><Clock size={14} /> {topic.readingMinutes} min</span> {' '}
-        <span className="badge">{topic.status}</span> {' '}
-        {topic.lastUpdated && <span>Updated {topic.lastUpdated}</span>}
+        {topic.lastUpdated && <span>Updated {formatDate(topic.lastUpdated)}</span>}
       </p>
       {topic.tags.length > 0 && <p>{topic.tags.map(t => <span key={t} className="badge" style={{ marginRight: 6 }}>{t}</span>)}</p>}
 
@@ -299,6 +306,8 @@ export function TopicPage() {
         <button className="btn secondary small" onClick={() => setRevisionMode(!revisionMode)}>{revisionMode ? 'Full study view' : 'Quick Revision Mode'}</button>
         <button className="btn secondary small" onClick={copyTopicLink} aria-live="polite"><Link2 size={15} /> {copied === 'copied' ? 'Link copied ✓' : copied === 'failed' ? 'Copy failed — copy the URL from the address bar' : 'Copy link'}</button>
       </div>
+      {revisionMode && <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 0 }}>Quick Revision Mode shows only the short version — Overview, Key Concepts, Common Mistakes, Interview Questions and Revision Summary. Switch back to Full study view for the complete topic, including code examples.</p>}
+      {!revisionMode && <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 0 }}>Quick Revision Mode shows a short version of this topic for revising before an interview. The stars above show how often interviewers ask about this topic.</p>}
 
       <div className="topic-layout">
         <div>
@@ -307,8 +316,9 @@ export function TopicPage() {
           {body && <MarkdownView markdown={revisionMode ? revisionBody : body} />}
 
           <Section title="Personal notes">
-            <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Write what clicked, what confused you, or a link to your own example. Notes are saved in this browser only.</p>
-            <textarea className="textarea" rows={5} value={data.notes[topic.id] || ''} onChange={e => setNote(topic.id, e.target.value)} placeholder="Your notes for this topic…" aria-label="Personal notes for this topic" />
+            <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Write what clicked, what confused you, or a link to your own example. Notes are saved in this browser only, as you type — there is no Save button.</p>
+            <textarea className="textarea" rows={5} maxLength={MAX_NOTE_LENGTH} value={data.notes[topic.id] || ''} onChange={e => setNote(topic.id, e.target.value)} placeholder="Your notes for this topic…" aria-label="Personal notes for this topic" />
+            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', margin: '4px 0 0' }}>{(data.notes[topic.id] || '').length.toLocaleString()} / {MAX_NOTE_LENGTH.toLocaleString()} characters · Saved as you type</p>
           </Section>
 
           <Section title="Prerequisites & related topics">
@@ -331,7 +341,7 @@ export function TopicPage() {
           <strong>On this page</strong>
           {headings.map(h => {
             const id = h.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-            return <a key={h} href={`#${id}`} onClick={() => setActiveHeading(h)} className={activeHeading === h ? 'active' : ''}>{h}</a>
+            return <a key={h} href={`#${id}`} onClick={e => { e.preventDefault(); setActiveHeading(h); const el = document.getElementById(id); el?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }); el?.focus({ preventScroll: true }) }} className={activeHeading === h ? 'active' : ''}>{h}</a>
           })}
           {headings.length === 0 && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Headings will appear here when content loads.</p>}
           <div style={{ marginTop: 16 }}>

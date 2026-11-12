@@ -10,13 +10,15 @@ tags: [Concurrency, Java Memory Model, volatile, happens-before]
 prerequisites: [concurrency-basics, executors-completablefuture]
 related: [concurrency-basics, garbage-collection]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: The Java Memory Model defines when a write made by one thread becomes visible to another, and happens-before rules are the guarantees you program against.
 ---
 
 ## Overview
 
-Two threads can each hold a different idea of what a shared variable contains, not because of a bug in your logic but because of caching and reordering done by the processor and the compiler. The Java Memory Model, usually shortened to JMM, is the contract that tells you when a write by one thread is guaranteed to be visible to another. If your code follows its rules, visibility is predictable. If it does not, a program can appear to work in testing and fail in production under different hardware or load.
+Two threads can each hold a different idea of what a shared variable contains, not because of a bug in your logic but because of caching and reordering done by the processor and the compiler.
+
+The Java Memory Model, usually shortened to JMM, is the contract that tells you when a write by one thread is guaranteed to be visible to another. If your code follows its rules, visibility is predictable. If it does not, a program can appear to work in testing and fail in production under different hardware or load.
 
 ## Theory
 

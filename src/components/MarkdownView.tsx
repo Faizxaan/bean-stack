@@ -19,10 +19,16 @@ export function MarkdownView({ markdown }: { markdown: string }) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          // tabIndex -1: TOC links move focus here (Learn.tsx), so a
+          // keyboard user lands on the heading they jumped to instead
+          // of staying on the TOC link while the viewport moves.
           h2: ({ children }) => {
             const id = slug(children)
-            return <h2 id={id} data-heading={String(children ?? '')}>{children}</h2>
+            return <h2 id={id} tabIndex={-1} data-heading={String(children ?? '')}>{children}</h2>
           },
+          // A pre with a long line is a scrollable region; without a
+          // tab stop a keyboard user can never scroll it.
+          pre: ({ children }) => <pre tabIndex={0}>{children}</pre>,
           // Tables otherwise overflow narrow screens: the wrapper scrolls
           // horizontally instead of squeezing or clipping the table.
           table: ({ children }) => (

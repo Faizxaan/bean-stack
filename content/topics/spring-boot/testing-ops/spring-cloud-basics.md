@@ -10,31 +10,41 @@ tags: [Spring Cloud, microservices, Eureka, Config Server, Gateway, circuit brea
 prerequisites: [actuator-microservices-deployment, spring-boot-autoconfig, configuration-profiles]
 related: [spring-task-scheduling, spring-rest-clients, security-jwt, dv-deploying-java-aws]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: The Spring Cloud pieces that make microservices work — service discovery, centralised config, an API gateway, and circuit breakers.
 ---
 
 ## Overview
 
-A single Spring Boot application is simple to run; a system of ten of them is not. The services need to find each other, share configuration, present one entry point to clients, and keep working when one of them fails. Spring Cloud is the set of projects that solves those four problems. In plain terms: **service discovery** answers "where is the orders service right now?", **centralised configuration** answers "what settings does every service use?", an **API gateway** answers "how does a client reach the system?", and a **circuit breaker** answers "what do we do when a service is down?". This topic covers each piece at the level a microservices interview expects — what it does, how the pieces fit, and what has replaced the older tools.
+A single Spring Boot application is simple to run; a system of ten of them is not. The services need to find each other, share configuration, present one entry point to clients, and keep working when one of them fails. Spring Cloud is the set of projects that solves those four problems.
+
+In plain terms: **service discovery** answers "where is the orders service right now?", **centralised configuration** answers "what settings does every service use?", an **API gateway** answers "how does a client reach the system?", and a **circuit breaker** answers "what do we do when a service is down?". This topic covers each piece at the level a microservices interview expects — what it does, how the pieces fit, and what has replaced the older tools.
 
 ## Theory
 
 ### Service discovery with Eureka
 
-Services come and go — instances start, stop, and move — so hard-coding their addresses does not work. With Eureka, each service registers itself with a Eureka server on startup (sending its name, host, and port, plus a heartbeat), and other services ask the server where a named service lives instead of using a fixed URL. A client then calls the service by name (`http://order-service/orders`) and the discovery client resolves the name to a live instance, with client-side load balancing spreading calls across instances. If an instance stops sending heartbeats, Eureka removes it after a timeout, so calls stop going to dead instances. In a test or a small deployment you can run Eureka in standalone mode; in production it runs as a small cluster of its own.
+Services come and go — instances start, stop, and move — so hard-coding their addresses does not work. With Eureka, each service registers itself with a Eureka server on startup (sending its name, host, and port, plus a heartbeat), and other services ask the server where a named service lives instead of using a fixed URL.
+
+A client then calls the service by name (`http://order-service/orders`) and the discovery client resolves the name to a live instance, with client-side load balancing spreading calls across instances. If an instance stops sending heartbeats, Eureka removes it after a timeout, so calls stop going to dead instances. In a test or a small deployment you can run Eureka in standalone mode; in production it runs as a small cluster of its own.
 
 ### Centralised configuration with Config Server
 
-When ten services each have their own `application.properties`, a password rotation or a feature-flag change means ten edits and ten restarts. A Config Server holds configuration centrally (usually in a Git repository, one file per service per profile, such as `order-service-prod.yml`) and serves it over HTTP; each service fetches its configuration from the server at startup. Changing a value becomes a Git commit, with history and review, and a `/actuator/refresh` call (or Spring Cloud Bus) pushes the change to running services without a restart. Secrets still belong in a vault or a secrets manager, not in the config repository — the Config Server can encrypt values, but a Git repository is not a vault (see `configuration-profiles`).
+When ten services each have their own `application.properties`, a password rotation or a feature-flag change means ten edits and ten restarts. A Config Server holds configuration centrally (usually in a Git repository, one file per service per profile, such as `order-service-prod.yml`) and serves it over HTTP; each service fetches its configuration from the server at startup.
+
+Changing a value becomes a Git commit, with history and review, and a `/actuator/refresh` call (or Spring Cloud Bus) pushes the change to running services without a restart. Secrets still belong in a vault or a secrets manager, not in the config repository — the Config Server can encrypt values, but a Git repository is not a vault (see `configuration-profiles`).
 
 ### The API gateway
 
-Clients should not call ten services directly, each with its own address and auth rules. An API gateway is the single entry point: it routes a request to the right service by path (`/api/orders/**` → the order service), adds cross-cutting behaviour (authentication, rate limiting, logging, CORS — see `spring-interceptors-filters`), and hides the internal topology. Spring Cloud Gateway is the current gateway: it is reactive, configured with routes made of predicates (which requests match) and filters (what to do with them), and it integrates with Eureka so routes can point at service names instead of addresses. The older Netflix Zuul proxy did the same job in a blocking way; it is in maintenance mode and should not be chosen for new systems. If an interviewer asks about Zuul, the right answer is that Gateway replaced it.
+Clients should not call ten services directly, each with its own address and auth rules. An API gateway is the single entry point: it routes a request to the right service by path (`/api/orders/**` → the order service), adds cross-cutting behaviour (authentication, rate limiting, logging, CORS — see `spring-interceptors-filters`), and hides the internal topology.
+
+Spring Cloud Gateway is the current gateway: it is reactive, configured with routes made of predicates (which requests match) and filters (what to do with them), and it integrates with Eureka so routes can point at service names instead of addresses. The older Netflix Zuul proxy did the same job in a blocking way; it is in maintenance mode and should not be chosen for new systems. If an interviewer asks about Zuul, the right answer is that Gateway replaced it.
 
 ### Circuit breakers and resilience
 
-When a service you call is slow or down, waiting for it — or retrying forever — spreads the failure to your own service and then to its callers. A **circuit breaker** watches the calls: while failures are rare, calls pass through (closed); when failures pass a threshold, the breaker opens and calls fail immediately with a fallback instead of waiting (open); after a pause it lets one call through to test recovery (half-open), and closes again if it succeeds. The current implementation is Resilience4j (used through Spring Cloud Circuit Breaker, with `@CircuitBreaker` and a fallback method); the older Netflix Hystrix is retired and should not be used in new code. A **bulkhead** limits how many threads or connections one dependency may consume, so a slow dependency cannot exhaust your pool; **retries** with backoff help with transient failures but must never be applied blindly to non-idempotent writes. Together with timeouts on the client (see `spring-rest-clients`), these are the standard resilience patterns.
+When a service you call is slow or down, waiting for it — or retrying forever — spreads the failure to your own service and then to its callers. A **circuit breaker** watches the calls: while failures are rare, calls pass through (closed); when failures pass a threshold, the breaker opens and calls fail immediately with a fallback instead of waiting (open); after a pause it lets one call through to test recovery (half-open), and closes again if it succeeds.
+
+The current implementation is Resilience4j (used through Spring Cloud Circuit Breaker, with `@CircuitBreaker` and a fallback method); the older Netflix Hystrix is retired and should not be used in new code. A **bulkhead** limits how many threads or connections one dependency may consume, so a slow dependency cannot exhaust your pool; **retries** with backoff help with transient failures but must never be applied blindly to non-idempotent writes. Together with timeouts on the client (see `spring-rest-clients`), these are the standard resilience patterns.
 
 ### Distributed tracing
 

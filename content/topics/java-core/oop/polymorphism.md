@@ -10,13 +10,15 @@ tags: [OOP, polymorphism, overriding, overloading, dynamic dispatch]
 prerequisites: [oop-principles, oop-inheritance]
 related: [oop-encapsulation, oop-abstraction, generics-deep-dive]
 status: complete
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-12
 summary: The same method call behaving differently depending on the runtime object — overriding, overloading, and dynamic dispatch.
 ---
 
 ## Overview
 
-Polymorphism means "many forms": the same method call can do different things depending on the object it is called on. You write code against a general type — a superclass or an interface — and at runtime the JVM picks the version of the method that belongs to the actual object. In plain terms: you tell a group of objects to "pay" or "draw yourself", and each one does it in its own way, without the calling code knowing which kind it is dealing with.
+Polymorphism means "many forms": the same method call can do different things depending on the object it is called on. You write code against a general type — a superclass or an interface — and at runtime the JVM picks the version of the method that belongs to the actual object.
+
+In plain terms: you tell a group of objects to "pay" or "draw yourself", and each one does it in its own way, without the calling code knowing which kind it is dealing with.
 
 This is what makes code extensible. A payment service that accepts a `PaymentMethod` works with card payments, UPI payments, and any payment method invented next year, without changing a line of the service — the new type just implements the same method differently.
 

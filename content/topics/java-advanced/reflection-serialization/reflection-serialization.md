@@ -10,13 +10,15 @@ tags: [Reflection, Serialization, Java]
 prerequisites: [oop-principles]
 related: [oop-principles, exception-handling]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: Reflection lets code inspect and invoke classes at runtime and serialization turns an object graph into bytes that can be stored or sent elsewhere.
 ---
 
 ## Overview
 
-Most Java code knows at compile time which classes and methods it uses. Reflection is for the cases where it does not, such as frameworks that instantiate your classes, call your annotated methods, or map objects to JSON. Serialization is the companion idea of turning an object into a stream of bytes, so it can be written to a file, sent over a network, or cached, and later rebuilt. Both are powerful, both bypass some of the safety the compiler normally gives you, and both should be used deliberately rather than as a default way to write application code.
+Most Java code knows at compile time which classes and methods it uses. Reflection is for the cases where it does not, such as frameworks that instantiate your classes, call your annotated methods, or map objects to JSON.
+
+Serialization is the companion idea of turning an object into a stream of bytes, so it can be written to a file, sent over a network, or cached, and later rebuilt. Both are powerful, both bypass some of the safety the compiler normally gives you, and both should be used deliberately rather than as a default way to write application code.
 
 ## Theory
 

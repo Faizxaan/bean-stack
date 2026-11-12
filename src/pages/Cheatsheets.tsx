@@ -4,7 +4,7 @@ import { Bookmark, Check, Eye, EyeOff } from 'lucide-react'
 import { contentIndex, getTopic, loadCheatsheetBody, stripFrontmatter, useRevisionPrompts } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { MarkdownView } from '../components/MarkdownView'
-import { topicUrl } from '../lib/utils'
+import { topicUrl, smoothScrollBehavior } from '../lib/utils'
 import type { RevisionPrompt } from '../types'
 
 // One-minute revision deck: the 37 prompts formerly known as Module 0
@@ -83,13 +83,13 @@ function RevisionDeck() {
   // Deep links from Search / the palette / Library use #rev-<id>.
   useEffect(() => {
     if (!loaded || !location.hash.startsWith('#rev-')) return
-    document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' })
   }, [loaded, location.hash])
 
   if (!loaded) return <div className="card"><p>Loading one-minute revision prompts…</p><div className="skeleton" /></div>
   if (prompts.length === 0) return null
   return (
-    <section aria-label="One-minute revision" style={{ marginBottom: 24 }}>
+    <section aria-label="One-minute revision" id="one-minute-revision" style={{ marginBottom: 24, scrollMarginTop: 76 }}>
       <h2 style={{ marginBottom: 4 }}>One-minute revision</h2>
       <p style={{ color: 'var(--muted)', marginTop: 0 }}>
         {prompts.length} quick recap prompts across {groups.length} topics. These used to be Module 0 in Interview Prep — they are
@@ -117,10 +117,17 @@ function RevisionDeck() {
 export function CheatsheetsIndex() {
   return (
     <div>
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/">Home</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">Revision &amp; Cheatsheets</span></span>
+      </nav>
       <h1>Revision &amp; Cheatsheets</h1>
-      <p style={{ color: 'var(--muted)' }}>One combined, content-driven section: quick-reference tables, comparison tables, and print-friendly layouts. Use your browser&apos;s print function for a clean print version.</p>
+      <p style={{ color: 'var(--muted)' }}>Two ways to revise. <strong>One-minute revision</strong> is a set of quick recall prompts — try to answer each in about a minute, then reveal. <strong>Cheatsheets</strong> are one-page quick-reference tables for a topic. Use your browser&apos;s print function for a clean print version.</p>
+      <p style={{ color: 'var(--muted)' }}>On this page: <a href="#one-minute-revision">One-minute revision (37 prompts)</a> · <a href="#cheatsheets">Cheatsheets ({contentIndex.cheatsheets.length})</a></p>
       <RevisionDeck />
-      <h2 style={{ marginBottom: 4 }}>Cheatsheets</h2>
+      <h2 id="cheatsheets" style={{ marginBottom: 4, scrollMarginTop: 76 }}>Cheatsheets ({contentIndex.cheatsheets.length})</h2>
+      <p style={{ color: 'var(--muted)', marginTop: 0 }}>Each cheatsheet summarises one topic area in a few minutes. Open one to read it, or print it before an interview.</p>
       {contentIndex.cheatsheets.length === 0 && (
         <div className="card">
           <p>No cheatsheets yet in this batch. Cheatsheets are concise and consistent with the topic content they summarise — for example HashMap vs ConcurrentHashMap, or @Component vs @Bean — and they are added with each content batch.</p>
@@ -150,13 +157,30 @@ export function CheatsheetPage() {
     loadCheatsheetBody(meta.file).then(raw => setBody(stripFrontmatter(raw))).catch(e => setError(String(e.message || e)))
   }, [meta])
   if (!meta) return <div><h1>Cheatsheet not found</h1><p>That cheatsheet does not exist yet.</p><Link to="/cheatsheets">← Back to Cheatsheets</Link></div>
+  const idx = contentIndex.cheatsheets.findIndex(c => c.id === id)
+  const nextSheet = idx >= 0 && idx < contentIndex.cheatsheets.length - 1 ? contentIndex.cheatsheets[idx + 1] : undefined
+  const prevSheet = idx > 0 ? contentIndex.cheatsheets[idx - 1] : undefined
   return (
     <div>
-      <p><Link to="/cheatsheets">← Cheatsheets</Link> · <button className="btn secondary small" onClick={() => window.print()}>Print this cheatsheet</button></p>
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/">Home</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><Link to="/cheatsheets">Revision &amp; Cheatsheets</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">{meta.title}</span></span>
+      </nav>
+      <p><button className="btn secondary small" onClick={() => window.print()}>Print this cheatsheet</button></p>
       <h1>{meta.title}</h1>
+      <p style={{ color: 'var(--muted)', marginTop: 0 }}>{meta.summary} · {meta.readingMinutes} min · {meta.category}</p>
       {error && <div className="card" role="alert">Could not load: {error}</div>}
       {!body && !error && <div className="skeleton" />}
       {body && <MarkdownView markdown={body} />}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20 }}>
+        <Link className="btn secondary" to="/cheatsheets">← All cheatsheets</Link>
+        {prevSheet && <Link className="btn secondary" to={`/cheatsheets/${prevSheet.id}`}>← {prevSheet.title}</Link>}
+        {nextSheet && <Link className="btn" to={`/cheatsheets/${nextSheet.id}`}>Next: {nextSheet.title} →</Link>}
+        {!nextSheet && <Link className="btn secondary" to="/learn">Browse Learn →</Link>}
+      </div>
     </div>
   )
 }

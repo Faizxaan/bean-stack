@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T12:50:42.286Z",
+  "generatedAt": "2026-11-12T13:14:49.721Z",
   "practiceItems": [
     {
       "answer": "String is immutable; operations return a new String.",
@@ -78,7 +78,7 @@
       "answerIndex": 3,
       "category": "Spring Boot",
       "difficulty": "Medium",
-      "explanation": "Auto-configuration is conditional. When you define a bean of the same type, @ConditionalOnMissingBean means the auto-configured bean is not created.",
+      "explanation": "Auto-configuration is conditional. When you define a bean of the same type, @ConditionalOnMissingBean means the auto-configured bean is not created. Note the difference from overriding a bean by the same name: since Spring Boot 2.1, bean-definition overriding is disabled by default, so redefining a bean with the same name fails unless spring.main.allow-bean-definition-overriding is set — defining your own bean of the same type and letting the auto-configuration back off is the intended mechanism, not a name collision.",
       "id": "mcq-spring-boot-override",
       "options": [
         "You cannot override auto-configuration.",
@@ -120,12 +120,22 @@
       "type": "flashcard"
     },
     {
-      "back": "List: ordered, duplicates allowed. Set: no duplicates. Map: key-value pairs, unique keys. ArrayList: fast access. HashMap: fast lookup, no order guarantee.",
+      "back": "List: ordered, duplicates allowed. Set: no duplicates. Map: key-value pairs, unique keys.",
       "category": "Collections",
       "difficulty": "Easy",
-      "front": "List vs Set vs Map — and when to pick ArrayList vs HashMap?",
+      "front": "List vs Set vs Map — how do they differ?",
       "id": "fc-collections",
       "title": "Collections choice",
+      "topicId": "collections-framework",
+      "type": "flashcard"
+    },
+    {
+      "back": "ArrayList: fast access by index in an ordered list. HashMap: fast lookup by key, with no order guarantee.",
+      "category": "Collections",
+      "difficulty": "Easy",
+      "front": "When do you pick ArrayList vs HashMap?",
+      "id": "fc-arraylist-hashmap",
+      "title": "ArrayList vs HashMap choice",
       "topicId": "collections-framework",
       "type": "flashcard"
     },
@@ -555,7 +565,7 @@
         "deposit and withdraw should reject negative amounts too."
       ],
       "id": "p2-code-bank-account",
-      "solution": "public class BankAccount {\n    private double balance;\n\n    public BankAccount(double initialBalance) {\n        if (initialBalance < 0) throw new IllegalArgumentException(\"Initial balance cannot be negative\");\n        this.balance = initialBalance;\n    }\n\n    public void deposit(double amount) {\n        if (amount < 0) throw new IllegalArgumentException(\"Deposit cannot be negative\");\n        balance += amount;\n    }\n\n    public void withdraw(double amount) {\n        if (amount < 0) throw new IllegalArgumentException(\"Withdrawal cannot be negative\");\n        if (amount > balance) throw new IllegalArgumentException(\"Insufficient funds\");\n        balance -= amount;\n    }\n\n    public double getBalance() {\n        return balance;\n    }\n}",
+      "solution": "public class BankAccount {\n    // Note: double is used here only to keep the exercise short. Real money code\n    // should use BigDecimal, because double cannot represent most decimals exactly\n    // and rounding errors accumulate across transactions.\n    private double balance;\n\n    public BankAccount(double initialBalance) {\n        if (initialBalance < 0) throw new IllegalArgumentException(\"Initial balance cannot be negative\");\n        this.balance = initialBalance;\n    }\n\n    public void deposit(double amount) {\n        if (amount < 0) throw new IllegalArgumentException(\"Deposit cannot be negative\");\n        balance += amount;\n    }\n\n    public void withdraw(double amount) {\n        if (amount < 0) throw new IllegalArgumentException(\"Withdrawal cannot be negative\");\n        if (amount > balance) throw new IllegalArgumentException(\"Insufficient funds\");\n        balance -= amount;\n    }\n\n    public double getBalance() {\n        return balance;\n    }\n}",
       "title": "Encapsulated bank account",
       "topicId": "oop-principles",
       "type": "coding"
@@ -1576,7 +1586,7 @@
     },
     {
       "category": "DevOps",
-      "description": "Write a GitHub Actions workflow that runs on pushes to main and on pull requests, sets up JDK 21 with a Maven cache, runs the full build and tests, then builds and pushes a container image tagged with the commit SHA. Secrets must not appear in the file.",
+      "description": "Write a GitHub Actions workflow that runs on pushes to main and on pull requests, sets up JDK 21 with a Maven cache, runs the full build and tests, then builds and pushes a container image tagged with the commit SHA. The image must only be pushed for pushes to main (not for pull requests), and pushing requires logging in to the registry first. Secrets must not appear in the file.",
       "difficulty": "Medium",
       "examples": [
         "Input: a push to main → Output: build and tests run, then an image tagged with the commit SHA is pushed to the registry"
@@ -1587,7 +1597,7 @@
         "Tag the image with github.sha so every image traces to one commit."
       ],
       "id": "pr-dv-code-ci-pipeline",
-      "solution": "name: build-and-test\non:\n  push:\n    branches: [main]\n  pull_request:\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Set up JDK 21\n        uses: actions/setup-java@v4\n        with:\n          java-version: \"21\"\n          distribution: temurin\n          cache: maven\n      - name: Build and test\n        run: ./mvnw -q verify\n      - name: Build image\n        run: docker build -t <your-registry>/order-service:${{ github.sha }} .\n      - name: Push image\n        run: docker push <your-registry>/order-service:${{ github.sha }}",
+      "solution": "name: build-and-test\non:\n  push:\n    branches: [main]\n  pull_request:\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Set up JDK 21\n        uses: actions/setup-java@v4\n        with:\n          java-version: \"21\"\n          distribution: temurin\n          cache: maven\n      - name: Build and test\n        run: ./mvnw -q verify\n      - name: Log in to registry\n        uses: docker/login-action@v3\n        with:\n          registry: <your-registry>\n          username: ${{ secrets.REGISTRY_USERNAME }}\n          password: ${{ secrets.REGISTRY_PASSWORD }}\n      - name: Build image\n        run: docker build -t <your-registry>/order-service:${{ github.sha }} .\n      - name: Push image\n        if: github.event_name == 'push'\n        run: docker push <your-registry>/order-service:${{ github.sha }}",
       "title": "CI pipeline for a Java service",
       "topicId": "dv-cicd-pipelines",
       "type": "coding"
@@ -1954,7 +1964,7 @@
       "description": "You need a leaderboard supporting frequent score updates, lookups of a player's score, and listing the top 10 players. Which structures would you combine, and what are the complexities?",
       "difficulty": "Medium",
       "id": "pr-dsa-scenario-choose-structure",
-      "solution": "Use a HashMap from player to score for O(1) average lookup and update, combined with a structure for ranking. For top 10 only, a min-heap of size 10 rebuilt or maintained on updates gives O(log 10), effectively constant, per update in the simple rebuild approach, or maintain a TreeMap from score to players for O(log n) updates and O(10) top-10 reads. Avoid re-sorting all players on every update, which is O(n log n) per update, and avoid a plain list scan for lookups, which is O(n).",
+      "solution": "Use a HashMap from player to score for O(1) average lookup and update, combined with a structure for ranking. For the top 10 only, keep a min-heap of at most 10 entries: on a score update, remove the player's old entry and insert the new one (O(log 10), effectively constant), evicting the smallest when the heap exceeds 10. Alternatively, maintain a TreeMap from score to players for O(log n) updates and O(10) top-10 reads. Rebuilding the heap from all players on every update would be O(n log 10) per update — avoid that. Avoid re-sorting all players on every update, which is O(n log n) per update, and avoid a plain list scan for lookups, which is O(n).",
       "title": "Choosing a structure for a leaderboard",
       "topicId": "dsa-complexities",
       "type": "scenario"
@@ -2338,7 +2348,7 @@
         "\"21\" then \"\"",
         "\"2B\" then \"0\""
       ],
-      "prompt": "What does this program print?",
+      "prompt": "Base62.encode uses the alphabet \"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\" (digits, then lowercase, then uppercase), most-significant digit first, and encodes 0 as \"0\". What does this program print?",
       "title": "Base62 encoding output",
       "topicId": "sd-designing-real-systems",
       "type": "output"
@@ -2411,7 +2421,7 @@
         "Apply the payer credit first, then subtract the share from every participant."
       ],
       "id": "pr-sd-code-expense-split",
-      "solution": "import java.util.*;\n\npublic class ExpenseSplitter {\n    private final Map<String, Double> balances = new HashMap<>();\n\n    public void addExpense(String paidBy, double amount, List<String> participants) {\n        double share = amount / participants.size();\n        balances.merge(paidBy, amount, Double::sum);\n        for (String participant : participants) {\n            balances.merge(participant, -share, Double::sum);\n        }\n    }\n\n    public double balanceOf(String user) {\n        return balances.getOrDefault(user, 0.0);\n    }\n}",
+      "solution": "import java.util.*;\n\npublic class ExpenseSplitter {\n    // Note: double is used here only to keep the exercise short. Real money code\n    // should use BigDecimal (or integer cents), because double rounding can make\n    // balances not sum to exactly zero.\n    private final Map<String, Double> balances = new HashMap<>();\n\n    public void addExpense(String paidBy, double amount, List<String> participants) {\n        double share = amount / participants.size();\n        balances.merge(paidBy, amount, Double::sum);\n        for (String participant : participants) {\n            balances.merge(participant, -share, Double::sum);\n        }\n    }\n\n    public double balanceOf(String user) {\n        return balances.getOrDefault(user, 0.0);\n    }\n}",
       "title": "Equal expense split",
       "topicId": "sd-common-lld-problems",
       "type": "coding"

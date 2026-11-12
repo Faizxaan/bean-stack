@@ -10,13 +10,15 @@ tags: [Spring Boot, Logging, Testing, OpenAPI, Swagger]
 prerequisites: [spring-mvc-rest]
 related: [validation-exception-handling, actuator-microservices-deployment]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How to log usefully, test Spring Boot applications at the right level, and document REST APIs with OpenAPI.
 ---
 
 ## Overview
 
-Three practices separate a hobby project from a production service: logs you can actually debug from, tests that catch regressions before users do, and API documentation that stays accurate. Spring Boot makes all three cheap — SLF4J (the logging interface your code calls) with Logback (the engine that actually writes the log lines) for logging, a layered testing stack for tests, and springdoc-openapi (which generates API documentation from your code and annotations) for documentation — but each has traps that turn a helpful tool into noise.
+Three practices separate a hobby project from a production service: logs you can actually debug from, tests that catch regressions before users do, and API documentation that stays accurate.
+
+Spring Boot makes all three cheap — SLF4J (the logging interface your code calls) with Logback (the engine that actually writes the log lines) for logging, a layered testing stack for tests, and springdoc-openapi (which generates API documentation from your code and annotations) for documentation — but each has traps that turn a helpful tool into noise.
 
 ## Theory
 
@@ -34,8 +36,8 @@ In a system with many requests, a correlation id — one identifier attached to 
 
 Spring Boot tests form a pyramid: many fast unit tests, fewer integration tests, and a small number of end-to-end tests.
 
-- **Unit tests** test one class in isolation, with collaborators replaced by Mockito mocks (`@Mock`, `@InjectMocks`, or `@MockBean` in a Spring test). They are fast and pinpoint failures.
-- **Slice tests** load only part of the application context. `@WebMvcTest` loads the web layer only and is the standard way to test controllers with `MockMvc`, mocking the service layer with `@MockBean`. `@DataJpaTest` loads only the JPA layer against an embedded database. Slice tests are much faster than a full context load.
+- **Unit tests** test one class in isolation, with collaborators replaced by Mockito mocks (`@Mock`, `@InjectMocks`). They are fast and pinpoint failures.
+- **Slice tests** load only part of the application context. `@WebMvcTest` loads the web layer only and is the standard way to test controllers with `MockMvc`, mocking the service layer with `@MockitoBean`. `@DataJpaTest` loads only the JPA layer against an embedded database. Slice tests are much faster than a full context load.
 - **Integration tests** with `@SpringBootTest` load the full application context and test components working together. They are slower, so they should cover the paths where wiring matters — not every branch.
 - **Testcontainers** runs real dependencies (PostgreSQL, Redis, Kafka) in Docker containers during tests, closing the gap between an embedded database and production. It is heavier, so reserve it for the tests that genuinely need a real database.
 
@@ -98,7 +100,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(HelloController.class)
@@ -120,7 +122,7 @@ class HelloControllerTest {
 }
 ```
 
-Explanation: `@WebMvcTest` loads only the web layer, so this test starts fast. `GreetingService` is replaced with a Mockito mock via `@MockBean`, its behaviour is stubbed with `when`, and `MockMvc` performs a real HTTP-style request against the controller, asserting the status and body. The service itself is not tested here — that is a unit test's job.
+Explanation: `@WebMvcTest` loads only the web layer, so this test starts fast. `GreetingService` is replaced with a Mockito mock via `@MockitoBean` (Spring Boot 3.4+; older code writes `@MockBean` for the same effect), its behaviour is stubbed with `when`, and `MockMvc` performs a real HTTP-style request against the controller, asserting the status and body. The service itself is not tested here — that is a unit test's job.
 
 ### A service unit test with Mockito
 
@@ -197,7 +199,7 @@ Explanation: with `springdoc-openapi` on the classpath, this controller appears 
 - Logging with `System.out.println`, which has no levels, no configuration, and no place in production logs.
 - Logging an exception's message without the exception itself, losing the stack trace that explains the failure.
 - Writing only `@SpringBootTest` tests, producing a slow suite that developers avoid running.
-- Overusing `@MockBean`, which forces context reloads and slows the suite; plain Mockito mocks belong in unit tests.
+- Overusing `@MockitoBean`, which forces context reloads and slows the suite; plain Mockito mocks belong in unit tests.
 - Testing with an embedded database while production runs something else, and being surprised by SQL dialect differences — that is what Testcontainers is for.
 - Hand-writing API documentation separately from the code, so it drifts out of date within a release or two.
 - Asserting on exact log output or internal method calls, making tests brittle against harmless refactoring.
@@ -210,7 +212,7 @@ Logging, testing, and documentation are the "professionalism" topics interviewer
 
 - **Why use a logger instead of System.out.println?** Levels, per-package configuration, output destinations, formatting, and performance through parameterized messages — none of which print statements offer.
 - **What is the difference between @WebMvcTest and @SpringBootTest?** `@WebMvcTest` loads only the web layer (controllers, filters, converters) with services mocked, while `@SpringBootTest` loads the full application context. Slice tests are faster; full tests verify real wiring.
-- **When should you use @MockBean instead of @Mock?** `@MockBean` replaces a bean inside a Spring test context (slice or integration tests); `@Mock` is a plain Mockito mock for unit tests that load no context.
+- **When should you use @MockitoBean instead of @Mock?** `@MockitoBean` replaces a bean inside a Spring test context (slice or integration tests); `@Mock` is a plain Mockito mock for unit tests that load no context. (Older Spring Boot code writes `@MockBean` for the same job; it is deprecated since Boot 3.4.)
 - **What is the test pyramid?** Many fast unit tests at the base, fewer integration tests in the middle, and few slow end-to-end tests at the top — a shape that keeps the suite fast and trustworthy.
 - **How does springdoc-openapi generate documentation?** It inspects controllers, mappings, and types at runtime to build an OpenAPI specification, served as Swagger UI, with `@Operation` and `@Parameter` annotations adding human-readable detail.
 
@@ -218,5 +220,5 @@ Logging, testing, and documentation are the "professionalism" topics interviewer
 
 - Log with SLF4J and Logback, at the right level, parameterized, and without secrets.
 - Unit tests use plain Mockito; `@WebMvcTest` and `@DataJpaTest` are fast slice tests; `@SpringBootTest` is for full-context integration.
-- Overusing `@MockBean` slows the suite through context reloads; Testcontainers gives real-database fidelity.
+- Overusing `@MockitoBean` slows the suite through context reloads; Testcontainers gives real-database fidelity.
 - OpenAPI documentation is generated from code via springdoc-openapi, so it stays in sync.

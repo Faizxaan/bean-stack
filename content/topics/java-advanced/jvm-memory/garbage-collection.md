@@ -10,13 +10,15 @@ tags: [JVM, GC, Memory, Performance]
 prerequisites: [jdk-jre-jvm, concurrency-basics]
 related: [concurrency-basics, spring-boot-autoconfig]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production.
 ---
 
 ## Overview
 
-The JVM manages memory for you, but "managed" does not mean "ignore". Think of the garbage collector (GC) as an automatic cleaner: it finds objects your program no longer uses and frees the memory they occupied, so you do not have to. The heap is the area of memory where objects live, and heap generations are simply the GC's way of grouping objects by age — most objects die young, so young objects are checked often and long-lived ones rarely. Knowing which collector fits a workload is essential for diagnosing pauses, leaks, and out-of-memory errors — and it is a staple of senior Java interviews.
+The JVM manages memory for you, but "managed" does not mean "ignore". Think of the garbage collector (GC) as an automatic cleaner: it finds objects your program no longer uses and frees the memory they occupied, so you do not have to.
+
+The heap is the area of memory where objects live, and heap generations are simply the GC's way of grouping objects by age — most objects die young, so young objects are checked often and long-lived ones rarely. Knowing which collector fits a workload is essential for diagnosing pauses, leaks, and out-of-memory errors — and it is a staple of senior Java interviews.
 
 ## Theory
 

@@ -10,7 +10,7 @@ tags: [NoSQL, Redis, key-value, caching, TTL]
 prerequisites: [db-sql-fundamentals, db-document-stores]
 related: [db-choosing-nosql, db-sql-java-developers]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "Key-value stores such as Redis, the data structures beyond plain strings, and caching patterns that keep Java services fast without serving stale data."
 ---
 
@@ -30,7 +30,9 @@ Because lookups are by exact key, key-value stores do not support ad-hoc queries
 
 ### Redis data structures and what each is for
 
-Strings hold a single value — a cached JSON blob, a counter incremented atomically with INCR, or a lock flag. Hashes hold field-value pairs under one key, ideal for an object such as a user profile whose fields you want to read or update individually without rewriting the whole object. Lists are ordered and support push and pop from both ends, which makes them natural queues. Sets hold unique members and support intersection and union, useful for tags or "users who liked this". Sorted sets add a score to each member and keep them ordered by it, which is exactly a leaderboard, a time-ordered feed, or a "top N" list. Streams, added later, provide an append-only log with consumer groups, suitable for event feeds.
+Strings hold a single value — a cached JSON blob, a counter incremented atomically with INCR, or a lock flag. Hashes hold field-value pairs under one key, ideal for an object such as a user profile whose fields you want to read or update individually without rewriting the whole object. Lists are ordered and support push and pop from both ends, which makes them natural queues.
+
+Sets hold unique members and support intersection and union, useful for tags or "users who liked this". Sorted sets add a score to each member and keep them ordered by it, which is exactly a leaderboard, a time-ordered feed, or a "top N" list. Streams, added later, provide an append-only log with consumer groups, suitable for event feeds.
 
 Atomicity in Redis is per command, and for multi-step logic you use Lua scripts, which run atomically on the server, or transactions (MULTI/EXEC), which queue commands but do not roll back on failure — a common interview distinction from relational transactions.
 

@@ -10,13 +10,15 @@ tags: [React, Components, Hooks, useEffect]
 prerequisites: [fe-js-fundamentals, fe-js-dom]
 related: [fe-react-state, fe-ts-react]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: How React components render and re-render, and how hooks like useState, useEffect, and useRef manage state, side effects, and values across renders.
 ---
 
 ## Overview
 
-A React component is like a recipe: a function that takes ingredients and produces a dish — here, a description of part of the page. Its props are the ingredients handed in from outside (such as a user's name), and its state is what the component remembers itself between renders (such as whether a menu is open). When props or state change, React re-renders the component, compares the new description with the previous one, and updates only what changed in the DOM. Hooks are the built-in tools that let function components hold state, run side effects (work beyond rendering, such as fetching data), and share logic — without classes. Understanding rendering, the rules of hooks, and effect lifecycles is the foundation of everything else in React.
+A React component is like a recipe: a function that takes ingredients and produces a dish — here, a description of part of the page. Its props are the ingredients handed in from outside (such as a user's name), and its state is what the component remembers itself between renders (such as whether a menu is open).
+
+When props or state change, React re-renders the component, compares the new description with the previous one, and updates only what changed in the DOM. Hooks are the built-in tools that let function components hold state, run side effects (work beyond rendering, such as fetching data), and share logic — without classes. Understanding rendering, the rules of hooks, and effect lifecycles is the foundation of everything else in React.
 
 ## Theory
 

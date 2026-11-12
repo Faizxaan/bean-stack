@@ -10,13 +10,15 @@ tags: [Patterns, Two Pointers, Sliding Window, Binary Search, Backtracking]
 prerequisites: [dsa-arrays-strings, dsa-complexities]
 related: [dsa-trees-graphs, dsa-dynamic-programming]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-12
 summary: "The reusable coding patterns behind most interview problems: two pointers, sliding window, binary search on answer, backtracking, and greedy, with guidance on recognising each one."
 ---
 
 ## Overview
 
-Interview problems look endless, but most of them are variations on a small set of patterns. Learning patterns is not about memorising solutions; it is about recognising the shape of a problem — sorted input plus a pair condition, a contiguous subarray with a constraint, or a yes/no question whose answer flips only once as you move through a range — and knowing which technique that shape calls for. For example, if the input is sorted and you need two numbers that add to a target, two pointers starting at opposite ends and moving inward is the pattern, not a trick to memorise. Once the pattern is identified, the solution is usually a short loop with a rule that stays true at each step, and the complexity analysis follows from the pattern rather than from the specific problem.
+Interview problems look endless, but most of them are variations on a small set of patterns. Learning patterns is not about memorising solutions; it is about recognising the shape of a problem — sorted input plus a pair condition, a contiguous subarray with a constraint, or a yes/no question whose answer flips only once as you move through a range — and knowing which technique that shape calls for.
+
+For example, if the input is sorted and you need two numbers that add to a target, two pointers starting at opposite ends and moving inward is the pattern, not a trick to memorise. Once the pattern is identified, the solution is usually a short loop with a rule that stays true at each step, and the complexity analysis follows from the pattern rather than from the specific problem.
 
 This topic covers the patterns that appear most often in Java interviews: two pointers, sliding window, fast and slow pointers, binary search (including binary search on the answer), prefix sums and hashmap counting, backtracking, greedy, and divide-and-conquer. Each pattern is described by its recognition signals, its template, and its complexity.
 
@@ -24,7 +26,9 @@ This topic covers the patterns that appear most often in Java interviews: two po
 
 ### How to recognise a pattern
 
-Start from the problem's structure, not from its story. Sorted input and a condition on pairs or triples points to two pointers. A contiguous subarray or substring with a constraint (sum, distinct count, at most k of something) points to a sliding window. A cycle, a middle element, or a meeting point in a linked structure points to fast and slow pointers. A yes/no predicate that flips exactly once as a parameter grows — "can we finish within k days?" — points to binary search on the answer. A search over all combinations with constraints points to backtracking with pruning. A problem where a locally best choice can be proven never to hurt points to greedy; if it cannot be proven, suspect DP instead.
+Start from the problem's structure, not from its story. Sorted input and a condition on pairs or triples points to two pointers. A contiguous subarray or substring with a constraint (sum, distinct count, at most k of something) points to a sliding window. A cycle, a middle element, or a meeting point in a linked structure points to fast and slow pointers.
+
+A yes/no predicate that flips exactly once as a parameter grows — "can we finish within k days?" — points to binary search on the answer. A search over all combinations with constraints points to backtracking with pruning. A problem where a locally best choice can be proven never to hurt points to greedy; if it cannot be proven, suspect DP instead.
 
 ### Two pointers and sliding window
 
@@ -204,7 +208,9 @@ Explanation: adding a copy of `current` at each call records every subset, inclu
 
 ## Interview Importance
 
-Pattern recognition is the skill interviewers are actually testing when they present a problem you have not seen before. They do not expect you to have memorised every LeetCode problem; they expect you to map a new problem to a known shape, justify the mapping, and implement the template cleanly. Candidates who can say "this is binary search on the answer because feasibility is monotonic" or "this is backtracking with pruning because we need all combinations satisfying a constraint" consistently outperform candidates who jump to code. At senior levels, the follow-up is usually to change a constraint and ask which pattern survives — for example, adding negative numbers to a sliding-window problem, or asking for the count of solutions instead of one solution in backtracking.
+Pattern recognition is the skill interviewers are actually testing when they present a problem you have not seen before. They do not expect you to have memorised every LeetCode problem; they expect you to map a new problem to a known shape, justify the mapping, and implement the template cleanly.
+
+Candidates who can say "this is binary search on the answer because feasibility is monotonic" or "this is backtracking with pruning because we need all combinations satisfying a constraint" consistently outperform candidates who jump to code. At senior levels, the follow-up is usually to change a constraint and ask which pattern survives — for example, adding negative numbers to a sliding-window problem, or asking for the count of solutions instead of one solution in backtracking.
 
 ## Interview Questions
 

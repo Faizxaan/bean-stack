@@ -3,7 +3,8 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, Eye, EyeOff, GraduationCap, Search, X } from 'lucide-react'
 import { contentIndex, getTopic, useInterviewQuestions } from '../lib/content'
 import { useApp } from '../store/AppContext'
-import { topicUrl } from '../lib/utils'
+import { topicUrl, smoothScrollBehavior } from '../lib/utils'
+import { ProgressBar } from '../components/ProgressBar'
 import {
   EMPTY_INTERVIEW_FILTERS,
   INTERVIEW_MODULES,
@@ -156,17 +157,22 @@ function AreaGroupCard({
   return (
     <section className="card topic-group" id={`area-${areaSlug(group.category)}`} aria-label={group.category}>
       <div className="topic-group-head">
-        <button className="topic-group-toggle" onClick={onToggleOpen} aria-expanded={open}>
-          <ChevronDown size={18} style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
-          <span>
-            <strong>{group.category}</strong>
-            <span className="topic-group-count"> — {group.questions.length} question{group.questions.length === 1 ? '' : 's'} · {stats.reviewed} reviewed · {stats.confident} confident</span>
-          </span>
-        </button>
+        {/* The area name is an h2 wrapping the disclosure button: before
+            this it was a <strong> inside a button, so heading navigation
+            skipped every area group entirely. */}
+        <h2 className="topic-group-heading">
+          <button className="topic-group-toggle" onClick={onToggleOpen} aria-expanded={open} aria-controls={`area-body-${areaSlug(group.category)}`}>
+            <ChevronDown size={18} style={{ transform: open ? 'rotate(180deg)' : 'none' }} aria-hidden="true" />
+            <span>
+              {group.category}
+              <span className="topic-group-count"> — {group.questions.length} question{group.questions.length === 1 ? '' : 's'} · {stats.reviewed} reviewed · {stats.confident} confident</span>
+            </span>
+          </button>
+        </h2>
       </div>
       {open && (
-        <div className="topic-group-body">
-          <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${group.category}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
+        <div className="topic-group-body" id={`area-body-${areaSlug(group.category)}`}>
+          <ProgressBar pct={stats.pctReviewed} label={`${stats.pctReviewed}% reviewed in ${group.category}`} />
           <div className="q-list">
             {group.questions.map(q => {
               const topic = q.topicId ? getTopic(q.topicId) : undefined
@@ -254,7 +260,7 @@ export function InterviewIndex() {
   const jumpToArea = (category: string) => {
     setOpenAreas(prev => new Set(prev).add(category))
     // Scroll after the group opens.
-    setTimeout(() => document.getElementById(`area-${areaSlug(category)}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+    setTimeout(() => document.getElementById(`area-${areaSlug(category)}`)?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }), 0)
   }
 
   // Open the requested area (from a question page's "Back to area"
@@ -290,12 +296,24 @@ export function InterviewIndex() {
   const revealAll = () => setExpandedIds(new Set(filtered.map(q => q.id)))
   const hideAll = () => setExpandedIds(new Set())
 
+  // If a filter narrows the list so none of the open areas is visible
+  // any more, every group would render collapsed and the page would
+  // look empty. In that case open the first visible area instead.
+  const openAreaCategories = groups.some(g => openAreas.has(g.category))
+    ? openAreas
+    : new Set(groups.slice(0, 1).map(g => g.category))
+
   return (
     <div>
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/">Home</Link></span>
+        <span className="breadcrumb-sep"> / </span>
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">Interview Prep</span></span>
+      </nav>
       <h1>Interview Preparation</h1>
       <p style={{ color: 'var(--muted)' }}>
         Pick your experience level, work through questions grouped by broad area, and test yourself before you reveal the answer.
-        Every question has a short answer, a detailed answer, follow-ups, tips, and common mistakes.
+        Every question has a short answer and a detailed answer. Most also have likely follow-ups, tips, or common mistakes — where one is missing, the short answer is the key point.
       </p>
 
       {/* How to use this — the three steps a first-time user needs. */}
@@ -316,7 +334,7 @@ export function InterviewIndex() {
             {overall.confident} confident · {overall.needsReview} need review · {overall.total - overall.reviewed} not yet reviewed · {overall.bookmarked} bookmarked
           </p>
         </div>
-        <div className="progress-bar" aria-label={`${overall.pctReviewed}% of interview questions reviewed`}><div style={{ width: `${overall.pctReviewed}%` }} /></div>
+        <ProgressBar pct={overall.pctReviewed} label={`${overall.pctReviewed}% of interview questions reviewed`} />
       </div>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -339,21 +357,20 @@ export function InterviewIndex() {
                   <h2 style={{ margin: '8px 0 4px' }}>{mod.title}</h2>
                   <p style={{ color: 'var(--muted)', marginTop: 0 }}>{mod.description}</p>
                   <p><strong>{qs.length} questions</strong> · {stats.reviewed} reviewed · {stats.confident} confident{stats.needsReview > 0 ? ` · ${stats.needsReview} need review` : ''}</p>
-                  <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${mod.title}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
+                  <ProgressBar pct={stats.pctReviewed} label={`${stats.pctReviewed}% reviewed in ${mod.title}`} />
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
                     <button className="btn" onClick={() => setParam({ view: 'module', module: mod.id, area: null })}>
                       <GraduationCap size={16} /> {stats.reviewed === 0 ? 'Start' : stats.reviewed < qs.length ? 'Continue' : 'Review again'}
                     </button>
-                    {next && <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.9rem' }}>Next up: {next.question.length > 60 ? `${next.question.slice(0, 60)}…` : next.question}</span>}
+                    {next && <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.9rem' }}>Next up: <Link to={`/interview/question/${next.id}`}>{next.question.length > 60 ? `${next.question.slice(0, 60)}…` : next.question}</Link></span>}
                   </div>
                 </article>
               )
             })}
           </div>
           <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
-            Counts are by each question&apos;s experience-level module. The same questions are also filed under topic files in the content
-            (Databases, System Design, DSA, DevOps, Testing, Frontend, Behavioural) — so a module total is bigger than any single
-            content file, e.g. Module 1 has {interviewQuestions.filter(q => q.module === 'module-1').length} questions while module-1.json holds fewer.
+            Counts are by experience level: each question belongs to exactly one module, so the module totals add up to {interviewQuestions.length} questions.
+            The Bonus module is resume help, not interview questions.
           </p>
         </>
       )}
@@ -370,8 +387,8 @@ export function InterviewIndex() {
                   <strong>{selectedStats.reviewed} of {selectedStats.total} reviewed</strong> · {selectedStats.confident} confident · {selectedStats.needsReview} need review · {selectedStats.bookmarked} bookmarked
                 </p>
               )}
-              <div className="progress-bar" aria-label={`${selectedStats?.pctReviewed || 0}% reviewed in ${selectedMeta.title}`}><div style={{ width: `${selectedStats?.pctReviewed || 0}%` }} /></div>
-              {nextUp && <p style={{ margin: '8px 0 0' }}>Next unreviewed question: <strong>{nextUp.question}</strong></p>}
+              <ProgressBar pct={selectedStats?.pctReviewed || 0} label={`${selectedStats?.pctReviewed || 0}% reviewed in ${selectedMeta.title}`} />
+              {nextUp && <p style={{ margin: '8px 0 0' }}>Next unreviewed question: <Link to={`/interview/question/${nextUp.id}`}><strong>{nextUp.question}</strong></Link></p>}
             </div>
           )}
           {view === 'topic' && (
@@ -441,6 +458,8 @@ export function InterviewIndex() {
             </nav>
           )}
 
+          {groups.length > 0 && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{groups.length} broad area{groups.length === 1 ? '' : 's'} in this view · {filtered.length} question{filtered.length === 1 ? '' : 's'}. One area is open — click another area heading to open it, or use Jump to area above.</p>}
+
           {groups.map((group, i) => (
             <AreaGroupCard
               key={group.category}
@@ -448,7 +467,7 @@ export function InterviewIndex() {
               selfTest={selfTest}
               expandedIds={expandedIds}
               onToggleQuestion={toggleQuestion}
-              open={openAreas.has(group.category)}
+              open={openAreaCategories.has(group.category)}
               onToggleOpen={() => setOpenAreas(prev => {
                 const next = new Set(prev)
                 if (next.has(group.category)) next.delete(group.category)
@@ -537,15 +556,17 @@ export function InterviewQuestionPage() {
 
         {revealed ? (
           <div className="q-answer">
-            <h3>Short answer</h3><p>{q.shortAnswer || 'No short answer yet.'}</p>
+            {/* h2, not h3: the question itself is the page h1, so these
+                sections are its direct sub-headings. */}
+            <h2>Short answer</h2><p>{q.shortAnswer || 'No short answer yet.'}</p>
             {q.detailedAnswer ? (
-              <><h3>Detailed answer</h3><p style={{ whiteSpace: 'pre-wrap' }}>{q.detailedAnswer}</p></>
+              <><h2>Detailed answer</h2><p style={{ whiteSpace: 'pre-wrap' }}>{q.detailedAnswer}</p></>
             ) : (
               <p style={{ color: 'var(--muted)' }}>No detailed answer yet — the short answer above is the key point.</p>
             )}
-            {q.followUps && q.followUps.length > 0 && <><h3>Likely follow-ups</h3><ul>{q.followUps.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
-            {q.tips && q.tips.length > 0 && <><h3>Tips</h3><ul>{q.tips.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
-            {q.commonMistakes && q.commonMistakes.length > 0 && <><h3>Common mistakes</h3><ul>{q.commonMistakes.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+            {q.followUps && q.followUps.length > 0 && <><h2>Likely follow-ups</h2><ul>{q.followUps.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+            {q.tips && q.tips.length > 0 && <><h2>Tips</h2><ul>{q.tips.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+            {q.commonMistakes && q.commonMistakes.length > 0 && <><h2>Common mistakes</h2><ul>{q.commonMistakes.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
           </div>
         ) : (
           <div className="card" style={{ background: 'var(--surface-2)' }}>
@@ -556,14 +577,14 @@ export function InterviewQuestionPage() {
 
       {topic && (
         <div className="card" style={{ marginTop: 16 }}>
-          <h3 style={{ marginTop: 0 }}>Study this topic in Learn</h3>
+          <h2 style={{ marginTop: 0 }}>Study this topic in Learn</h2>
           <p style={{ color: 'var(--muted)' }}>{topic.summary || topic.title}</p>
           <Link className="btn secondary" to={topicUrl(topic)}>Open {topic.title} →</Link>
         </div>
       )}
       {q.relatedTopics && q.relatedTopics.length > 0 && (
         <div className="card" style={{ marginTop: 16 }}>
-          <h3 style={{ marginTop: 0 }}>Related topics</h3>
+          <h2 style={{ marginTop: 0 }}>Related topics</h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {q.relatedTopics.map(id => {
               const t = getTopic(id)

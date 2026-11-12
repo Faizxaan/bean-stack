@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import { AppProvider } from './store/AppContext'
 import { Layout } from './components/Layout'
 
@@ -31,6 +31,11 @@ function Page({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AppProvider>
+      {/* reducedMotion="user" makes the page fade respect the OS
+          reduced-motion setting; the in-app toggle is handled by the
+          [data-reduced-motion] CSS rule in index.css. Previously the
+          fade ran regardless of either setting. */}
+      <MotionConfig reducedMotion="user">
       <BrowserRouter>
         <Suspense fallback={<div style={{ padding: 24 }}>Loading Beanstack…</div>}>
           <Routes>
@@ -52,6 +57,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </MotionConfig>
     </AppProvider>
   )
 }

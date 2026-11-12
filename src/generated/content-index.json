@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T12:50:42.286Z",
+  "generatedAt": "2026-11-12T13:14:49.721Z",
   "tracks": [
     {
       "comingSoon": false,
@@ -721,7 +721,7 @@
         "db-sql-java-developers"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/databases/nosql/key-value-caching.md",
       "readingMinutes": 11,
       "summary": "Key-value stores such as Redis, the data structures beyond plain strings, and caching patterns that keep Java services fast without serving stale data."
@@ -751,7 +751,7 @@
         "db-sql-java-developers"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/databases/nosql/choosing-nosql.md",
       "readingMinutes": 10,
       "summary": "A decision framework for SQL versus NoSQL, the NoSQL families, CAP and consistency trade-offs, and polyglot persistence in real Java systems."
@@ -806,7 +806,7 @@
         "spring-data-jpa"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/databases/sql/joins-indexes-transactions.md",
       "readingMinutes": 9,
       "summary": "How joins combine tables, how indexes speed up reads at a cost to writes, and how transactions and isolation levels keep concurrent work correct."
@@ -837,7 +837,7 @@
         "db-document-stores"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/databases/sql/sql-java-developers.md",
       "readingMinutes": 10,
       "summary": "How Java applications really talk to SQL databases: JDBC, connection pools, JPA and Hibernate, the N+1 problem, and transactions in Spring."
@@ -867,7 +867,7 @@
         "db-sql-java-developers"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/databases/sql/sql-window-functions.md",
       "readingMinutes": 7,
       "summary": "Computing rankings, running totals, and comparisons across rows without collapsing them, using OVER and PARTITION BY."
@@ -955,7 +955,7 @@
         "date-time-regex"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/databases/sql/sql-functions.md",
       "readingMinutes": 8,
       "summary": "The built-in functions you use in almost every query — transforming text, working with dates, and handling NULL safely."
@@ -1006,7 +1006,7 @@
         "dv-testing-in-ci"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/devops-cloud/aws-basics/deploying-java-aws.md",
       "readingMinutes": 11,
       "summary": "How to take a Spring Boot service from a container image to a running production deployment on AWS, with database, configuration, and rollback."
@@ -1131,7 +1131,7 @@
         "dv-cicd-pipelines"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/devops-cloud/git/git-fundamentals.md",
       "readingMinutes": 8,
       "summary": "How Git tracks changes as snapshots, what the working tree staging area and repository are, and the everyday commands every Java developer uses."
@@ -1156,7 +1156,7 @@
         "dv-cicd-pipelines"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/devops-cloud/git/git-branching-merging.md",
       "readingMinutes": 10,
       "summary": "How branches, merges, rebases, and pull requests work in practice, and how Java teams keep a main branch releasable."
@@ -1183,7 +1183,7 @@
         "dv-deploying-java-aws"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/devops-cloud/kubernetes/kubernetes-pods-services-deployments.md",
       "readingMinutes": 11,
       "summary": "How Kubernetes schedules pods, exposes them with services, and rolls out new versions with deployments for a containerised Java service."
@@ -1212,7 +1212,7 @@
         "dsa-dynamic-programming"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/dsa-coding/coding/patterns.md",
       "readingMinutes": 11,
       "summary": "The reusable coding patterns behind most interview problems: two pointers, sliding window, binary search on answer, backtracking, and greedy, with guidance on recognising each one."
@@ -1239,7 +1239,7 @@
         "dsa-patterns"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/dsa-coding/coding/complexities.md",
       "readingMinutes": 10,
       "summary": "Big O, Big Theta, and Big Omega explained plainly, with a complexity table for common structures and operations and the analysis mistakes interviewers watch for."
@@ -1270,7 +1270,7 @@
         "dsa-dynamic-programming"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/dsa-coding/coding/interview-coding-problems.md",
       "readingMinutes": 10,
       "summary": "How to approach interview coding problems end to end: clarifying, choosing a pattern, coding cleanly, testing, and handling follow-ups, illustrated with classic problems."
@@ -1298,7 +1298,7 @@
         "dsa-complexities"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/dsa-coding/dsa/arrays-strings.md",
       "readingMinutes": 9,
       "summary": "How arrays and strings work in Java, and the two-pointer, sliding-window, and prefix techniques that solve most interview problems on them."
@@ -1327,7 +1327,7 @@
         "dsa-patterns"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/dsa-coding/dsa/trees-graphs.md",
       "readingMinutes": 9,
       "summary": "Binary trees, binary search trees, and graphs in Java, with BFS, DFS, traversal orders, and the recursion and cycle pitfalls interviewers probe."
@@ -1406,7 +1406,7 @@
         "fe-js-dom"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/frontend/javascript/async-javascript.md",
       "readingMinutes": 5,
       "summary": "How JavaScript handles work that takes time — callbacks, promises, async and await, and the event loop — without blocking the page."
@@ -1433,7 +1433,7 @@
         "fe-react-components-hooks"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/frontend/javascript/dom-browser-apis.md",
       "readingMinutes": 5,
       "summary": "How web pages are structured as a document tree, how events flow through it, and which browser APIs power storage, fetching, and rendering."
@@ -1461,7 +1461,7 @@
         "fe-ts-react"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/frontend/react/components-hooks.md",
       "readingMinutes": 5,
       "summary": "How React components render and re-render, and how hooks like useState, useEffect, and useRef manage state, side effects, and values across renders."
@@ -1539,7 +1539,7 @@
         "fe-ts-generics"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/frontend/typescript/types-interfaces.md",
       "readingMinutes": 5,
       "summary": "How TypeScript adds a static type layer to JavaScript — primitives, unions, interfaces, type aliases, and the strictness settings that make them useful."
@@ -1564,7 +1564,7 @@
         "fe-ts-react"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/frontend/typescript/generics.md",
       "readingMinutes": 5,
       "summary": "How generics let one function or type work safely over many types, with constraints, defaults, and the utility types used every day."
@@ -1620,7 +1620,7 @@
         "spring-ioc-di"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/concurrency/concurrency-basics.md",
       "readingMinutes": 5,
       "summary": "Threads, executors, synchronization, and the Java Memory Model — the concurrency fundamentals interviewers expect from experienced Java developers."
@@ -1675,7 +1675,7 @@
         "garbage-collection"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/concurrency/java-memory-model.md",
       "readingMinutes": 9,
       "summary": "The Java Memory Model defines when a write made by one thread becomes visible to another, and happens-before rules are the guarantees you program against."
@@ -1705,7 +1705,7 @@
         "garbage-collection"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/concurrency/thread-lifecycle-control.md",
       "readingMinutes": 10,
       "summary": "The six thread states, and how to start, pause, join, interrupt, and shut down threads safely."
@@ -1733,7 +1733,7 @@
         "collections-framework"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/jdbc-networking/jdbc-networking.md",
       "readingMinutes": 10,
       "summary": "JDBC connects Java code to relational databases with SQL and prepared statements, while sockets and HTTP clients connect it to services over a network."
@@ -1761,7 +1761,7 @@
         "spring-boot-autoconfig"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/jvm-memory/garbage-collection.md",
       "readingMinutes": 4,
       "summary": "How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production."
@@ -1788,7 +1788,7 @@
         "spring-mvc-rest"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/patterns-solid/design-patterns-solid.md",
       "readingMinutes": 4,
       "summary": "SOLID in plain language, plus the patterns interviewers actually ask about — Singleton, Factory, Builder, Strategy, Observer, and Decorator — with Java examples."
@@ -1809,15 +1809,14 @@
         "Virtual Threads"
       ],
       "prerequisites": [
-        "streams-lambdas",
-        "garbage-collection"
+        "streams-lambdas"
       ],
       "related": [
         "streams-lambdas",
         "concurrency-basics"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/performance-modern/modern-java-features.md",
       "readingMinutes": 12,
       "summary": "Records, sealed classes, pattern matching, virtual threads, and sequenced collections change how modern Java code is written, and knowing which version introduced each one matters in interviews."
@@ -1845,7 +1844,7 @@
         "concurrency-basics"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/performance-modern/performance-best-practices.md",
       "readingMinutes": 10,
       "summary": "Measure first with a profiler, then fix the real bottleneck, which is usually allocation, I/O, locking, or an algorithm rather than a micro-optimization."
@@ -1871,7 +1870,7 @@
         "exception-handling"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/reflection-serialization/reflection-serialization.md",
       "readingMinutes": 8,
       "summary": "Reflection lets code inspect and invoke classes at runtime and serialization turns an object graph into bytes that can be stored or sent elsewhere."
@@ -1972,7 +1971,7 @@
         "concurrency-basics"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-core/collections/collections-framework.md",
       "readingMinutes": 5,
       "summary": "List, Set, Map, and Queue in one mental model, how to choose between them, and the HashMap internals interviewers probe."
@@ -2119,7 +2118,7 @@
         "streams-lambdas"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-core/exceptions-generics/exception-handling.md",
       "readingMinutes": 4,
       "summary": "Checked vs unchecked exceptions, try-with-resources, custom exceptions, and generics with wildcards — the safety nets interviewers check."
@@ -2170,7 +2169,7 @@
         "concurrency-basics"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-core/functional/streams-lambdas.md",
       "readingMinutes": 5,
       "summary": "How lambdas and method references work, how Streams transform collections declaratively, and when to use Optional — without abusing it."
@@ -2193,7 +2192,7 @@
       ],
       "related": [],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-core/functional/functional-interfaces-optional.md",
       "readingMinutes": 8,
       "summary": "The standard functional interfaces for passing behaviour and Optional for expressing possibly absent values."
@@ -2242,7 +2241,7 @@
         "collections-framework"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-core/oop/oop-principles.md",
       "readingMinutes": 4,
       "summary": "Encapsulation, inheritance, polymorphism, and abstraction in plain language, plus how constructors and initialization actually run."
@@ -2332,7 +2331,7 @@
         "generics-deep-dive"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-core/oop/polymorphism.md",
       "readingMinutes": 7,
       "summary": "The same method call behaving differently depending on the runtime object — overriding, overloading, and dynamic dispatch."
@@ -2390,7 +2389,7 @@
         "collections-framework"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/data-jpa/spring-data-jpa.md",
       "readingMinutes": 5,
       "summary": "Repositories, query methods, pagination, transactions, and the N+1 problem — the JPA knowledge that shows up in almost every Java backend interview."
@@ -2421,7 +2420,7 @@
         "validation-exception-handling"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/data-jpa/spring-jdbctemplate.md",
       "readingMinutes": 8,
       "summary": "Spring's JdbcTemplate — raw JDBC without the boilerplate, plus RowMapper, named parameters, and batch updates."
@@ -2449,7 +2448,7 @@
         "design-patterns-solid"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/mvc-rest/spring-mvc-rest.md",
       "readingMinutes": 5,
       "summary": "Controllers, request mapping, validation, exception handling, and ResponseEntity — how to build clean, interview-ready REST APIs with Spring."
@@ -2507,7 +2506,7 @@
         "logging-testing-docs"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/mvc-rest/spring-rest-clients.md",
       "readingMinutes": 7,
       "summary": "Calling other services over HTTP from Spring Boot — which client to pick and how to use it safely."
@@ -2537,7 +2536,7 @@
         "validation-exception-handling"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/mvc-rest/spring-interceptors-filters.md",
       "readingMinutes": 8,
       "summary": "The request pipeline — servlet filters, HandlerInterceptors, and cross-origin (CORS) configuration."
@@ -2567,7 +2566,7 @@
         "file-io-nio"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/mvc-rest/spring-file-handling.md",
       "readingMinutes": 7,
       "summary": "Accepting file uploads with MultipartFile and serving downloads with Resource, safely."
@@ -2678,7 +2677,7 @@
         "actuator-microservices-deployment"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/spring-boot-core/spring-task-scheduling.md",
       "readingMinutes": 8,
       "summary": "Running code on a schedule with @Scheduled and in the background with @Async — and the thread-pool traps."
@@ -2708,7 +2707,7 @@
         "configuration-profiles"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/spring-boot-core/spring-build-systems.md",
       "readingMinutes": 8,
       "summary": "How Maven and Gradle build a Spring Boot application — dependencies, lifecycle, and the executable jar."
@@ -2728,15 +2727,14 @@
         "Beans"
       ],
       "prerequisites": [
-        "oop-principles",
-        "design-patterns-solid"
+        "oop-principles"
       ],
       "related": [
         "spring-boot-autoconfig",
         "spring-mvc-rest"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/spring-core/spring-ioc-di.md",
       "readingMinutes": 5,
       "summary": "Inversion of Control in plain language, how Spring creates and wires beans, bean scopes and lifecycle, and why constructor injection is preferred."
@@ -2821,7 +2819,7 @@
         "actuator-microservices-deployment"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/testing-ops/logging-testing-docs.md",
       "readingMinutes": 8,
       "summary": "How to log usefully, test Spring Boot applications at the right level, and document REST APIs with OpenAPI."
@@ -2851,7 +2849,7 @@
         "security-jwt"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/testing-ops/actuator-microservices-deployment.md",
       "readingMinutes": 9,
       "summary": "How Actuator exposes production-ready endpoints, how microservices split a system, and how a Spring Boot application is containerized and deployed."
@@ -2884,7 +2882,7 @@
         "dv-deploying-java-aws"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-09T00:00:00.000Z",
+      "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/spring-boot/testing-ops/spring-cloud-basics.md",
       "readingMinutes": 9,
       "summary": "The Spring Cloud pieces that make microservices work — service discovery, centralised config, an API gateway, and circuit breakers."
@@ -3748,6 +3746,7 @@
     "mcq-jpa-nplus1",
     "fc-jdk-jre-jvm",
     "fc-collections",
+    "fc-arraylist-hashmap",
     "fc-streams",
     "fc-spring-di",
     "code-even-squares",
