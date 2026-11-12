@@ -2,14 +2,15 @@
 
 This file is the resume point if a session is interrupted or its context is reset. Read it first, then run validation and the build before continuing.
 
-## Current state (2026-11-09, after second Modules batch + chunk fix — ready for one final push)
+## Current state (2026-11-12, after Interview Prep redesign — ready to push)
 
 - **Local directory:** `~/workspace/beanstack` (persistent, not /tmp)
 - **GitHub repo:** Faizxaan/bean-stack, branch `main`
 - **Repo before this work:** only `README.md` (12 bytes, initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92` on 2026-11-03). No other code existed to replace.
 - **App status:** Fully functional end-to-end SPA. Production build, type-check, validation script, and unit tests all pass with no chunk-size warning (see Verification below).
 - **Content status:** 96 topics validated, 19 cheatsheets, 366 interview questions, 183 practice items, 10 tracks (none Coming Soon), 6 paths. Interview modules 0–4 and Bonus Resume are complete; all 7 former placeholder tracks are now filled with full content (see Completed — completion run below).
-- **Push status:** See "Push log" at the bottom. Confirmed pushes on `main`, in order: `81f00e1e…` (foundation + Java), `58f7c452…` (interview/practice/cheatsheets/polish), `666e536d…` (complete all tracks), `c5c4fd2c…` (PROGRESS log sync), `e4be9bdd…` (clickable topic arrows), `5b899e8e…` (critic audit), `d87d9ac0…` (PROGRESS log sync), `89459fe1…` (Desktop Modules interview import, 93 new questions), `ee0da341…` (PROGRESS log sync). The second deeper Modules batch (manifest-11, 26 files) and this chunk-fix run are validated locally and prepared in a combined manifest, but NOT yet pushed — do not claim them on GitHub until a new confirmed commit SHA is recorded.
+- **Push status:** See "Push log" at the bottom. Confirmed pushes on `main`, in order: `81f00e1e…` (foundation + Java), `58f7c452…` (interview/practice/cheatsheets/polish), `666e536d…` (complete all tracks), `c5c4fd2c…` (PROGRESS log sync), `e4be9bdd…` (clickable topic arrows), `5b899e8e…` (critic audit), `d87d9ac0…` (PROGRESS log sync), `89459fe1…` (Desktop Modules interview import, 93 new questions), `ee0da341…` (PROGRESS log sync), `54378363…` (Module 0 topic gaps + chunk split), `3167e995…` (PROGRESS log sync). The Interview Prep redesign in this run is validated locally and prepared in a fresh manifest, but NOT yet pushed — do not claim it on GitHub until a new confirmed commit SHA is recorded.
+- **Push permission (2026-11-12):** Faizan said do NOT ask for approval before pushing Beanstack to GitHub; once tested from Jarvis's side, push directly — he has given permission. No approval widget for Beanstack pushes; push, verify the head, and report the commit SHA.
 
 ## Completed
 
@@ -27,6 +28,7 @@ This file is the resume point if a session is interrupted or its context is rese
 - [x] Home dashboard: continue learning, today's focus, track progress, flashcards due, recently viewed, bookmarks, statistics, quick actions, interview-date countdown
 - [x] Learn: tracks, track pages (including Coming Soon placeholders with planned sections), topic pages with all standard sections, progress status, Quick Revision Mode, prev/next, sticky TOC with scroll-spy, personal notes, prerequisites/related
 - [x] Interview Prep: Modules 0–4 + Bonus listed, browse by module and by topic, self-test hide/reveal, Confident/Needs review, copy, bookmark, deep links
+- [x] Interview Prep redesign (2026-11-12, UI only — no content changed): the old link-list page was replaced with module cards (level, description, question count, progress, Start/Continue), a 3-step "How to use this" strip, overall review progress, questions grouped by Learn topic then category as question cards with inline answers (self-test mode hides answers until revealed, Reveal all / Hide all), filters (text search, difficulty, category, review status incl. bookmarked), and a rich question page with breadcrumb, prev/next within the topic group, related Learn topics, copy, bookmark and review actions. Pure grouping/filtering logic lives in `src/lib/interview.ts` with 7 new unit tests. Deep links `/interview/question/:id`, sidebar, command palette and Library bookmarks all still work. See DECISIONS.md.
 - [x] Practice: MCQs, flashcards (Leitner boxes, due today), coding, output-based, scenario-based, persisted attempts, per-topic accuracy, weak areas, retry wrong, mock interview mode
 - [x] Revision & Cheatsheets: content-driven list, comparison tables, print-friendly layout (print CSS hides nav)
 - [x] My Library: bookmarks vs favorites separate, question/flashcard bookmarks, notes, recently viewed, statistics (completed, in progress, bookmarks, favorites, accuracy, streak)

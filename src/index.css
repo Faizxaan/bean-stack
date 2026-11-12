@@ -130,6 +130,57 @@ button { cursor: pointer; }
 .palette-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50; display: flex; align-items: flex-start; justify-content: center; padding-top: 12vh; }
 .palette { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: min(640px, 92vw); max-height: 70vh; overflow: auto; padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
 .kbd { font-family: ui-monospace, monospace; font-size: 0.78rem; background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+/* Interview Prep redesign (2026-11-12): module cards, topic groups and
+   question cards. Reuses the existing variables/cards/badges/buttons,
+   so light and dark mode both work without a second design system. */
+.iv-howto { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.iv-step { display: flex; gap: 12px; align-items: flex-start; }
+.iv-step-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.iv-step p { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
+.iv-progress { margin-bottom: 16px; }
+.iv-progress .progress-bar { margin-top: 10px; }
+.module-grid { margin-bottom: 16px; }
+.module-card h2 { font-size: 1.2rem; }
+.module-card.resume { border-style: dashed; }
+.iv-module-head { margin-bottom: 16px; }
+.iv-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+.iv-filter { display: grid; gap: 4px; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+.iv-filter .select { min-width: 150px; }
+.iv-search-wrap { display: flex; align-items: center; gap: 8px; min-width: min(320px, 80vw); }
+.iv-search-wrap .input { flex: 1; }
+.iv-toggle { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text); padding-bottom: 8px; }
+.iv-toggle-note { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+.iv-filter-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-bottom: 4px; }
+.topic-group { margin-bottom: 16px; }
+.topic-group-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.topic-group-toggle { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--text); font: inherit; text-align: left; padding: 4px 0; min-width: 0; }
+.topic-group-toggle:hover { color: var(--accent); }
+.topic-group-track { color: var(--muted); font-weight: 400; }
+.topic-group-count { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+.topic-group-body { margin-top: 12px; }
+.topic-group-body .progress-bar { margin-bottom: 12px; }
+.cat-group { margin-top: 16px; }
+.cat-heading { margin: 0 0 10px; font-size: 1rem; }
+.q-list { display: grid; gap: 12px; }
+.q-card { padding: 16px; }
+.q-question { margin: 0 0 8px; font-size: 1.05rem; line-height: 1.4; }
+.q-badges { margin: 0 0 10px; color: var(--muted); }
+.q-try, .q-preview { color: var(--muted); margin: 0 0 12px; }
+.q-answer { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 8px; }
+.q-answer h4 { margin: 14px 0 4px; }
+.q-answer h4:first-child { margin-top: 8px; }
+.q-answer p { margin: 0 0 8px; white-space: pre-wrap; }
+.q-answer ul { margin: 0 0 8px; }
+.q-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.q-page { margin-top: 8px; }
+.iv-empty { margin-bottom: 16px; }
+@media (max-width: 900px) {
+  .iv-howto { grid-template-columns: 1fr; }
+  .iv-filter .select { min-width: 0; width: 100%; }
+  .iv-filters { flex-direction: column; align-items: stretch; }
+  .iv-search-wrap { min-width: 0; width: 100%; }
+}
+
 @media print {
   .sidebar, .topbar { display: none !important; }
   .app-shell { display: block; }

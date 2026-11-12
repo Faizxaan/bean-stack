@@ -1,81 +1,403 @@
-import React, { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { Bookmark, Copy, Eye, EyeOff } from 'lucide-react'
-import { getTopic, useInterviewQuestions } from '../lib/content'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, Eye, EyeOff, GraduationCap, Search, X } from 'lucide-react'
+import { contentIndex, getTopic, useInterviewQuestions } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { topicUrl } from '../lib/utils'
+import {
+  EMPTY_INTERVIEW_FILTERS,
+  INTERVIEW_MODULES,
+  filterQuestions,
+  firstUnreviewed,
+  groupQuestionsByTopic,
+  moduleMeta,
+  prevNextQuestion,
+  reviewStats,
+} from '../lib/interview'
+import type { InterviewQuestion } from '../types'
 
-const MODULES = [
-  { id: 'module-0', title: 'Module 0 — Revision Notes', level: 'Optional' },
-  { id: 'module-1', title: 'Module 1 — 0–3 years', level: '0–3' },
-  { id: 'module-2', title: 'Module 2 — 3–5 years', level: '3–5' },
-  { id: 'module-3', title: 'Module 3 — 5–8 years', level: '5–8' },
-  { id: 'module-4', title: 'Module 4 — 8–15 years', level: '8–15' },
-  { id: 'bonus-resume', title: 'Bonus — Resume Tips & Templates', level: 'Bonus' },
-]
+// Interview Prep, redesigned 2026-11-12 (UI only — no question, answer,
+// id, category, difficulty, module or topicId was changed).
+//
+// The old page was one long <ul> of bare question links grouped only by
+// module, and each question opened onto a nearly empty page. The new
+// page is: module cards -> a module's questions grouped by Learn topic,
+// each question a card you can read and self-test on the spot, with
+// full answers inline. The deep-link route /interview/question/:id is
+// kept, and now renders the same rich layout with prev/next navigation.
+
+function ReviewBadge({ status }: { status?: 'confident' | 'needs-review' }) {
+  if (status === 'confident') return <span className="badge accent">✓ Confident</span>
+  if (status === 'needs-review') return <span className="badge warn">Needs review</span>
+  return <span className="badge">Not yet reviewed</span>
+}
+
+function QuestionCard({
+  q,
+  selfTest,
+  expanded,
+  onToggle,
+  showModule,
+}: {
+  q: InterviewQuestion
+  selfTest: boolean
+  expanded: boolean
+  onToggle: () => void
+  showModule?: boolean
+}) {
+  const { data, toggleList, setInterviewReview } = useApp()
+  const status = data.interviewReview[q.id]
+  const bookmarked = data.questionBookmarks.includes(q.id)
+  const topic = q.topicId ? getTopic(q.topicId) : undefined
+  const mod = moduleMeta(q.module)
+  return (
+    <article className="card q-card" aria-label={q.question}>
+      <h3 className="q-question">{q.question}</h3>
+      <p className="q-badges">
+        <span className="badge">{q.category || 'General'}</span>{' '}
+        <span className="badge">{q.difficulty || 'Medium'}</span>{' '}
+        {showModule && <span className="badge">{mod?.title || q.module}</span>}{' '}
+        {topic && <span className="badge">Topic: {topic.title}</span>}{' '}
+        <ReviewBadge status={status} />{' '}
+        {bookmarked && <span className="badge accent">Bookmarked</span>}
+      </p>
+      {!expanded && (
+        selfTest ? (
+          <p className="q-try"><strong>Try it first.</strong> Answer in your own words, then reveal the answer and compare.</p>
+        ) : (
+          <p className="q-preview"><strong>Short answer:</strong> {q.shortAnswer || 'No short answer yet.'}</p>
+        )
+      )}
+      {expanded && (
+        <div className="q-answer">
+          <h4>Short answer</h4>
+          <p>{q.shortAnswer || 'No short answer yet.'}</p>
+          {q.detailedAnswer ? (
+            <><h4>Detailed answer</h4><p style={{ whiteSpace: 'pre-wrap' }}>{q.detailedAnswer}</p></>
+          ) : (
+            <p style={{ color: 'var(--muted)' }}>No detailed answer yet — the short answer above is the key point.</p>
+          )}
+          {q.followUps && q.followUps.length > 0 && (
+            <><h4>Likely follow-ups</h4><ul>{q.followUps.map((f, i) => <li key={i}>{f}</li>)}</ul></>
+          )}
+          {q.tips && q.tips.length > 0 && (
+            <><h4>Tips</h4><ul>{q.tips.map((f, i) => <li key={i}>{f}</li>)}</ul></>
+          )}
+          {q.commonMistakes && q.commonMistakes.length > 0 && (
+            <><h4>Common mistakes</h4><ul>{q.commonMistakes.map((f, i) => <li key={i}>{f}</li>)}</ul></>
+          )}
+          {(!q.followUps || q.followUps.length === 0) && (!q.tips || q.tips.length === 0) && (!q.commonMistakes || q.commonMistakes.length === 0) && (
+            <p style={{ color: 'var(--muted)' }}>No follow-ups, tips, or common mistakes listed for this question.</p>
+          )}
+        </div>
+      )}
+      <div className="q-actions">
+        <button className="btn secondary small" onClick={onToggle} aria-expanded={expanded}>
+          {expanded ? <><EyeOff size={15} /> Hide answer</> : <><Eye size={15} /> {selfTest ? 'Reveal answer' : 'Show full answer'}</>}
+        </button>
+        <Link className="btn secondary small" to={`/interview/question/${q.id}`}>Open full page →</Link>
+        <button
+          className="btn secondary small"
+          aria-pressed={status === 'confident'}
+          onClick={() => setInterviewReview(q.id, 'confident')}
+        >
+          <Check size={15} /> Confident {status === 'confident' ? '✓' : ''}
+        </button>
+        <button
+          className="btn secondary small"
+          aria-pressed={status === 'needs-review'}
+          onClick={() => setInterviewReview(q.id, 'needs-review')}
+        >
+          Needs review {status === 'needs-review' ? '✓' : ''}
+        </button>
+        <button className="btn secondary small" onClick={() => toggleList('questionBookmarks', q.id)} aria-pressed={bookmarked}>
+          <Bookmark size={15} /> {bookmarked ? 'Bookmarked ✓' : 'Bookmark'}
+        </button>
+      </div>
+    </article>
+  )
+}
+
+function TopicGroupCard({
+  group,
+  selfTest,
+  expandedIds,
+  onToggleQuestion,
+  open,
+  onToggleOpen,
+  showModule,
+}: {
+  group: ReturnType<typeof groupQuestionsByTopic>[number]
+  selfTest: boolean
+  expandedIds: Set<string>
+  onToggleQuestion: (id: string) => void
+  open: boolean
+  onToggleOpen: () => void
+  showModule?: boolean
+}) {
+  const { data } = useApp()
+  const stats = reviewStats(group.questions, data.interviewReview, data.questionBookmarks)
+  const topic = group.topicId !== 'general' ? getTopic(group.topicId) : undefined
+  return (
+    <section className="card topic-group" aria-label={group.topicTitle}>
+      <div className="topic-group-head">
+        <button className="topic-group-toggle" onClick={onToggleOpen} aria-expanded={open}>
+          <ChevronDown size={18} style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
+          <span>
+            <strong>{group.topicTitle}</strong>
+            {group.trackTitle && <span className="topic-group-track"> · {group.trackTitle}</span>}
+            <span className="topic-group-count"> — {group.questions.length} question{group.questions.length === 1 ? '' : 's'} · {stats.reviewed} reviewed · {stats.confident} confident</span>
+          </span>
+        </button>
+        {topic && <Link className="btn secondary small" to={topicUrl(topic)}>Learn topic →</Link>}
+      </div>
+      {open && (
+        <div className="topic-group-body">
+          <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${group.topicTitle}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
+          {group.categories.map(cat => (
+            <div key={cat.category} className="cat-group">
+              <h4 className="cat-heading">{cat.category} <span className="badge">{cat.questions.length}</span></h4>
+              <div className="q-list">
+                {cat.questions.map(q => (
+                  <QuestionCard
+                    key={q.id}
+                    q={q}
+                    selfTest={selfTest}
+                    expanded={expandedIds.has(q.id)}
+                    onToggle={() => onToggleQuestion(q.id)}
+                    showModule={showModule}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
 
 export function InterviewIndex() {
-  const [browseBy, setBrowseBy] = useState<'module' | 'topic'>('module')
-  const [filterModule, setFilterModule] = useState('all')
-  const [filterCategory, setFilterCategory] = useState('all')
-  const [filterDifficulty, setFilterDifficulty] = useState('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const view = searchParams.get('view') === 'topic' ? 'topic' : 'module'
+  const selectedModule = searchParams.get('module')
+  const topicParam = searchParams.get('topic')
   const { data } = useApp()
   const { questions: interviewQuestions, loaded } = useInterviewQuestions()
-  const categories = [...new Set(interviewQuestions.map(q => q.category))].sort()
-  const filtered = interviewQuestions.filter(q =>
-    (filterModule === 'all' || q.module === filterModule) &&
-    (filterCategory === 'all' || q.category === filterCategory) &&
-    (filterDifficulty === 'all' || q.difficulty === filterDifficulty)
-  )
-  const byTopic = useMemo(() => {
-    const map = new Map<string, typeof filtered>()
-    for (const q of filtered) {
-      const key = q.topicId || 'general'
-      if (!map.has(key)) map.set(key, [])
-      map.get(key)!.push(q)
+  const [filters, setFilters] = useState(EMPTY_INTERVIEW_FILTERS)
+  const [selfTest, setSelfTest] = useState(true)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [openTopics, setOpenTopics] = useState<Set<string>>(new Set())
+
+  const setParam = (patch: Record<string, string | null>) => {
+    const next = new URLSearchParams(searchParams)
+    for (const [k, v] of Object.entries(patch)) {
+      if (v === null) next.delete(k)
+      else next.set(k, v)
     }
-    return map
-  }, [filtered])
+    setSearchParams(next, { replace: true })
+  }
+
+  const categories = useMemo(
+    () => [...new Set(interviewQuestions.map(q => q.category))].sort(),
+    [interviewQuestions],
+  )
+
+  // Questions in scope: a selected module, or everything in topic view.
+  const scoped = useMemo(() => {
+    if (view === 'topic') return interviewQuestions
+    if (!selectedModule) return interviewQuestions
+    return interviewQuestions.filter(q => q.module === selectedModule)
+  }, [interviewQuestions, view, selectedModule])
+
+  const filtered = useMemo(
+    () => filterQuestions(scoped, filters, data.interviewReview, data.questionBookmarks),
+    [scoped, filters, data.interviewReview, data.questionBookmarks],
+  )
+
+  const groups = useMemo(
+    () => groupQuestionsByTopic(filtered, contentIndex.topics, contentIndex.tracks),
+    [filtered],
+  )
+
+  // Open the requested topic (from a deep link back), else the first
+  // topic with unreviewed questions, else the first topic.
+  useEffect(() => {
+    if (groups.length === 0) return
+    const wanted = topicParam && groups.some(g => g.topicId === topicParam) ? topicParam : undefined
+    const firstOpen = wanted || groups.find(g => g.questions.some(q => !data.interviewReview[q.id]))?.topicId || groups[0].topicId
+    setOpenTopics(new Set([firstOpen]))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedModule, view, loaded])
+
+  const toggleQuestion = (id: string) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const clearFilters = () => setFilters(EMPTY_INTERVIEW_FILTERS)
+  const filtersActive =
+    filters.query !== '' || filters.difficulty !== 'all' || filters.category !== 'all' || filters.review !== 'all'
+  const overall = reviewStats(interviewQuestions, data.interviewReview, data.questionBookmarks)
+  const selectedMeta = selectedModule ? moduleMeta(selectedModule) : undefined
+  const selectedStats = selectedMeta ? reviewStats(scoped, data.interviewReview, data.questionBookmarks) : null
+  const nextUp = selectedMeta ? firstUnreviewed(scoped, data.interviewReview) : undefined
+
+  const revealAll = () => setExpandedIds(new Set(filtered.map(q => q.id)))
+  const hideAll = () => setExpandedIds(new Set())
 
   return (
     <div>
       <h1>Interview Preparation</h1>
-      <p style={{ color: 'var(--muted)' }}>Browse by module or by topic/technology. Each question has a short answer, a detailed answer, follow-ups, tips, and common mistakes. In self-test mode, answers stay hidden until you reveal them.</p>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-        <button className="btn secondary" aria-pressed={browseBy === 'module'} onClick={() => setBrowseBy('module')}>By Module {browseBy === 'module' ? '✓' : ''}</button>
-        <button className="btn secondary" aria-pressed={browseBy === 'topic'} onClick={() => setBrowseBy('topic')}>By Topic / Technology {browseBy === 'topic' ? '✓' : ''}</button>
-        <select className="select" style={{ width: 'auto' }} value={filterModule} onChange={e => setFilterModule(e.target.value)} aria-label="Filter by module"><option value="all">All modules</option>{MODULES.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}</select>
-        <select className="select" style={{ width: 'auto' }} value={filterCategory} onChange={e => setFilterCategory(e.target.value)} aria-label="Filter by category"><option value="all">All categories</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}</select>
-        <select className="select" style={{ width: 'auto' }} value={filterDifficulty} onChange={e => setFilterDifficulty(e.target.value)} aria-label="Filter by difficulty"><option value="all">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option></select>
+      <p style={{ color: 'var(--muted)' }}>
+        Pick your experience level, work through questions grouped by topic, and test yourself before you reveal the answer.
+        Every question has a short answer, a detailed answer, follow-ups, tips, and common mistakes.
+      </p>
+
+      {/* How to use this — the three steps a first-time user needs. */}
+      <div className="card iv-howto" aria-label="How to use Interview Prep">
+        <div className="iv-step"><span className="iv-step-num">1</span><div><strong>Pick your level</strong><p>Module 1 for 0–3 years, up to Module 4 for 8–15 years. Module 0 is a one-minute revision of the essentials.</p></div></div>
+        <div className="iv-step"><span className="iv-step-num">2</span><div><strong>Pick a topic</strong><p>Questions are grouped by the Learn topic they belong to, so you revise the topic and its questions together.</p></div></div>
+        <div className="iv-step"><span className="iv-step-num">3</span><div><strong>Test yourself</strong><p>Answer in your own words first, then reveal. Mark each question Confident or Needs review — your progress is saved in this browser.</p></div></div>
       </div>
 
-      {!loaded && <div className="card"><p>Loading interview questions…</p></div>}
-      {loaded && filtered.length === 0 && <div className="card"><p>No interview questions match those filters. Try clearing the filters, or browse Learn for topics.</p><button className="btn secondary" onClick={() => { setFilterModule('all'); setFilterCategory('all'); setFilterDifficulty('all') }}>Clear all filters</button></div>}
+      {/* Overall progress — derived from stored reviews, never hardcoded. */}
+      <div className="card iv-progress" aria-label="Your interview progress">
+        <div>
+          <strong>Your progress: {overall.reviewed} of {overall.total} questions reviewed</strong>
+          <p style={{ color: 'var(--muted)', margin: '4px 0 0' }}>
+            {overall.confident} confident · {overall.needsReview} need review · {overall.total - overall.reviewed} not yet reviewed · {overall.bookmarked} bookmarked
+          </p>
+        </div>
+        <div className="progress-bar" aria-label={`${overall.pctReviewed}% of interview questions reviewed`}><div style={{ width: `${overall.pctReviewed}%` }} /></div>
+      </div>
 
-      {browseBy === 'module' ? (
-        MODULES.map(mod => {
-          const qs = filtered.filter(q => q.module === mod.id)
-          if (filterModule !== 'all' && filterModule !== mod.id) return null
-          if (qs.length === 0) return <div key={mod.id} className="card" style={{ marginBottom: 12 }}><h3 style={{ marginTop: 0 }}>{mod.title}</h3><p style={{ color: 'var(--muted)' }}>Questions for this module are planned and will be added in the interview content batch. Structure is ready — no component changes needed to add them.</p></div>
-          return (
-            <div key={mod.id} className="card" style={{ marginBottom: 12 }}>
-              <h2 style={{ marginTop: 0 }}>{mod.title} <span className="badge">{qs.length} questions</span></h2>
-              <ul>{qs.map(q => (
-                <li key={q.id}><Link to={`/interview/question/${q.id}`}>{q.question}</Link> — {q.category} · {q.difficulty} {data.interviewReview[q.id] && <span className="badge">{data.interviewReview[q.id]}</span>} {data.questionBookmarks.includes(q.id) && <span className="badge">Bookmarked</span>}</li>
-              ))}</ul>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        <button className="btn secondary" aria-pressed={view === 'module'} onClick={() => setParam({ view: 'module', module: null, topic: null })}>By experience level {view === 'module' ? '✓' : ''}</button>
+        <button className="btn secondary" aria-pressed={view === 'topic'} onClick={() => setParam({ view: 'topic', module: null, topic: null })}>By topic {view === 'topic' ? '✓' : ''}</button>
+      </div>
+
+      {!loaded && <div className="card"><p>Loading interview questions…</p><div className="skeleton" style={{ height: 24, marginBottom: 10 }} /><div className="skeleton" /><div className="skeleton" style={{ marginTop: 8 }} /></div>}
+
+      {loaded && view === 'module' && !selectedModule && (
+        <div className="grid grid-2 module-grid">
+          {INTERVIEW_MODULES.map(mod => {
+            const qs = interviewQuestions.filter(q => q.module === mod.id)
+            const stats = reviewStats(qs, data.interviewReview, data.questionBookmarks)
+            const next = firstUnreviewed(qs, data.interviewReview)
+            return (
+              <article key={mod.id} className={`card module-card${mod.isResume ? ' resume' : ''}`}>
+                <p style={{ margin: 0 }}><span className="badge">{mod.level}</span>{mod.isResume && <span className="badge accent"> Resume, not a question module</span>}</p>
+                <h2 style={{ margin: '8px 0 4px' }}>{mod.title}</h2>
+                <p style={{ color: 'var(--muted)', marginTop: 0 }}>{mod.description}</p>
+                <p><strong>{qs.length} questions</strong> · {stats.reviewed} reviewed · {stats.confident} confident{stats.needsReview > 0 ? ` · ${stats.needsReview} need review` : ''}</p>
+                <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${mod.title}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+                  <button className="btn" onClick={() => setParam({ view: 'module', module: mod.id, topic: null })}>
+                    <GraduationCap size={16} /> {stats.reviewed === 0 ? 'Start' : stats.reviewed < qs.length ? 'Continue' : 'Review again'}
+                  </button>
+                  {next && <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.9rem' }}>Next up: {next.question.length > 60 ? `${next.question.slice(0, 60)}…` : next.question}</span>}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      )}
+
+      {loaded && (selectedModule || view === 'topic') && (
+        <div>
+          {selectedMeta && (
+            <div className="card iv-module-head">
+              <button className="btn secondary small" onClick={() => setParam({ view: 'module', module: null, topic: null })}>← All modules</button>
+              <h2 style={{ margin: '10px 0 4px' }}>{selectedMeta.title}</h2>
+              <p style={{ color: 'var(--muted)', marginTop: 0 }}>{selectedMeta.description}</p>
+              {selectedStats && (
+                <p style={{ margin: '4px 0 8px' }}>
+                  <strong>{selectedStats.reviewed} of {selectedStats.total} reviewed</strong> · {selectedStats.confident} confident · {selectedStats.needsReview} need review · {selectedStats.bookmarked} bookmarked
+                </p>
+              )}
+              <div className="progress-bar" aria-label={`${selectedStats?.pctReviewed || 0}% reviewed in ${selectedMeta.title}`}><div style={{ width: `${selectedStats?.pctReviewed || 0}%` }} /></div>
+              {nextUp && <p style={{ margin: '8px 0 0' }}>Next unreviewed question: <strong>{nextUp.question}</strong></p>}
             </div>
-          )
-        })
-      ) : (
-        [...byTopic.entries()].map(([topicId, qs]) => {
-          const topic = getTopic(topicId)
-          return (
-            <div key={topicId} className="card" style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
-              <h3 style={{ marginTop: 0 }}>{topic ? topic.title : topicId === 'general' ? 'General' : 'Topic no longer available'}</h3>
-              <ul>{qs.map(q => <li key={q.id}><Link to={`/interview/question/${q.id}`}>{q.question}</Link> — {q.category} · {q.difficulty}</li>)}</ul>
+          )}
+          {view === 'topic' && (
+            <div className="card iv-module-head">
+              <h2 style={{ margin: '0 0 4px' }}>Browse by topic</h2>
+              <p style={{ color: 'var(--muted)', margin: 0 }}>The same {interviewQuestions.length} questions, grouped by the Learn topic they belong to — across all experience levels. Each question shows its module as a badge.</p>
             </div>
-          )
-        })
+          )}
+
+          {/* Filters that actually help: text, difficulty, category, review status, self-test. */}
+          <div className="card iv-filters" aria-label="Filter interview questions">
+            <label className="iv-filter">
+              <span className="sr-only">Search interview questions</span>
+              <span className="iv-search-wrap"><Search size={16} /><input className="input" type="search" placeholder="Search questions and answers…" value={filters.query} onChange={e => setFilters({ ...filters, query: e.target.value })} aria-label="Search interview questions" /></span>
+            </label>
+            <label className="iv-filter">Difficulty
+              <select className="select" value={filters.difficulty} onChange={e => setFilters({ ...filters, difficulty: e.target.value })} aria-label="Filter by difficulty">
+                <option value="all">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option>
+              </select>
+            </label>
+            <label className="iv-filter">Category
+              <select className="select" value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })} aria-label="Filter by category">
+                <option value="all">All categories</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label className="iv-filter">Review status
+              <select className="select" value={filters.review} onChange={e => setFilters({ ...filters, review: e.target.value as never })} aria-label="Filter by review status">
+                <option value="all">All questions</option>
+                <option value="not-reviewed">Not yet reviewed</option>
+                <option value="needs-review">Needs review</option>
+                <option value="confident">Confident</option>
+                <option value="bookmarked">Bookmarked</option>
+              </select>
+            </label>
+            <label className="iv-filter iv-toggle">
+              <input type="checkbox" checked={selfTest} onChange={e => setSelfTest(e.target.checked)} /> Self-test mode
+              <span className="iv-toggle-note">{selfTest ? 'Answers hidden until revealed' : 'Short answers shown'}</span>
+            </label>
+            <div className="iv-filter-actions">
+              <button className="btn secondary small" onClick={revealAll}>Reveal all</button>
+              <button className="btn secondary small" onClick={hideAll}>Hide all</button>
+              {filtersActive && <button className="btn secondary small" onClick={clearFilters}><X size={15} /> Clear filters</button>}
+            </div>
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="card iv-empty" role="status">
+              <h3 style={{ marginTop: 0 }}>No questions match those filters</h3>
+              <p style={{ color: 'var(--muted)' }}>
+                {scoped.length === 0
+                  ? 'This module has no questions yet.'
+                  : 'Try a different search term, or clear the filters to see every question in this view.'}
+              </p>
+              <button className="btn" onClick={clearFilters}>Clear all filters</button>
+              <Link className="btn secondary" to="/learn" style={{ marginLeft: 8 }}>Browse Learn instead</Link>
+            </div>
+          )}
+
+          {groups.map(group => (
+            <TopicGroupCard
+              key={group.topicId}
+              group={group}
+              selfTest={selfTest}
+              expandedIds={expandedIds}
+              onToggleQuestion={toggleQuestion}
+              open={openTopics.has(group.topicId)}
+              onToggleOpen={() => setOpenTopics(prev => {
+                const next = new Set(prev)
+                if (next.has(group.topicId)) next.delete(group.topicId)
+                else next.add(group.topicId)
+                return next
+              })}
+              showModule={view === 'topic'}
+            />
+          ))}
+        </div>
       )}
     </div>
   )
@@ -84,45 +406,120 @@ export function InterviewIndex() {
 export function InterviewQuestionPage() {
   const { questionId } = useParams()
   const { questions: interviewQuestions, loaded } = useInterviewQuestions()
-  const q = interviewQuestions.find(x => x.id === questionId)
   const { data, toggleList, setInterviewReview } = useApp()
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copyFailed, setCopyFailed] = useState(false)
-  if (!loaded) return <div><h1>Loading question…</h1><p>Fetching this interview question.</p></div>
+
+  const q = interviewQuestions.find(x => x.id === questionId)
+  const { prev, next } = prevNextQuestion(interviewQuestions, questionId || '')
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    setRevealed(false)
+    setCopied(false)
+    setCopyFailed(false)
+  }, [questionId])
+
+  if (!loaded) return <div><h1>Loading question…</h1><p>Fetching this interview question.</p><div className="skeleton" style={{ height: 24, marginBottom: 10 }} /><div className="skeleton" /></div>
   if (!q) return <div><h1>Question not found</h1><p>That question id does not exist in the current interview content. It may have been removed, or planned for a later batch — your other data is unaffected.</p><p><Link to="/interview">← Back to Interview Prep</Link> · <Link to="/search">Search questions</Link> · <Link to="/learn">Browse Learn</Link></p></div>
+
   const topic = q.topicId ? getTopic(q.topicId) : undefined
+  const mod = moduleMeta(q.module)
+  const status = data.interviewReview[q.id]
+  const bookmarked = data.questionBookmarks.includes(q.id)
   const copy = async () => {
     setCopyFailed(false)
-    try { await navigator.clipboard.writeText(`${q.question}\n\n${q.shortAnswer}`); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { setCopied(false); setCopyFailed(true) }
+    try {
+      await navigator.clipboard.writeText(`${q.question}\n\n${q.shortAnswer}${q.detailedAnswer ? `\n\n${q.detailedAnswer}` : ''}`)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch { setCopied(false); setCopyFailed(true) }
   }
+
   return (
     <div style={{ overflowWrap: 'break-word' }}>
-      <p><Link to="/interview">← Interview Prep</Link></p>
-      <h1>{q.question}</h1>
-      <p style={{ color: 'var(--muted)' }}>{q.category} · {q.difficulty} · {MODULES.find(m => m.id === q.module)?.title || q.module}</p>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-        <button className="btn secondary small" onClick={() => setRevealed(!revealed)}>{revealed ? <><EyeOff size={15} /> Hide answer (self-test)</> : <><Eye size={15} /> Reveal answer</>}</button>
-        <button className="btn secondary small" onClick={() => toggleList('questionBookmarks', q.id)}><Bookmark size={15} /> {data.questionBookmarks.includes(q.id) ? 'Bookmarked ✓' : 'Bookmark question'}</button>
-        <button className="btn secondary small" onClick={copy}><Copy size={15} /> {copied ? 'Copied!' : 'Copy question + answer'}</button>
-        {copyFailed && <span role="alert" style={{ color: 'var(--danger)', alignSelf: 'center' }}>Copy failed (clipboard blocked) — select the text manually instead.</span>}
-        <button className="btn secondary small" onClick={() => setInterviewReview(q.id, 'confident')}>Mark Confident {data.interviewReview[q.id] === 'confident' ? '✓' : ''}</button>
-        <button className="btn secondary small" onClick={() => setInterviewReview(q.id, 'needs-review')}>Needs review {data.interviewReview[q.id] === 'needs-review' ? '✓' : ''}</button>
-      </div>
-      {revealed ? (
-        <div className="card">
-          <h3>Short answer</h3><p>{q.shortAnswer}</p>
-          {q.detailedAnswer && <><h3>Detailed answer</h3><p>{q.detailedAnswer}</p></>}
-          {q.followUps && q.followUps.length > 0 && <><h3>Likely follow-ups</h3><ul>{q.followUps.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
-          {q.tips && q.tips.length > 0 && <><h3>Tips</h3><ul>{q.tips.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
-          {q.commonMistakes && q.commonMistakes.length > 0 && <><h3>Common mistakes</h3><ul>{q.commonMistakes.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <span className="breadcrumb-item"><Link to="/interview">Interview Prep</Link></span>
+        <span className="breadcrumb-sep">/</span>
+        {mod && <><span className="breadcrumb-item"><Link to={`/interview?view=module&module=${mod.id}`}>{mod.title}</Link></span><span className="breadcrumb-sep">/</span></>}
+        {topic && <><span className="breadcrumb-item"><Link to={`/interview?view=module&module=${q.module}&topic=${topic.id}`}>{topic.title}</Link></span><span className="breadcrumb-sep">/</span></>}
+        <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">{q.question.length > 60 ? `${q.question.slice(0, 60)}…` : q.question}</span></span>
+      </nav>
+
+      <article className="card q-page">
+        <h1 style={{ marginBottom: 4 }}>{q.question}</h1>
+        <p className="q-badges">
+          <span className="badge">{q.category || 'General'}</span>{' '}
+          <span className="badge">{q.difficulty || 'Medium'}</span>{' '}
+          {mod && <span className="badge">{mod.title}</span>}{' '}
+          {topic && <span className="badge">Topic: {topic.title}</span>}{' '}
+          <ReviewBadge status={status} />{' '}
+          {bookmarked && <span className="badge accent">Bookmarked</span>}
+        </p>
+
+        <div className="q-actions">
+          <button className="btn secondary small" onClick={() => setRevealed(!revealed)} aria-expanded={revealed}>
+            {revealed ? <><EyeOff size={15} /> Hide answer</> : <><Eye size={15} /> Reveal answer</>}
+          </button>
+          <button className="btn secondary small" onClick={() => toggleList('questionBookmarks', q.id)} aria-pressed={bookmarked}>
+            <Bookmark size={15} /> {bookmarked ? 'Bookmarked ✓' : 'Bookmark question'}
+          </button>
+          <button className="btn secondary small" onClick={copy}><Copy size={15} /> {copied ? 'Copied!' : 'Copy question + answer'}</button>
+          {copyFailed && <span role="alert" style={{ color: 'var(--danger)', alignSelf: 'center' }}>Copy failed (clipboard blocked) — select the text manually instead.</span>}
+          <button className="btn secondary small" aria-pressed={status === 'confident'} onClick={() => setInterviewReview(q.id, 'confident')}>Mark Confident {status === 'confident' ? '✓' : ''}</button>
+          <button className="btn secondary small" aria-pressed={status === 'needs-review'} onClick={() => setInterviewReview(q.id, 'needs-review')}>Needs review {status === 'needs-review' ? '✓' : ''}</button>
         </div>
-      ) : (
-        <div className="card"><p style={{ color: 'var(--muted)' }}>Answer hidden for self-test. Reveal it when you are ready, then mark yourself Confident or Needs review.</p><p><strong>Short answer preview:</strong> Try answering in your own words first.</p></div>
+
+        {revealed ? (
+          <div className="q-answer">
+            <h3>Short answer</h3><p>{q.shortAnswer || 'No short answer yet.'}</p>
+            {q.detailedAnswer ? (
+              <><h3>Detailed answer</h3><p style={{ whiteSpace: 'pre-wrap' }}>{q.detailedAnswer}</p></>
+            ) : (
+              <p style={{ color: 'var(--muted)' }}>No detailed answer yet — the short answer above is the key point.</p>
+            )}
+            {q.followUps && q.followUps.length > 0 && <><h3>Likely follow-ups</h3><ul>{q.followUps.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+            {q.tips && q.tips.length > 0 && <><h3>Tips</h3><ul>{q.tips.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+            {q.commonMistakes && q.commonMistakes.length > 0 && <><h3>Common mistakes</h3><ul>{q.commonMistakes.map((f, i) => <li key={i}>{f}</li>)}</ul></>}
+          </div>
+        ) : (
+          <div className="card" style={{ background: 'var(--surface-2)' }}>
+            <p style={{ color: 'var(--muted)', margin: 0 }}><strong>Try it first.</strong> Answer in your own words, out loud or on paper, then reveal the answer and compare. Mark yourself Confident or Needs review afterwards.</p>
+          </div>
+        )}
+      </article>
+
+      {topic && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <h3 style={{ marginTop: 0 }}>Study this topic in Learn</h3>
+          <p style={{ color: 'var(--muted)' }}>{topic.summary || topic.title}</p>
+          <Link className="btn secondary" to={topicUrl(topic)}>Open {topic.title} →</Link>
+        </div>
       )}
-      {topic && <p>Related topic: <Link to={topicUrl(topic)}>{topic.title}</Link></p>}
-      {q.relatedTopics && q.relatedTopics.length > 0 && <p>Related topics: {q.relatedTopics.map(id => { const t = getTopic(id); return t ? <span key={id} style={{ marginRight: 8 }}><Link to={topicUrl(t)}>{t.title}</Link></span> : null })}</p>}
-      <p><Link to={`/interview/question/${q.id}`} style={{ wordBreak: 'break-all' }}>Deep link to this question: /interview/question/{q.id}</Link></p>
+      {q.relatedTopics && q.relatedTopics.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <h3 style={{ marginTop: 0 }}>Related topics</h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {q.relatedTopics.map(id => {
+              const t = getTopic(id)
+              return t ? <Link key={id} className="btn secondary small" to={topicUrl(t)}>{t.title}</Link> : null
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="topic-nav-bottom" aria-label="Previous and next question">
+        {prev
+          ? <Link className="btn secondary" to={`/interview/question/${prev.id}`}><ChevronLeft size={16} /> Previous: {prev.question.length > 50 ? `${prev.question.slice(0, 50)}…` : prev.question}</Link>
+          : <span />}
+        {next
+          ? <Link className="btn secondary" to={`/interview/question/${next.id}`}>Next: {next.question.length > 50 ? `${next.question.slice(0, 50)}…` : next.question} <ChevronRight size={16} /></Link>
+          : <span />}
+      </div>
+      <p style={{ marginTop: 16 }}>
+        <Link to={topic ? `/interview?view=module&module=${q.module}&topic=${topic.id}` : `/interview?view=module&module=${q.module}`}>← Back to {topic ? `${topic.title} questions` : 'this module'}</Link>
+      </p>
     </div>
   )
 }
