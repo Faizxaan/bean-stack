@@ -151,7 +151,10 @@ button { cursor: pointer; }
 .iv-toggle { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text); padding-bottom: 8px; }
 .iv-toggle-note { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
 .iv-filter-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-bottom: 4px; }
-.topic-group { margin-bottom: 16px; }
+.topic-group { margin-bottom: 16px; scroll-margin-top: 76px; }
+.area-topic-label { margin: 16px 0 10px; font-size: 0.95rem; color: var(--muted); }
+.area-topic-label:first-child { margin-top: 4px; }
+.iv-area-jump { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
 .topic-group-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .topic-group-toggle { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--text); font: inherit; text-align: left; padding: 4px 0; min-width: 0; }
 .topic-group-toggle:hover { color: var(--accent); }

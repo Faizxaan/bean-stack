@@ -57,7 +57,10 @@ export function Settings() {
         return
       }
       const knownTopics = new Set(contentIndex.topics.map(t => t.id))
-      const knownQuestions = new Set(contentIndex.interviewQuestionIds)
+      // Include revision prompt ids: they share the questionBookmarks /
+      // interviewReview keys, so an import carrying a Module 0 prompt's
+      // saved state must validate, not be rejected as unknown.
+      const knownQuestions = new Set([...contentIndex.interviewQuestionIds, ...contentIndex.revisionPromptIds])
       const knownPractice = new Set(contentIndex.practiceItemIds)
       const result = validateImport(parsed, knownTopics, knownQuestions, knownPractice)
       if (!result.ok) {

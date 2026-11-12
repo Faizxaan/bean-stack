@@ -22,7 +22,7 @@
     "topicId": "generics-deep-dive"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "detailedAnswer": "ConcurrentHashMap scales by striping locks across bins rather than locking the whole map, and its atomic bulk methods such as compute, merge, and forEach operate per bin, so they do not give you a consistent snapshot across the whole map. A mapping function in computeIfAbsent must be short, non-blocking, and side-effect free, because it can run while holding a bin lock and may be invoked more than once under contention, which can stall other threads or cause surprising duplicate work. Sizing matters less than in HashMap because concurrency level is a hint, not a hard segment count, but an undersized map still resizes under load, and a huge initial capacity wastes memory. For high-contention counters, prefer LongAdder over AtomicLong inside the map, and for compound multi-key updates, accept that you need an external lock or a redesign, not a single atomic map call.",
     "difficulty": "Medium",
     "followUps": [
@@ -45,7 +45,7 @@
     "topicId": "collections-deep-dive"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "detailedAnswer": "A correct parallel reduction needs an associative, stateless combiner and an identity that is truly neutral, otherwise results vary between runs depending on how work is split. Stateful intermediate operations such as sorted, distinct, and limit on an unordered stream force buffering or coordination that can erase parallel gains, and encounter order adds further coordination costs that an unordered stream avoids. Short-circuiting operations such as findAny are faster in parallel than findFirst, which must respect order. Before parallelizing, check that the source splits efficiently \u2014 a LinkedList or an iterator-based stream splits poorly \u2014 that the per-element work is large enough to outweigh splitting overhead, and that no operation blocks or mutates shared state.",
     "difficulty": "Hard",
     "followUps": [
@@ -68,7 +68,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "detailedAnswer": "An executor saturates in stages: tasks queue up, threads grow to the maximum, the queue fills, and then the rejection policy decides whether callers block, run the task themselves, or drop it \u2014 and the default abort policy throws RejectedExecutionException at the worst moment. A bounded queue with caller-runs or a backpressure-aware policy protects downstream systems, while an unbounded queue hides overload until memory or latency explodes. Separate executors by workload class \u2014 CPU-bound, blocking I/O, and scheduled work \u2014 so one slow dependency cannot starve everything else, and expose queue depth, active threads, and rejections as metrics with alerts. Virtual threads change the calculus for blocking I/O by making a thread per task cheap, but they do not remove the need for bounds, timeouts, and backpressure when the downstream system itself is the bottleneck.",
     "difficulty": "Hard",
     "followUps": [
@@ -90,7 +90,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "detailedAnswer": "Start from the symptom: long pauses point to garbage collection logs and heap sizing, a steadily growing heap points to a leak, and high CPU without progress points to a hot loop or lock contention. Enable GC logging, then read pause times, allocation rate, and promotion rate before touching flags, and take a heap dump only after confirming the heap is actually growing, since a dump freezes or slows the process. Analyze the dump for the largest retained objects and their shortest paths to GC roots, which usually reveal a static cache, a listener never deregistered, or an unbounded collection. Metaspace growth points instead to classloader leaks, often from repeated redeploys, while native memory growth points outside the heap entirely. Fix the retention cause, then tune the collector; tuning flags around a leak only postpones the outage.",
     "difficulty": "Hard",
     "followUps": [
@@ -113,7 +113,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Spring AOP and @Transactional work through proxies: a call from outside the bean goes through the proxy, which starts a transaction or applies advice, while a call from one method of the bean to another bypasses the proxy entirely, so the annotation on the called method is silently ignored. The same applies to private methods, which proxies cannot intercept, and to final classes or methods with JDK dynamic proxies. The fixes are to restructure so the transactional method is called through another bean, to self-inject the proxy, or to use AspectJ weaving when proxy limits are truly unacceptable. This also explains why @Transactional on a method that only calls another method in the same class appears to do nothing, and why a rollback only happens for unchecked exceptions by default unless rollbackFor is configured.",
     "difficulty": "Medium",
     "followUps": [
@@ -136,7 +136,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Auto-configuration classes are ordered and conditional, so when two starters provide the same bean, the one whose conditions match and that is ordered first wins, and a user-defined bean of the same type normally makes auto-configuration back off via @ConditionalOnMissingBean. Conflicts usually come from an explicit @Bean that shadows the auto-configured one, a starter pulled in transitively that you did not expect, or a condition such as @ConditionalOnClass that behaves differently in tests versus production because the classpath differs. Debug with the auto-configuration report, which lists what applied, what was excluded, and why each candidate was skipped, and with the conditions evaluation report in tests. Prefer excluding a specific auto-configuration or defining a replacement bean deliberately over broad component-scan exclusions, which hide future surprises.",
     "difficulty": "Medium",
     "followUps": [
@@ -158,7 +158,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Filters run at the servlet level, before Spring MVC dispatches, so they see every request but not the handler, while interceptors run inside Spring MVC around the handler, with access to the controller method and model, and argument resolvers and exception resolvers run even closer to the handler. Use filters for cross-cutting transport concerns such as logging and authentication headers, interceptors for handler-aware concerns such as feature flags or tenant context, and @ControllerAdvice for consistent error translation. For asynchronous handling, Callable and DeferredResult release the request thread while work completes, and WebFlux-style reactive endpoints only help when the whole downstream chain is non-blocking; wrapping a blocking call in a reactive type just moves the blockage. Idempotency for retried POSTs belongs at the API layer with an idempotency key stored with the result, not in the client retry logic alone.",
     "difficulty": "Medium",
     "followUps": [
@@ -181,7 +181,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Optimistic locking with a @Version column lets concurrent updates proceed and fails the loser with an OptimisticLockException instead of silently overwriting, which suits low-contention data such as user profiles, while pessimistic locking suits high-contention resources such as inventory counts. Isolation levels trade correctness for concurrency: read committed prevents dirty reads, repeatable read prevents non-repeatable reads, and serializable prevents phantoms, but each stronger level costs throughput and increases lock waits. Lost updates, phantom reads, and write skew are the anomalies to name, and the fix is usually a version column plus a retry for the loser, or a pessimistic lock for the contested row, rather than raising the global isolation level. Second-level caching helps read-heavy reference data but can serve stale entities across nodes, so it needs explicit invalidation and must never cache frequently mutated data.",
     "difficulty": "Hard",
     "followUps": [
@@ -225,7 +225,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "detailedAnswer": "Window functions such as ROW_NUMBER, RANK, and running totals compute over a window of rows without collapsing them, so you can rank orders per customer or compute a moving average while keeping every row. Offset pagination with LIMIT and OFFSET is simple but scans and discards skipped rows, so it slows as the offset grows and can skip or repeat rows when data changes between pages. Keyset pagination, filtering on an ordered unique key such as a timestamp plus id, stays fast at any depth and is stable under inserts, but it cannot jump to an arbitrary page number. Covering indexes, which include every column a query needs, let the database answer from the index alone, but each extra index costs write performance and storage, so verify with the execution plan and measure on realistic data volumes.",
     "difficulty": "Medium",
     "followUps": [
@@ -247,7 +247,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "detailedAnswer": "The task is to design an LRU cache with get and put in constant time. The idiomatic approach pairs a hash map from key to node with a doubly linked list ordered by recency: the map gives constant-time lookup, and the list lets you move a node to the front on access and evict the tail node on overflow, both in constant time. On get, return the value and move its node to the front; on put, insert or update the node, move it to the front, and if the size exceeds capacity, remove the tail node from both the list and the map. A linked hash map in access-order mode provides this out of the box in Java, but interviewers usually want the map-plus-list structure explained, and for a concurrent version you must add locking or sharding rather than assuming the structure is thread-safe.",
     "difficulty": "Hard",
     "followUps": [
@@ -270,7 +270,7 @@
     "topicId": "collections-deep-dive"
   },
   {
-    "category": "Scenario-based",
+    "category": "Java",
     "detailedAnswer": "First, establish whether threads are blocked, deadlocked, or merely busy: thread dumps taken a few seconds apart show threads stuck in the same place for a deadlock or lock wait, versus threads moving through different code for CPU saturation. A common root cause is a thread pool exhausted by calls to a slow downstream service without timeouts, so every request thread waits and new requests queue until the service appears dead. Mitigate immediately by shedding load or restarting with bounded pools and timeouts, then fix the dependency contract: add timeouts, bulkheads per dependency, and circuit breakers, and alert on queue depth before it reaches saturation. A post-incident review should ask why the missing timeout was not caught by a checklist or test, because the same failure will recur with the next slow dependency.",
     "difficulty": "Hard",
     "followUps": [
@@ -345,7 +345,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Treating Metaspace growth as a heap leak and tuning heap flags.",
       "Leaving Metaspace uncapped in production.",
@@ -402,7 +402,7 @@
     "topicId": "reflection-serialization"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Assuming loadClass runs static initialisers.",
       "Breaking parent delegation and loading two copies of the same class.",
@@ -460,7 +460,7 @@
     "topicId": "oop-principles"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Checking the condition with if instead of while.",
       "Calling wait or notify outside a synchronized block.",
@@ -489,7 +489,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "Coding",
+    "category": "Testing",
     "commonMistakes": [
       "Capturing an argument when the expected object was already known.",
       "Verifying every interaction instead of the one that defines the behaviour.",
@@ -605,7 +605,7 @@
     "topicId": "design-patterns-solid"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Listing patterns without a Spring example for any of them.",
       "Confusing a container-managed singleton bean with a hand-written Singleton class.",
@@ -634,7 +634,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Calling an @Async method from the same bean and expecting it to run in the background.",
       "Using the default executor under load.",
@@ -663,7 +663,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Creating beans unconditionally so consumers cannot override them.",
       "Forgetting the properties prefix so settings collide with other starters.",
@@ -692,7 +692,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming one @Transactional covers both databases.",
       "Leaking the tenant key in a ThreadLocal across requests.",
@@ -721,7 +721,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Scenario-based",
+    "category": "Microservices",
     "commonMistakes": [
       "Adding instances before checking whether the database is the bottleneck.",
       "Raising the connection pool without checking what the database can handle.",
@@ -750,7 +750,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Adding an index without reading the plan first.",
       "Testing the fix on a tiny dataset.",
@@ -779,7 +779,7 @@
     "topicId": "db-joins-indexes-transactions"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Adding a filter without a position and letting it land in a random spot.",
       "Doing heavy work in a filter that runs on every request.",
@@ -893,7 +893,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Catching the exception instead of fixing the modification.",
       "Assuming the exception is guaranteed to be thrown."
@@ -1049,7 +1049,7 @@
     "topicId": "reflection-serialization"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Using AtomicInteger for a check-then-act across two fields.",
       "Assuming lock-free means contention-free."
@@ -1075,7 +1075,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Using TreeSet when only insertion order is needed.",
       "Adding null to a TreeSet."
@@ -1153,7 +1153,7 @@
     "topicId": "design-patterns-solid"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Logging through the implementation class instead of SLF4J.",
       "Logging passwords or tokens."
@@ -1179,7 +1179,7 @@
     "topicId": "logging-testing-docs"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming scheduled tasks run in parallel by default.",
       "Running a scheduled job on every instance without a distributed lock."
@@ -1205,7 +1205,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using hasRole('ROLE_ADMIN') and doubling the prefix.",
       "Calling a secured method from inside the same class and expecting a check."
@@ -1231,7 +1231,7 @@
     "topicId": "security-jwt"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Keeping sessions in instance memory behind a load balancer.",
       "Storing large objects in the session."
@@ -1257,7 +1257,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Buffering without a bound.",
       "Dropping items from a stream where loss is unacceptable."
@@ -1283,7 +1283,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Returning false for null inside a custom validator.",
       "Writing validation logic in the controller instead of a constraint."
@@ -1309,7 +1309,7 @@
     "topicId": "validation-exception-handling"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming a checked exception rolls back by default.",
       "Raising isolation to SERIALIZABLE everywhere."
@@ -1335,7 +1335,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Returning entities directly from controllers.",
       "Setting only one side of the relationship."
@@ -1361,7 +1361,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Enabling the second-level cache without an invalidation plan.",
       "Expecting it to cache query results automatically."
@@ -1387,7 +1387,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Adding indexes without ever reading a plan.",
       "Trusting the estimated row counts without ANALYZE."
@@ -1491,7 +1491,7 @@
     "topicId": "sd-designing-real-systems"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Using the default groupingBy HashMap and losing the order.",
       "Returning a null or a magic character when nothing repeats."
@@ -1517,7 +1517,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Scenario-based",
+    "category": "System Design",
     "commonMistakes": [
       "Scaling up before knowing what is saturated.",
       "Adding caching before confirming the bottleneck is the database."

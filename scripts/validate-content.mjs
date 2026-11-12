@@ -101,7 +101,12 @@ function loadJsonFiles(dir, kind) {
       ids.add(it.id)
       if (!it.question && !it.prompt && !it.title) err(`${rel}: ${kind} ${it.id} missing question/prompt/title`)
       if (kind === 'interview') {
-        if (it.module && !['module-0', 'module-1', 'module-2', 'module-3', 'module-4', 'bonus-resume'].includes(it.module)) err(`${rel}: interview ${it.id} has invalid module ${it.module}`)
+        // Module 0 was removed from Interview Prep in the 2026-11-12
+        // second pass (its prompts moved to content/revision). An
+        // interview question must never carry module-0 or the Revision
+        // category again — the validator is the backstop.
+        if (it.module && !['module-1', 'module-2', 'module-3', 'module-4', 'bonus-resume'].includes(it.module)) err(`${rel}: interview ${it.id} has invalid module ${it.module}`)
+        if (it.category === 'Revision') err(`${rel}: interview ${it.id} still has category Revision — revision prompts belong in content/revision, not Interview Prep`)
         if (it.difficulty && !['Easy', 'Medium', 'Hard'].includes(it.difficulty)) err(`${rel}: interview ${it.id} has invalid difficulty ${it.difficulty}`)
       }
       if (kind === 'practice') {
@@ -119,8 +124,31 @@ function loadJsonFiles(dir, kind) {
   }
   return ids
 }
-loadJsonFiles(path.join(contentRoot, 'interview'), 'interview')
+const interviewIds = loadJsonFiles(path.join(contentRoot, 'interview'), 'interview')
 loadJsonFiles(path.join(contentRoot, 'practice'), 'practice')
+
+// Revision prompts (content/revision): the former Module 0 one-minute
+// prompts. Same shape as interview questions, but a separate namespace:
+// unique ids, resolvable topicIds, and no id collision with interview
+// questions (both namespaces share the LocalStorage review/bookmark keys).
+{
+  const revisionIds = new Set()
+  for (const file of walk(path.join(contentRoot, 'revision')).filter(f => f.endsWith('.json'))) {
+    const rel = path.relative(contentRoot, file)
+    let data
+    try { data = JSON.parse(fs.readFileSync(file, 'utf8')) } catch (e) { err(`${rel}: invalid JSON: ${e.message}`); continue }
+    const items = Array.isArray(data) ? data : (data.questions || [])
+    for (const it of items) {
+      if (!it.id) { err(`${rel}: revision prompt missing id`); continue }
+      if (revisionIds.has(it.id)) err(`Duplicate revision prompt id ${it.id} in ${rel}`)
+      revisionIds.add(it.id)
+      if (interviewIds.has(it.id)) err(`Revision prompt id ${it.id} in ${rel} collides with an interview question id`)
+      if (!it.question && !it.title) err(`${rel}: revision ${it.id} missing question/title`)
+      if (it.topicId && !topicIds.has(it.topicId)) err(`${rel}: revision ${it.id} references unknown topicId ${it.topicId}`)
+    }
+  }
+  if (revisionIds.size === 0) warn('content/revision has no prompts — the Module 0 deck is empty')
+}
 
 // Paths reference check
 try {

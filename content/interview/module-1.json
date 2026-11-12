@@ -43,7 +43,7 @@
     "topicId": "strings"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "detailedAnswer": "A HashMap stores entries in buckets chosen by the key's hash. In Java 8+, a bucket starts as a linked list and converts to a balanced tree when collisions grow (8 entries with at least 64 buckets), keeping worst-case lookup from degrading linearly. Equal keys must have equal hash codes, and a key's hash code must not change while it is in the map \u2014 hence immutable keys are preferred. HashMap allows one null key; ConcurrentHashMap allows neither null keys nor null values.",
     "difficulty": "Medium",
     "followUps": [
@@ -64,7 +64,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "detailedAnswer": "Intermediate operations (filter, map, sorted, distinct) are lazy and return a new stream; they do nothing until a terminal operation (collect, forEach, reduce, findFirst) runs. A stream is consumed by its terminal operation and cannot be reused \u2014 reusing it throws IllegalStateException. Short-circuiting terminals like findFirst or anyMatch can stop processing early.",
     "difficulty": "Medium",
     "followUps": [
@@ -85,7 +85,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Inversion of Control means the Spring container creates objects (beans) and supplies their dependencies, instead of each class creating its own with new. Dependency Injection is how it does that, preferably through constructors. Constructor injection makes dependencies explicit, required, and final, and makes testing easy because you can pass a mock directly. Field injection hides dependencies and is discouraged in new code.",
     "difficulty": "Easy",
     "followUps": [
@@ -106,7 +106,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Auto-configuration classes are guarded by conditions \u2014 for example @ConditionalOnClass (a class is on the classpath), @ConditionalOnMissingBean (no user bean of that type exists), and @ConditionalOnProperty. If you define your own bean of the same type, auto-configuration backs off for that bean. That is how Spring Boot provides sensible defaults that you can override. The --debug report shows which auto-configurations applied and why others did not.",
     "difficulty": "Medium",
     "followUps": [
@@ -127,7 +127,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Loading N parent entities and then lazily loading a collection for each one produces 1 + N queries \u2014 the N+1 problem. Fix it with a fetch join (JOIN FETCH), an @EntityGraph, or a DTO projection that fetches exactly what is needed. Do not fix it by making everything EAGER, which loads data you may never use. Also, accessing a lazy collection after the transaction closes throws LazyInitializationException.",
     "difficulty": "Hard",
     "followUps": [
@@ -148,7 +148,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "detailedAnswer": "synchronized provides mutual exclusion and visibility: only one thread holds a given monitor at a time, and writes before releasing the lock are visible to the next thread acquiring it. volatile provides visibility only: writes are visible to other threads, but compound actions like count++ (read-modify-write) are still not atomic. For atomic single-variable updates, use AtomicInteger and friends, or a lock.",
     "difficulty": "Medium",
     "followUps": [
@@ -169,7 +169,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Reaching for StringBuilder.reverse() when the question forbids built-in helpers.",
       "Forgetting that strings are immutable, so you must build a new string rather than editing in place.",
@@ -196,7 +196,7 @@
     "topicId": "strings"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Counting 'Java' and 'java' as different words because the case was not normalised.",
       "Using containsKey plus get in two lookups instead of getOrDefault or merge.",
@@ -223,7 +223,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Comparing with == on strings instead of comparing characters.",
       "Reversing the whole string first and then comparing \u2014 it works, but it uses extra memory for no reason.",
@@ -250,7 +250,7 @@
     "topicId": "strings"
   },
   {
-    "category": "Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Sorting the array first: correct, but O(n log n) when one pass is enough.",
       "Treating the second element of a sorted array as the answer, which fails when the largest value appears twice.",
@@ -277,7 +277,7 @@
     "topicId": "dsa-arrays-strings"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "commonMistakes": [
       "Writing a manual loop with a map and if-else when groupingBy does the same thing in one line.",
       "Forgetting that groupingBy returns a Map, so you cannot call stream operations on the result directly.",
@@ -304,7 +304,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "commonMistakes": [
       "Using map on a list of lists and ending up with Stream<List<String>> instead of Stream<String>.",
       "Forgetting that flatMap needs a function returning a stream \u2014 List::stream is the usual one.",
@@ -467,7 +467,7 @@
     "topicId": "oop-principles"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming every bean is a singleton by design \u2014 singleton is just the default scope, not a guarantee of thread safety.",
       "Expecting a prototype bean injected into a singleton to be fresh on every call \u2014 it is created once, at injection time.",
@@ -494,7 +494,7 @@
     "topicId": "bean-scopes-lifecycle"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Saying BeanFactory and ApplicationContext are interchangeable \u2014 for most apps you want the ApplicationContext.",
       "Manually creating a BeanFactory in application code instead of letting Spring Boot build an ApplicationContext.",
@@ -521,7 +521,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Treating @SpringBootApplication as magic \u2014 it is three annotations combined, and you should know which three.",
       "Putting the main class in the wrong package so component scan misses your controllers.",
@@ -548,7 +548,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Adding individual library versions by hand instead of letting the starter and its parent manage versions.",
       "Including two starters that pull in conflicting versions of the same library without checking the dependency tree.",
@@ -575,7 +575,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Enabling every actuator endpoint in production, including env and heapdump, without security.",
       "Assuming Actuator is on by default \u2014 only health and info are exposed over HTTP out of the box.",
@@ -602,7 +602,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Calling DispatcherServlet 'the controller' \u2014 it is the front controller that routes to your controllers.",
       "Forgetting that @RestController methods skip view resolution and write straight to the response body.",
@@ -629,7 +629,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Returning a plain string from a @Controller method and expecting JSON \u2014 it is treated as a view name.",
       "Putting @ResponseBody on every method instead of using @RestController on the class.",
@@ -656,7 +656,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Extending JpaRepository when you only need basic CRUD \u2014 CrudRepository is the simpler, sufficient choice.",
       "Calling save() in a loop for thousands of rows instead of saveAll with batching.",
@@ -683,7 +683,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Putting @Transactional on a private method or calling it from within the same class \u2014 Spring's proxy never sees the call, so no transaction starts.",
       "Expecting a rollback for a checked exception \u2014 by default Spring rolls back only on unchecked exceptions.",
@@ -710,7 +710,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Saying a unique key cannot be null \u2014 it can, in most databases, and MySQL even allows several nulls in one.",
       "Putting two primary keys on one table instead of one composite primary key.",
@@ -737,7 +737,7 @@
     "topicId": "db-sql-fundamentals"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Using HAVING without GROUP BY to filter rows \u2014 that is WHERE's job.",
       "Putting an aggregate condition in WHERE, which fails because WHERE runs before grouping.",
@@ -791,7 +791,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Scenario-based",
+    "category": "DevOps & Cloud",
     "commonMistakes": [
       "Running mvn install when you only meant to compile \u2014 it runs tests, packages, and writes to the local repository.",
       "Using -DskipTests when you meant -Dmaven.test.skip: skipTests still compiles tests, maven.test.skip skips compiling them too.",
@@ -816,7 +816,7 @@
     "topicId": "dv-cicd-pipelines"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Forgetting Java is pass-by-value and writing a swap on two int parameters.",
       "Using the arithmetic version without mentioning overflow."
@@ -842,7 +842,7 @@
     "topicId": "variables-operators-control-flow"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Treating 1 as prime.",
       "Looping all the way to n - 1 and calling it efficient."
@@ -868,7 +868,7 @@
     "topicId": "language-basics-syntax"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Forgetting the base cases, which causes infinite recursion.",
       "Claiming the naive version is efficient because it is short."
@@ -894,7 +894,7 @@
     "topicId": "language-basics-syntax"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Sorting the string first, which works but costs O(n log n) for no reason.",
       "Using nested loops, which is O(n squared)."
@@ -1050,7 +1050,7 @@
     "topicId": "language-basics-syntax"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Saying LinkedList is always better for insertions without mentioning the walk to the node.",
       "Claiming either is thread-safe."
@@ -1076,7 +1076,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Saying HashSet compares elements with ==.",
       "Overriding equals without hashCode in a class used in a set."
@@ -1102,7 +1102,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Using TreeMap when no ordering is needed and paying log n for nothing.",
       "Putting a null into a TreeSet and being surprised by the exception."
@@ -1128,7 +1128,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "commonMistakes": [
       "Expecting filter or map to change the original collection.",
       "Forgetting the terminal operation, so the pipeline never executes."
@@ -1154,7 +1154,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using field injection, which hides dependencies and makes testing harder.",
       "Making a required dependency optional through a setter."
@@ -1180,7 +1180,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming singleton scope means thread safety.",
       "Storing per-request data in a bean field."
@@ -1206,7 +1206,7 @@
     "topicId": "bean-scopes-lifecycle"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Hardcoding the port in code instead of configuration.",
       "Assuming Tomcat is the only embedded server."
@@ -1232,7 +1232,7 @@
     "topicId": "configuration-profiles"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Returning 200 for everything and encoding errors in the body.",
       "Returning a body with 204 No Content."
@@ -1258,7 +1258,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Putting a resource identifier in a query parameter.",
       "Forgetting that a missing required request parameter gives a 400."
@@ -1284,7 +1284,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using CascadeType.ALL on every relationship by default.",
       "Confusing cascading with orphanRemoval."
@@ -1310,7 +1310,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Using INNER JOIN and silently losing unmatched rows.",
       "Forgetting that the unmatched side comes back as nulls."
@@ -1336,7 +1336,7 @@
     "topicId": "db-joins-indexes-transactions"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Indexing every column and wondering why writes got slower.",
       "Indexing a boolean column and expecting a big win."
@@ -1388,7 +1388,7 @@
     "topicId": "sd-designing-real-systems"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Calling run() and thinking a new thread was created.",
       "Trying to restart a finished thread instead of creating a new one."
@@ -1414,7 +1414,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Saying objects are stored on the stack.",
       "Saying the heap is faster than the stack."

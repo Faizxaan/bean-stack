@@ -10,6 +10,9 @@ export const KNOWN_IDS = {
   // Id-only lists from the slim index — the full interview/practice
   // bodies are lazy-loaded, but sanitisation still needs the ids.
   questions: new Set(contentIndex.interviewQuestionIds),
+  // Revision prompt ids share the review/bookmark keys (utils.ts
+  // accepts either set), so a moved Module 0 prompt keeps its state.
+  revision: new Set(contentIndex.revisionPromptIds),
   practice: new Set(contentIndex.practiceItemIds),
 }
 

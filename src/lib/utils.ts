@@ -154,6 +154,17 @@ export interface KnownIdSets {
   topics: Set<string>
   questions: Set<string>
   practice: Set<string>
+  // One-minute revision prompts (former Module 0). They share the
+  // questionBookmarks / interviewReview keys with interview questions
+  // (same ids as before the move), so sanitisation accepts an id that
+  // is in either set — dropping a revision id here would silently lose
+  // a user's saved review/bookmark for that prompt.
+  revision?: Set<string>
+}
+
+function knownQuestionOrRevision(known: KnownIdSets): Set<string> {
+  if (!known.revision || known.revision.size === 0) return known.questions
+  return new Set([...known.questions, ...known.revision])
 }
 
 function parseableDate(v: unknown): v is string {
@@ -176,7 +187,10 @@ export function sanitizeUserData(data: unknown, known: KnownIdSets): UserData {
   }
   base.bookmarks = filterKnownIds(d.bookmarks, known.topics)
   base.favorites = filterKnownIds(d.favorites, known.topics)
-  base.questionBookmarks = filterKnownIds(d.questionBookmarks, known.questions)
+  // Question bookmarks / interview reviews may reference a revision
+  // prompt id as well as an interview question id (see KnownIdSets).
+  const knownQ = knownQuestionOrRevision(known)
+  base.questionBookmarks = filterKnownIds(d.questionBookmarks, knownQ)
   base.flashcardBookmarks = filterKnownIds(d.flashcardBookmarks, known.practice)
   if (isPlainObject(d.notes)) {
     for (const [id, v] of Object.entries(d.notes)) {
@@ -206,7 +220,7 @@ export function sanitizeUserData(data: unknown, known: KnownIdSets): UserData {
   }
   if (isPlainObject(d.interviewReview)) {
     for (const [id, v] of Object.entries(d.interviewReview)) {
-      if (known.questions.has(id) && (v === 'confident' || v === 'needs-review')) base.interviewReview[id] = v
+      if (knownQ.has(id) && (v === 'confident' || v === 'needs-review')) base.interviewReview[id] = v
     }
   }
   base.recentlyViewed = filterKnownIds(d.recentlyViewed, known.topics).slice(0, 20)

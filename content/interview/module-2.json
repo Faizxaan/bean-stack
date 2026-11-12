@@ -22,7 +22,7 @@
     "topicId": "exception-handling"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "detailedAnswer": "HashMap is not thread-safe and its iterators are fail-fast, so a concurrent modification during iteration usually throws ConcurrentModificationException, whereas ConcurrentHashMap iterators are weakly consistent and tolerate concurrent updates without throwing. ConcurrentHashMap also forbids null keys and null values, because a null return from get would be ambiguous when another thread could have removed the entry. Its atomic methods such as computeIfAbsent, merge, and putIfAbsent let you update a shared map without external locking, but the mapping function must be short and side-effect free, since it may be retried. For counters or grouped results, combine it with atomic values such as LongAdder or a concurrent collection rather than synchronizing the whole map.",
     "difficulty": "Medium",
     "followUps": [
@@ -45,7 +45,7 @@
     "topicId": "collections-deep-dive"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "detailedAnswer": "Parallel streams split work across the common ForkJoinPool, which helps only for large, CPU-bound, splittable workloads with independent, non-blocking operations. They hurt when the source is small, the work is I/O-bound, the operations block, or the pipeline uses stateful operations such as sorted or distinct that force coordination, and they can starve other tasks sharing the common pool. Stateful lambda side effects, such as appending to a shared list, break correctness in parallel pipelines, so collect results with a proper collector instead. A good answer names the workload, checks its size, avoids blocking calls, and measures before and after rather than assuming parallelism is faster.",
     "difficulty": "Medium",
     "followUps": [
@@ -68,7 +68,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "detailedAnswer": "CompletableFuture chains such as thenApply, thenCompose, and thenCombine let you express dependent and independent async steps without blocking, while exceptionally and handle let you recover or translate failures at a defined point in the chain. The most common production failure is submitting many futures to an unbounded or too-small pool, so dependent stages queue up and the whole pipeline stalls even though no thread has deadlocked. Always supply an explicit executor for blocking or long-running stages, bound the pool and its queue, set timeouts with orTimeout, and decide where exceptions are observed, because an unobserved future failure is silently lost. For fan-out work, combine futures with allOf and then inspect each result individually rather than assuming success.",
     "difficulty": "Hard",
     "followUps": [
@@ -90,7 +90,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "detailedAnswer": "Most modern collectors divide the heap into young and old generations, because most objects die young: short-lived objects are collected cheaply in the young generation, while survivors are promoted to the old generation, which is collected less often but more expensively. G1 divides the heap into regions and targets a pause-time goal by collecting the regions with the most garbage first, whereas the Parallel collector prioritizes throughput and accepts longer pauses. Frequent full garbage collections, long promotion failures, or a steadily growing old generation usually point to a leak, an undersized heap, or objects that live longer than expected. Tune by measuring pause times and allocation rates first, then adjust heap size and collector choice, rather than guessing flags.",
     "difficulty": "Medium",
     "followUps": [
@@ -113,7 +113,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Singleton is the default scope, so the container creates one instance per application context, while prototype creates a new instance on every request for the bean. The classic trap is injecting a prototype bean into a singleton: the injection happens once, so the singleton keeps the same prototype instance forever. Fix it by injecting a provider, such as ObjectProvider or Provider, and asking for a fresh instance on each use, or by using a scoped proxy. Request and session scopes only exist in a web context, and relying on them in a service layer makes the service untestable outside a request, so keep scope decisions at the edge where they belong.",
     "difficulty": "Medium",
     "followUps": [
@@ -135,7 +135,7 @@
     "topicId": "bean-scopes-lifecycle"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Spring Boot resolves configuration from many sources in a defined precedence order, roughly: command-line arguments and environment variables beat application properties files, which beat packaged defaults, and profile-specific files such as application-prod.properties beat the base application.properties within the same source type. Binding properties into a validated @ConfigurationProperties class is safer than scattering @Value annotations, because it groups related settings, supports relaxed binding and type conversion, and fails fast on invalid values when validation is enabled. Secrets should come from environment variables or a secret store, never from a committed properties file, and profile-specific behaviour should be expressed as configuration, not as if-statements scattered through code. When a value surprises you, check the active profiles and the effective property source order before assuming the code is wrong.",
     "difficulty": "Medium",
     "followUps": [
@@ -157,7 +157,7 @@
     "topicId": "configuration-profiles"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "A @RestControllerAdvice class centralizes exception handling across controllers, mapping each exception type to a consistent error body and HTTP status, so controllers stay focused on happy-path logic. Bean Validation annotations such as @NotNull, @Size, and @Pattern on a request DTO, triggered by @Valid, reject bad input before business logic runs, and validation failures arrive as a MethodArgumentNotValidException you can translate in the same advice class. Return ResponseEntity when the status or headers vary, such as 201 Created with a Location header after creating a resource, and keep error bodies stable with fields for a code, a message, and request context. Never leak stack traces or internal exception messages to clients, and never use exceptions for ordinary control flow.",
     "difficulty": "Medium",
     "followUps": [
@@ -179,7 +179,7 @@
     "topicId": "validation-exception-handling"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Derived query methods are readable for simple lookups, but they grow unwieldy for complex conditions, so use @Query for explicit JPQL or native SQL, and projections or DTO queries when you only need a few columns. Pagination with Pageable is convenient, but offset pagination degrades on large tables because the database still scans skipped rows, so keyset pagination on an ordered unique key is better for infinite-scroll or export workloads. Keep transaction boundaries at the service layer, not the repository, so a unit of work that touches several repositories commits or rolls back together, and avoid lazy-loading collections inside a controller after the transaction has closed. Count queries for Page results can also be expensive, so use Slice or a separate count only when the total is actually displayed.",
     "difficulty": "Medium",
     "followUps": [
@@ -224,7 +224,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "detailedAnswer": "An inner join returns only rows with a match on both sides, a left join keeps every row from the left table and fills unmatched right-side columns with null, and a full outer join keeps unmatched rows from both sides. To find duplicates, group by the candidate columns and keep only groups whose count is greater than one; to find orphan rows, use a left join and filter for null on the right side, or an anti-join with NOT EXISTS. Indexes speed up filtered and joined columns, but every index slows writes and costs storage, so index the columns your queries actually filter and join on, and verify with an execution plan rather than guessing. A common mistake is joining on a column with a different type or collation, which silently prevents index use.",
     "difficulty": "Medium",
     "followUps": [
@@ -246,7 +246,7 @@
     "topicId": "jdbc-networking"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "detailedAnswer": "The task is to group words that are anagrams of each other, for example listen and silent. The idiomatic approach is a single pass over the input: for each word, build a canonical key by sorting its characters or by counting character frequencies, then append the word to the list stored under that key in a hash map. Sorting gives a key in time proportional to word length times log word length, while a frequency count gives a linear-time key and is preferable for long words. At the end, return the map values as the groups. A common mistake is comparing words pairwise, which is quadratic, or using the unsorted word itself as the key, which never groups anything.",
     "difficulty": "Medium",
     "followUps": [
@@ -269,7 +269,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Scenario-based",
+    "category": "Java",
     "detailedAnswer": "Start by reproducing the slowness with a realistic request and measuring where time goes: check application metrics for thread-pool saturation, database connection-pool waits, and cache hit rates, and enable slow-query logging before changing anything. The usual culprits, in order, are an N+1 query pattern introduced by a new feature, a missing index on a newly filtered column, an unbounded result set being serialized, and a downstream call without a timeout. Fix the query or add the index, page or limit the result, add a timeout and a cache only where the data tolerates staleness, and verify with the same measurement you started from. A common mistake is adding caching or scaling instances first, which hides the bad query and spreads its cost across more machines.",
     "difficulty": "Hard",
     "followUps": [
@@ -314,7 +314,7 @@
     "topicId": "java-memory-model"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Overriding equals() without hashCode().",
       "Using a mutable entity with a generated id as a key before the id is set.",
@@ -369,7 +369,7 @@
     "topicId": "reflection-serialization"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Treating the two as interchangeable.",
       "Catching NoClassDefFoundError instead of fixing the classpath.",
@@ -396,7 +396,7 @@
     "topicId": "jdk-jre-jvm"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Storing custom objects with no Comparable or Comparator.",
       "Writing a Comparator that disagrees with equals and losing elements.",
@@ -423,7 +423,7 @@
     "topicId": "collections-framework"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "commonMistakes": [
       "Using map() where flatMap() was needed and getting nested lists.",
       "Doing real work or mutation inside peek().",
@@ -450,7 +450,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "commonMistakes": [
       "Calling get() without checking isPresent().",
       "Wrapping a value that can never be null in ofNullable() and hiding a bug.",
@@ -477,7 +477,7 @@
     "topicId": "functional-interfaces-optional"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Using ReentrantLock everywhere for no reason.",
       "Forgetting unlock in a finally block.",
@@ -504,7 +504,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Using execute() and never noticing failed tasks.",
       "Ignoring the Future returned by submit().",
@@ -531,7 +531,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Doing heavy work in a constructor instead of @PostConstruct, before dependencies are ready.",
       "Expecting @PreDestroy to run for prototype beans \u2014 the container never destroys them.",
@@ -558,7 +558,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Marking several beans @Primary for the same type.",
       "Hard-coding qualifier strings in many places so a rename breaks injection silently.",
@@ -612,7 +612,7 @@
     "topicId": "tst-junit-mockito-fundamentals"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Exposing all endpoints with no authentication.",
       "Letting health depend on a slow downstream so the load balancer drops healthy instances.",
@@ -639,7 +639,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Caching without any eviction on writes.",
       "Expecting time-based expiration from the default simple cache.",
@@ -666,7 +666,7 @@
     "topicId": "performance-best-practices"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using long-lived access tokens with no refresh flow.",
       "Putting passwords or personal data in the token payload.",
@@ -693,7 +693,7 @@
     "topicId": "security-jwt"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Marking everything eager to dodge lazy-loading errors.",
       "Accessing a lazy collection in a controller after the transaction closed.",
@@ -720,7 +720,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Inserting thousands of rows in one transaction without flush and clear.",
       "Running automatic schema updates against production.",
@@ -828,7 +828,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Storing passwords in plain text or with MD5/SHA-256.",
       "Adding a custom filter in the wrong position so it never runs.",
@@ -855,7 +855,7 @@
     "topicId": "security-jwt"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using the old implicit flow and exposing tokens in the browser.",
       "Skipping state validation on the redirect.",
@@ -882,7 +882,7 @@
     "topicId": "security-jwt"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Using HAVING for a filter that belongs in WHERE.",
       "Normalizing a reporting table until every read needs six joins.",
@@ -909,7 +909,7 @@
     "topicId": "db-sql-fundamentals"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Using a HashMap and returning a character that is not actually first.",
       "Scanning the string once per character, making it quadratic.",
@@ -936,7 +936,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Special-casing the first node instead of using a dummy.",
       "Copying nodes instead of relinking them.",
@@ -1067,7 +1067,7 @@
     "topicId": "functional-interfaces-optional"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "commonMistakes": [
       "Using a non-associative accumulator in a parallel stream.",
       "Picking an identity that is not neutral, such as 1 for addition."
@@ -1093,7 +1093,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Blaming the garbage collector or the database for a deadlock.",
       "Adding more locks to 'fix' a locking problem."
@@ -1119,7 +1119,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Using Runnable and a shared mutable field to smuggle out a result.",
       "Ignoring the Future and losing task failures silently."
@@ -1145,7 +1145,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Synchronising the whole method when only two lines need it.",
       "Locking on a String literal or a publicly reachable object."
@@ -1171,7 +1171,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Increasing the heap and calling the problem solved.",
       "Looking at total heap instead of heap after a full GC."
@@ -1197,7 +1197,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Silently re-enabling circular references instead of fixing the design.",
       "Hiding the cycle with field injection."
@@ -1223,7 +1223,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Claiming @Service adds transaction or caching behaviour.",
       "Annotating everything @Component and losing the layering."
@@ -1249,7 +1249,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Doing heavy work in a runner and delaying application readiness.",
       "Parsing raw args by hand when ApplicationRunner does it for you."
@@ -1275,7 +1275,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming @Value accepts relaxed names.",
       "A typo in a property name silently binding to nothing."
@@ -1301,7 +1301,7 @@
     "topicId": "configuration-profiles"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Leaving the Whitelabel page in front of API clients.",
       "Exposing stack traces in production error responses."
@@ -1327,7 +1327,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Forgetting SpringBootServletInitializer, so the WAR deploys but never starts.",
       "Shipping the embedded Tomcat inside a WAR and getting class clashes."
@@ -1353,7 +1353,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Disabling CSRF because a form broke, instead of adding the token.",
       "Assuming a JWT in a cookie is safe from CSRF."
@@ -1379,7 +1379,7 @@
     "topicId": "security-jwt"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Catching everything in each controller with try-catch.",
       "Throwing generic RuntimeException, which the advice cannot distinguish."
@@ -1405,7 +1405,7 @@
     "topicId": "validation-exception-handling"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Trusting the file extension for validation.",
       "Storing uploads in a web-accessible directory."
@@ -1431,7 +1431,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Joining a table to itself without aliases.",
       "Using an inner join and dropping employees without a manager."
@@ -1457,7 +1457,7 @@
     "topicId": "db-joins-indexes-transactions"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Writing a correlated subquery that runs once per row.",
       "Using NOT IN with nulls, which silently returns no rows."
@@ -1483,7 +1483,7 @@
     "topicId": "db-sql-java-developers"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using @Modifying without @Transactional.",
       "Reading stale entities after a bulk update without clearing the context."
@@ -1509,7 +1509,7 @@
     "topicId": "spring-data-jpa"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Forgetting equals and hashCode on the key class.",
       "Using a composite key when a surrogate id would be simpler."
@@ -1587,7 +1587,7 @@
     "topicId": "sd-designing-real-systems"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Forgetting that -15 starts with a minus sign.",
       "Writing a manual loop when the question asks for streams."

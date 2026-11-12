@@ -19,6 +19,7 @@ import {
 const KNOWN = {
   topics: new Set(['t1', 't2']),
   questions: new Set(['q1']),
+  revision: new Set(['r1']),
   practice: new Set(['p1', 'p2']),
 }
 
@@ -64,6 +65,16 @@ describe('sanitizeUserData (corrupt / old-schema storage)', () => {
     const s = sanitizeUserData({ activityDates: ['2026-01-01', 'junk', '2026-13-40', 5], practiceAttempts: attempts }, KNOWN)
     expect(s.activityDates).toEqual(['2026-01-01'])
     expect(s.practiceAttempts.length).toBe(5000)
+  })
+  it('keeps review/bookmark state for revision prompt ids as well as interview ids', () => {
+    // The former Module 0 prompts moved to content/revision with the
+    // same ids; dropping them here would silently lose saved state.
+    const s = sanitizeUserData({
+      questionBookmarks: ['q1', 'r1', 'nope'],
+      interviewReview: { q1: 'confident', r1: 'needs-review', nope: 'confident' },
+    }, KNOWN)
+    expect(s.questionBookmarks).toEqual(['q1', 'r1'])
+    expect(s.interviewReview).toEqual({ q1: 'confident', r1: 'needs-review' })
   })
 })
 

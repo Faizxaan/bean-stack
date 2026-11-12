@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BookOpen, Coffee, Home, Library, Search, Settings, Target, Layers, GraduationCap, PenLine, FileText } from 'lucide-react'
-import { contentIndex, getTrack, useFullContent } from '../lib/content'
+import { contentIndex, getTopic, getTrack, useFullContent, useRevisionPrompts } from '../lib/content'
 import { searchScore, topicUrl } from '../lib/utils'
 
 const NAV = [
@@ -39,6 +39,8 @@ export function Layout() {
   // Heavy interview/practice data loads only when the palette is open,
   // so the app shell's initial bundle stays slim (2026-11-09 chunk fix).
   const { interviewQuestions, practiceItems, loaded: fullLoaded } = useFullContent(paletteOpen)
+  const { prompts: revisionPrompts, loaded: revisionLoaded } = useRevisionPrompts(paletteOpen)
+  const allLoaded = fullLoaded && revisionLoaded
   const results = useMemo(() => {
     if (!query.trim()) return []
     const q = query.trim()
@@ -51,6 +53,10 @@ export function Layout() {
       const s = searchScore(q, qq.question + ' ' + qq.category)
       if (s > 0) scored.push({ label: qq.question, detail: `Interview · ${qq.category}`, to: `/interview/question/${qq.id}`, score: s })
     }
+    for (const rp of revisionPrompts) {
+      const s = searchScore(q, rp.question + ' ' + (rp.title || ''))
+      if (s > 0) scored.push({ label: rp.question, detail: `One-minute revision · ${rp.topicId ? (getTopic(rp.topicId)?.title || rp.topicId) : 'General'}`, to: `/cheatsheets#rev-${rp.id}`, score: s })
+    }
     for (const c of contentIndex.cheatsheets) {
       const s = searchScore(q, c.title)
       if (s > 0) scored.push({ label: c.title, detail: 'Cheatsheet', to: `/cheatsheets/${c.id}`, score: s })
@@ -60,7 +66,7 @@ export function Layout() {
       if (s > 0) scored.push({ label: item.prompt || item.title, detail: 'Practice MCQ', to: '/practice?tab=mcq', score: s })
     }
     return scored.sort((a, b) => b.score - a.score).slice(0, 20)
-  }, [query, interviewQuestions, practiceItems])
+  }, [query, interviewQuestions, practiceItems, revisionPrompts])
 
   return (
     <div className="app-shell">
@@ -133,8 +139,8 @@ export function Layout() {
                   <span><strong>{r.label}</strong><br /><span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '0.85rem' }}>{r.detail}</span></span>
                 </button>
               ))}
-              {query.trim() !== '' && !fullLoaded && <p style={{ color: 'var(--muted)' }}>Loading interview questions and practice MCQs…</p>}
-              {query.trim() !== '' && fullLoaded && results.length === 0 && <p style={{ color: 'var(--muted)' }}>No matches yet. Try a broader term, or browse Learn — new content is added section by section.</p>}
+              {query.trim() !== '' && !allLoaded && <p style={{ color: 'var(--muted)' }}>Loading interview questions and practice MCQs…</p>}
+              {query.trim() !== '' && allLoaded && results.length === 0 && <p style={{ color: 'var(--muted)' }}>No matches yet. Try a broader term, or browse Learn — new content is added section by section.</p>}
             </div>
           </div>
         </div>

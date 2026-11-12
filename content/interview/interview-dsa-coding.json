@@ -1,6 +1,6 @@
 [
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Sorting the input when original indices are required, which loses the answer.",
       "Using a nested loop and calling it O(n) because the loops look small."
@@ -28,7 +28,7 @@
     "topicId": "dsa-arrays-strings"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Moving the left pointer backwards, which breaks linearity.",
       "Forgetting the guard that the previous occurrence must be inside the current window."
@@ -55,7 +55,7 @@
     "topicId": "dsa-arrays-strings"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Checking only the immediate parent instead of the whole ancestor range.",
       "Using int bounds, which fail when a node holds Integer.MIN_VALUE or MAX_VALUE."
@@ -83,7 +83,7 @@
     "topicId": "dsa-trees-graphs"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Marking nodes visited at dequeue time instead of enqueue time, causing duplicate work.",
       "Starting from one node and missing disconnected components."
@@ -111,7 +111,7 @@
     "topicId": "dsa-trees-graphs"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Claiming DP without checking that subproblems overlap.",
       "Jumping to a compressed table without defining the state."
@@ -139,7 +139,7 @@
     "topicId": "dsa-dynamic-programming"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Iterating capacity forwards in 0/1 knapsack, silently turning it into unbounded knapsack.",
       "Using a sentinel that could also be a valid answer."
@@ -166,7 +166,7 @@
     "topicId": "dsa-dynamic-programming"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Using (left + right) / 2, which can overflow.",
       "Mixing the array binary search template with the binary search on the answer template."
@@ -193,7 +193,7 @@
     "topicId": "dsa-patterns"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Forgetting to undo a choice after recursion.",
       "Storing a reference to mutable state instead of a copy in the results."
@@ -220,7 +220,7 @@
     "topicId": "dsa-patterns"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Quoting average-case complexity as worst case.",
       "Ignoring recursion stack space or the size of the output."
@@ -247,7 +247,7 @@
     "topicId": "dsa-complexities"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Assuming a tree is balanced and quoting O(log n) without qualification.",
       "Confusing depth with height, or getting the empty-tree height convention wrong."
@@ -275,7 +275,7 @@
     "topicId": "dsa-trees-graphs"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Solving the wrong problem by skipping clarification.",
       "Testing only the happy path and missing empty input or the last-element flush."
@@ -302,7 +302,7 @@
     "topicId": "dsa-interview-coding-problems"
   },
   {
-    "category": "DSA/Coding",
+    "category": "DSA & Coding",
     "commonMistakes": [
       "Applying a sliding window where the invariant is not monotone.",
       "Claiming a greedy solution without any safety argument."

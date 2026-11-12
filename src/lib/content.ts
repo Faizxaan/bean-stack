@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import indexJson from '../generated/content-index.json'
-import type { InterviewQuestion, NavContentIndex, PracticeItem, TopicMeta } from '../types'
+import type { InterviewQuestion, NavContentIndex, PracticeItem, RevisionPrompt, TopicMeta } from '../types'
 
 // The generated SLIM index is the single source of truth for
 // navigation/search. It is produced by scripts/build-content-index.mjs
@@ -34,6 +34,19 @@ export function loadPracticeItems(): Promise<PracticeItem[]> {
     )
   }
   return practicePromise
+}
+
+// One-minute revision prompts (former Module 0, content/revision).
+// Same lazy pattern as interview/practice: a separate chunk fetched
+// only by Revision & Cheatsheets, Search, the palette, and Library.
+let revisionPromise: Promise<RevisionPrompt[]> | null = null
+export function loadRevisionPrompts(): Promise<RevisionPrompt[]> {
+  if (!revisionPromise) {
+    revisionPromise = import('../generated/content-revision.json').then(
+      m => (m.default as { revisionPrompts: RevisionPrompt[] }).revisionPrompts
+    )
+  }
+  return revisionPromise
 }
 
 export function loadFullContent(): Promise<{ interviewQuestions: InterviewQuestion[]; practiceItems: PracticeItem[] }> {
@@ -71,6 +84,20 @@ export function usePracticeItems(enabled = true) {
     return () => { live = false }
   }, [enabled])
   return { items, loaded }
+}
+
+export function useRevisionPrompts(enabled = true) {
+  const [prompts, setPrompts] = useState<RevisionPrompt[]>([])
+  const [loaded, setLoaded] = useState(false)
+  useEffect(() => {
+    if (!enabled) return
+    let live = true
+    loadRevisionPrompts()
+      .then(p => { if (live) { setPrompts(p); setLoaded(true) } })
+      .catch(() => { if (live) setLoaded(true) })
+    return () => { live = false }
+  }, [enabled])
+  return { prompts, loaded }
 }
 
 export function useFullContent(enabled = true) {

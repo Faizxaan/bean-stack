@@ -4,6 +4,13 @@ import { normalizeSearchQuery } from './utils'
 // Pure Interview Prep logic, kept out of the page component so it can
 // be unit-tested without rendering. No content is changed here — this
 // only groups, sorts, filters, and navigates the questions as they are.
+//
+// Second pass (2026-11-12): Module 0 is gone from Interview Prep (its
+// 37 one-minute prompts moved to content/revision and render under
+// Revision & Cheatsheets). The old 26 categories are consolidated into
+// 10 broad areas, questions are grouped by broad area (not by 77
+// individual Learn topics), and ordering is learning order, not
+// alphabetical by category.
 
 export interface InterviewModuleMeta {
   id: string
@@ -14,12 +21,6 @@ export interface InterviewModuleMeta {
 }
 
 export const INTERVIEW_MODULES: InterviewModuleMeta[] = [
-  {
-    id: 'module-0',
-    title: 'Module 0 — Revision Notes',
-    level: 'Optional · all levels',
-    description: 'One-minute revision of the essentials — JDK/JVM, OOP, collections, streams, Spring, SQL — before you go deeper.',
-  },
   {
     id: 'module-1',
     title: 'Module 1 — 0–3 years',
@@ -57,70 +58,138 @@ export function moduleMeta(id: string): InterviewModuleMeta | undefined {
   return INTERVIEW_MODULES.find(m => m.id === id)
 }
 
+// The consolidated taxonomy (2026-11-12 second pass): 26 old categories
+// collapsed to 10 broad areas. Order matters — it is the display order
+// of the areas inside a module, and the first area (Java) is where
+// "next unreviewed" starts, so a behavioural question can never come
+// first in Module 1 again. The full old -> new mapping with counts is
+// in DECISIONS.md; the mapping itself lives in the content files (only
+// the `category` field was re-labelled, nothing else).
+export const INTERVIEW_CATEGORIES = [
+  'Java',
+  'Spring & Spring Boot',
+  'Microservices',
+  'SQL & Databases',
+  'System Design',
+  'DSA & Coding',
+  'Frontend',
+  'DevOps & Cloud',
+  'Testing',
+  'Behavioral & Projects',
+] as const
+
+export type InterviewCategory = (typeof INTERVIEW_CATEGORIES)[number]
+
+// 'Resume' is not an interview area: it is the category of the 12
+// bonus-resume items, which are templates, not interview questions.
+// It sorts after every real area and only ever appears in that module.
+export const RESUME_CATEGORY = 'Resume'
+
+const CATEGORY_RANK = new Map<string, number>([
+  ...INTERVIEW_CATEGORIES.map((c, i) => [c, i] as [string, number]),
+  [RESUME_CATEGORY, INTERVIEW_CATEGORIES.length],
+])
+
+export function categoryRank(category: string | undefined): number {
+  if (!category) return INTERVIEW_CATEGORIES.length + 1
+  return CATEGORY_RANK.get(category) ?? INTERVIEW_CATEGORIES.length + 1
+}
+
+export function isInterviewCategory(category: string | undefined): category is InterviewCategory {
+  return category !== undefined && (INTERVIEW_CATEGORIES as readonly string[]).includes(category)
+}
+
+/** URL/anchor slug for a broad area, e.g. 'Spring & Spring Boot' -> 'spring-and-spring-boot'. */
+export function areaSlug(category: string): string {
+  return category
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
 export const DIFFICULTY_RANK: Record<string, number> = { Easy: 0, Medium: 1, Hard: 2 }
 
-export function sortQuestions(questions: InterviewQuestion[]): InterviewQuestion[] {
+/** Learning order of a Learn topic: track order, then section order within
+ * the track, then the topic's own order. Unknown topics sort last. */
+export interface SortContext {
+  topics: TopicMeta[]
+  tracks: Track[]
+}
+
+export function topicRankMap(ctx: SortContext): Map<string, number> {
+  const trackOrder = new Map(ctx.tracks.map((t, i) => [t.id, i]))
+  const sectionOrder = new Map<string, number>()
+  for (const t of ctx.tracks) t.sections.forEach((s, i) => sectionOrder.set(`${t.id}|${s.id}`, i))
+  const ranks = new Map<string, number>()
+  for (const topic of ctx.topics) {
+    const trackIdx = trackOrder.get(topic.track) ?? 999
+    const sectionIdx = sectionOrder.get(`${topic.track}|${topic.section}`) ?? 999
+    ranks.set(topic.id, trackIdx * 1_000_000 + sectionIdx * 1_000 + (topic.order ?? 999))
+  }
+  return ranks
+}
+
+/**
+ * Display order inside a module and inside a broad area: broad area
+ * (taxonomy order), then the question's Learn topic in learning order,
+ * then difficulty Easy -> Medium -> Hard, then question text as
+ * tie-break. NOT alphabetical by category and NOT file order — the old
+ * alphabetical sort put Behavioral first, so Module 1's "next
+ * unreviewed" was a behavioural question.
+ */
+export function sortQuestions(questions: InterviewQuestion[], ctx?: SortContext): InterviewQuestion[] {
+  const ranks = ctx ? topicRankMap(ctx) : undefined
   return [...questions].sort((a, b) => {
-    const cat = (a.category || '').localeCompare(b.category || '')
+    const cat = categoryRank(a.category) - categoryRank(b.category)
     if (cat !== 0) return cat
+    if (ranks) {
+      const ra = ranks.get(a.topicId || '') ?? Number.MAX_SAFE_INTEGER
+      const rb = ranks.get(b.topicId || '') ?? Number.MAX_SAFE_INTEGER
+      if (ra !== rb) return ra - rb
+    }
     const diff = (DIFFICULTY_RANK[a.difficulty] ?? 99) - (DIFFICULTY_RANK[b.difficulty] ?? 99)
     if (diff !== 0) return diff
     return (a.question || '').localeCompare(b.question || '')
   })
 }
 
-export interface CategoryGroup {
+export interface AreaGroup {
   category: string
   questions: InterviewQuestion[]
+  /** Distinct Learn topic ids in display order, for the small sub-labels. */
+  topicIds: string[]
 }
 
-export interface TopicGroup {
-  topicId: string
-  topicTitle: string
-  trackId: string
-  trackTitle: string
-  questions: InterviewQuestion[]
-  categories: CategoryGroup[]
-}
-
-export function groupQuestionsByTopic(
+/**
+ * Group by broad area (= consolidated category), in taxonomy order.
+ * Inside an area, questions are in display order (see sortQuestions);
+ * the original Learn topic is only a small sub-label on the question
+ * card / a sub-heading when the topic changes — never a separate
+ * collapsible section. (The old groupQuestionsByTopic grouped by 77
+ * individual Learn topics; that is what made the module view a wall
+ * of tiny sections.)
+ */
+export function groupQuestionsByArea(
   questions: InterviewQuestion[],
   topics: TopicMeta[],
   tracks: Track[],
-): TopicGroup[] {
-  const topicById = new Map(topics.map(t => [t.id, t]))
-  const trackOrder = new Map(tracks.map((t, i) => [t.id, i]))
-  const trackById = new Map(tracks.map(t => [t.id, t]))
-  const byTopic = new Map<string, InterviewQuestion[]>()
-  for (const q of questions) {
-    const key = q.topicId || 'general'
-    if (!byTopic.has(key)) byTopic.set(key, [])
-    byTopic.get(key)!.push(q)
+): AreaGroup[] {
+  const ctx: SortContext = { topics, tracks }
+  const sorted = sortQuestions(questions, ctx)
+  const byArea = new Map<string, InterviewQuestion[]>()
+  for (const q of sorted) {
+    const cat = q.category || 'General'
+    if (!byArea.has(cat)) byArea.set(cat, [])
+    byArea.get(cat)!.push(q)
   }
-  const groups: TopicGroup[] = [...byTopic.entries()].map(([topicId, qs]) => {
-    const topic = topicById.get(topicId)
-    const sorted = sortQuestions(qs)
-    const catMap = new Map<string, InterviewQuestion[]>()
-    for (const q of sorted) {
-      const cat = q.category || 'General'
-      if (!catMap.has(cat)) catMap.set(cat, [])
-      catMap.get(cat)!.push(q)
-    }
-    return {
-      topicId,
-      topicTitle: topic ? topic.title : 'General',
-      trackId: topic ? topic.track : '',
-      trackTitle: topic ? (trackById.get(topic.track)?.title || topic.track) : '',
-      questions: sorted,
-      categories: [...catMap.entries()].map(([category, list]) => ({ category, questions: list })),
-    }
-  })
-  return groups.sort((a, b) => {
-    const ta = trackOrder.get(a.trackId) ?? 999
-    const tb = trackOrder.get(b.trackId) ?? 999
-    if (ta !== tb) return ta - tb
-    return a.topicTitle.localeCompare(b.topicTitle)
-  })
+  return [...byArea.entries()]
+    .sort(([a], [b]) => categoryRank(a) - categoryRank(b))
+    .map(([category, list]) => ({
+      category,
+      questions: list,
+      topicIds: [...new Set(list.map(q => q.topicId).filter((t): t is string => Boolean(t)))],
+    }))
 }
 
 export type ReviewFilter = 'all' | 'confident' | 'needs-review' | 'not-reviewed' | 'bookmarked'
@@ -192,23 +261,30 @@ export function reviewStats(
   return { total, reviewed, confident, needsReview, bookmarked: bookmarkedCount, pctReviewed: total ? Math.round((reviewed / total) * 100) : 0 }
 }
 
-/** First question the user has not reviewed yet (for Start / Continue), else the first question. */
+/** First question the user has not reviewed yet (for Start / Continue), else the first question.
+ *  In display order, so it is a core technical question — never a
+ *  behavioural question first in Module 1. */
 export function firstUnreviewed(
   questions: InterviewQuestion[],
   review: Record<string, 'confident' | 'needs-review'>,
+  ctx?: SortContext,
 ): InterviewQuestion | undefined {
-  const sorted = sortQuestions(questions)
+  const sorted = sortQuestions(questions, ctx)
   return sorted.find(q => !review[q.id]) || sorted[0]
 }
 
-/** Previous / next question within the same topic group, in display order. */
+/** Previous / next question within the same module, in display order
+ * (broad area -> learning order -> difficulty). The old version walked
+ * only within the same Learn topic, which no longer matches the
+ * broad-area grouping the page shows. */
 export function prevNextQuestion(
   allQuestions: InterviewQuestion[],
   currentId: string,
+  ctx?: SortContext,
 ): { prev: InterviewQuestion | undefined; next: InterviewQuestion | undefined } {
   const current = allQuestions.find(q => q.id === currentId)
   if (!current) return { prev: undefined, next: undefined }
-  const group = sortQuestions(allQuestions.filter(q => (q.topicId || 'general') === (current.topicId || 'general')))
+  const group = sortQuestions(allQuestions.filter(q => q.module === current.module), ctx)
   const idx = group.findIndex(q => q.id === currentId)
   return { prev: idx > 0 ? group[idx - 1] : undefined, next: idx >= 0 && idx < group.length - 1 ? group[idx + 1] : undefined }
 }

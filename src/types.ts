@@ -65,6 +65,11 @@ export interface InterviewQuestion {
   relatedTopics?: string[]
 }
 
+// One-minute revision prompts (the former Module 0). Same shape as an
+// interview question — same ids, same fields — but a separate namespace:
+// they are rendered under Revision & Cheatsheets, never in Interview Prep.
+export type RevisionPrompt = InterviewQuestion
+
 export interface PracticeItem {
   id: string
   type: 'mcq' | 'flashcard' | 'coding' | 'output' | 'scenario'
@@ -122,6 +127,7 @@ export interface NavContentIndex {
   topics: TopicMeta[]
   cheatsheets: CheatsheetMeta[]
   interviewQuestionIds: string[]
+  revisionPromptIds: string[]
   practiceItemIds: string[]
 }
 

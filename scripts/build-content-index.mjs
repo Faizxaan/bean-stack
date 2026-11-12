@@ -67,6 +67,13 @@ function loadJsonDir(dir) {
 }
 const interviewQuestions = loadJsonDir(path.join(contentRoot, 'interview'))
 const practiceItems = loadJsonDir(path.join(contentRoot, 'practice'))
+// One-minute revision prompts: moved out of content/interview in the
+// 2026-11-12 second pass (they were Module 0, category Revision — recap
+// prompts, not interview questions). They live in content/revision so
+// the interview index, counts, filters and progress never see them, but
+// the prompts themselves are kept, with the same ids, and lazy-loaded
+// for the Revision & Cheatsheets page (see src/lib/content.ts).
+const revisionPrompts = loadJsonDir(path.join(contentRoot, 'revision'))
 
 // Split index (2026-11-09 chunk fix): the full interview + practice
 // bodies are ~850 KB of the ~1 MB index, and inlining them in the app
@@ -83,15 +90,19 @@ const index = {
   topics,
   cheatsheets,
   interviewQuestionIds: interviewQuestions.map(q => q.id),
+  revisionPromptIds: revisionPrompts.map(q => q.id),
   practiceItemIds: practiceItems.map(i => i.id),
 }
 const interviewFile = path.join(outDir, 'content-interview.json')
+const revisionFile = path.join(outDir, 'content-revision.json')
 const practiceFile = path.join(outDir, 'content-practice.json')
 
 fs.mkdirSync(outDir, { recursive: true })
 fs.writeFileSync(outFile, JSON.stringify(index, null, 2) + '\n')
 fs.writeFileSync(interviewFile, JSON.stringify({ generatedAt, interviewQuestions }, null, 2) + '\n')
+fs.writeFileSync(revisionFile, JSON.stringify({ generatedAt, revisionPrompts }, null, 2) + '\n')
 fs.writeFileSync(practiceFile, JSON.stringify({ generatedAt, practiceItems }, null, 2) + '\n')
-console.log(`Wrote ${outFile}: ${topics.length} topics, ${cheatsheets.length} cheatsheets, ${interviewQuestions.length} interview question ids, ${practiceItems.length} practice item ids, ${tracks.length} tracks, ${paths.length} paths`)
+console.log(`Wrote ${outFile}: ${topics.length} topics, ${cheatsheets.length} cheatsheets, ${interviewQuestions.length} interview question ids, ${revisionPrompts.length} revision prompt ids, ${practiceItems.length} practice item ids, ${tracks.length} tracks, ${paths.length} paths`)
 console.log(`Wrote ${interviewFile}: ${interviewQuestions.length} interview questions`)
+console.log(`Wrote ${revisionFile}: ${revisionPrompts.length} revision prompts`)
 console.log(`Wrote ${practiceFile}: ${practiceItems.length} practice items`)

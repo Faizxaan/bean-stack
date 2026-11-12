@@ -7,24 +7,33 @@ import { topicUrl } from '../lib/utils'
 import {
   EMPTY_INTERVIEW_FILTERS,
   INTERVIEW_MODULES,
+  areaSlug,
+  categoryRank,
   filterQuestions,
   firstUnreviewed,
-  groupQuestionsByTopic,
+  groupQuestionsByArea,
   moduleMeta,
   prevNextQuestion,
   reviewStats,
 } from '../lib/interview'
 import type { InterviewQuestion } from '../types'
+import type { AreaGroup } from '../lib/interview'
 
 // Interview Prep, redesigned 2026-11-12 (UI only — no question, answer,
 // id, category, difficulty, module or topicId was changed).
 //
-// The old page was one long <ul> of bare question links grouped only by
-// module, and each question opened onto a nearly empty page. The new
-// page is: module cards -> a module's questions grouped by Learn topic,
-// each question a card you can read and self-test on the spot, with
-// full answers inline. The deep-link route /interview/question/:id is
-// kept, and now renders the same rich layout with prev/next navigation.
+// Second pass, 2026-11-12: Module 0 is gone (its 37 one-minute prompts
+// moved to content/revision and render under Revision & Cheatsheets),
+// the 26 categories are consolidated into 10 broad areas (+ Resume on
+// the bonus module only), and questions are grouped by broad area in
+// learning order — not by 77 individual Learn topics, and not
+// alphabetically by category (which used to put Behavioural first).
+// Only the `category` field of content/interview/*.json was re-labelled;
+// question text, answers, ids, topicIds and modules are unchanged.
+// The deep-link route /interview/question/:id is kept, and prev/next on
+// the question page now walks the whole module in display order.
+
+const SORT_CTX = { topics: contentIndex.topics, tracks: contentIndex.tracks }
 
 function ReviewBadge({ status }: { status?: 'confident' | 'needs-review' }) {
   if (status === 'confident') return <span className="badge accent">✓ Confident</span>
@@ -118,7 +127,7 @@ function QuestionCard({
   )
 }
 
-function TopicGroupCard({
+function AreaGroupCard({
   group,
   selfTest,
   expandedIds,
@@ -126,51 +135,70 @@ function TopicGroupCard({
   open,
   onToggleOpen,
   showModule,
+  nextArea,
+  onJumpToArea,
 }: {
-  group: ReturnType<typeof groupQuestionsByTopic>[number]
+  group: AreaGroup
   selfTest: boolean
   expandedIds: Set<string>
   onToggleQuestion: (id: string) => void
   open: boolean
   onToggleOpen: () => void
   showModule?: boolean
+  nextArea?: AreaGroup
+  onJumpToArea: (category: string) => void
 }) {
   const { data } = useApp()
   const stats = reviewStats(group.questions, data.interviewReview, data.questionBookmarks)
-  const topic = group.topicId !== 'general' ? getTopic(group.topicId) : undefined
+  // Within an area, the Learn topic is only a small sub-heading when
+  // the topic changes — never a separate collapsible section.
+  let lastTopicId = ''
   return (
-    <section className="card topic-group" aria-label={group.topicTitle}>
+    <section className="card topic-group" id={`area-${areaSlug(group.category)}`} aria-label={group.category}>
       <div className="topic-group-head">
         <button className="topic-group-toggle" onClick={onToggleOpen} aria-expanded={open}>
           <ChevronDown size={18} style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
           <span>
-            <strong>{group.topicTitle}</strong>
-            {group.trackTitle && <span className="topic-group-track"> · {group.trackTitle}</span>}
+            <strong>{group.category}</strong>
             <span className="topic-group-count"> — {group.questions.length} question{group.questions.length === 1 ? '' : 's'} · {stats.reviewed} reviewed · {stats.confident} confident</span>
           </span>
         </button>
-        {topic && <Link className="btn secondary small" to={topicUrl(topic)}>Learn topic →</Link>}
       </div>
       {open && (
         <div className="topic-group-body">
-          <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${group.topicTitle}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
-          {group.categories.map(cat => (
-            <div key={cat.category} className="cat-group">
-              <h4 className="cat-heading">{cat.category} <span className="badge">{cat.questions.length}</span></h4>
-              <div className="q-list">
-                {cat.questions.map(q => (
+          <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${group.category}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
+          <div className="q-list">
+            {group.questions.map(q => {
+              const topic = q.topicId ? getTopic(q.topicId) : undefined
+              const topicChanged = (q.topicId || '') !== lastTopicId
+              lastTopicId = q.topicId || ''
+              return (
+                <React.Fragment key={q.id}>
+                  {topicChanged && topic && (
+                    <h4 className="area-topic-label">
+                      <Link to={topicUrl(topic)}>{topic.title}</Link>
+                      <span className="topic-group-track"> · Learn topic</span>
+                    </h4>
+                  )}
+                  {topicChanged && !topic && <h4 className="area-topic-label">General</h4>}
                   <QuestionCard
-                    key={q.id}
                     q={q}
                     selfTest={selfTest}
                     expanded={expandedIds.has(q.id)}
                     onToggle={() => onToggleQuestion(q.id)}
                     showModule={showModule}
                   />
-                ))}
-              </div>
-            </div>
-          ))}
+                </React.Fragment>
+              )
+            })}
+          </div>
+          {nextArea && (
+            <p style={{ margin: '16px 0 0' }}>
+              <button className="btn secondary" onClick={() => onJumpToArea(nextArea.category)}>
+                Next area: {nextArea.category} ({nextArea.questions.length} questions) →
+              </button>
+            </p>
+          )}
         </div>
       )}
     </section>
@@ -181,13 +209,13 @@ export function InterviewIndex() {
   const [searchParams, setSearchParams] = useSearchParams()
   const view = searchParams.get('view') === 'topic' ? 'topic' : 'module'
   const selectedModule = searchParams.get('module')
-  const topicParam = searchParams.get('topic')
+  const areaParam = searchParams.get('area')
   const { data } = useApp()
   const { questions: interviewQuestions, loaded } = useInterviewQuestions()
   const [filters, setFilters] = useState(EMPTY_INTERVIEW_FILTERS)
   const [selfTest, setSelfTest] = useState(true)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
-  const [openTopics, setOpenTopics] = useState<Set<string>>(new Set())
+  const [openAreas, setOpenAreas] = useState<Set<string>>(new Set())
 
   const setParam = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams(searchParams)
@@ -198,17 +226,20 @@ export function InterviewIndex() {
     setSearchParams(next, { replace: true })
   }
 
-  const categories = useMemo(
-    () => [...new Set(interviewQuestions.map(q => q.category))].sort(),
-    [interviewQuestions],
-  )
-
-  // Questions in scope: a selected module, or everything in topic view.
+  // Questions in scope: a selected module, or everything in area view.
   const scoped = useMemo(() => {
     if (view === 'topic') return interviewQuestions
     if (!selectedModule) return interviewQuestions
     return interviewQuestions.filter(q => q.module === selectedModule)
   }, [interviewQuestions, view, selectedModule])
+
+  // Category filter lists only areas that actually have questions in
+  // scope — previously it listed every category in the whole bank, so
+  // a module view offered filters with zero questions in that module.
+  const categories = useMemo(
+    () => [...new Set(scoped.map(q => q.category))].sort((a, b) => categoryRank(a) - categoryRank(b)),
+    [scoped],
+  )
 
   const filtered = useMemo(
     () => filterQuestions(scoped, filters, data.interviewReview, data.questionBookmarks),
@@ -216,19 +247,28 @@ export function InterviewIndex() {
   )
 
   const groups = useMemo(
-    () => groupQuestionsByTopic(filtered, contentIndex.topics, contentIndex.tracks),
+    () => groupQuestionsByArea(filtered, contentIndex.topics, contentIndex.tracks),
     [filtered],
   )
 
-  // Open the requested topic (from a deep link back), else the first
-  // topic with unreviewed questions, else the first topic.
+  const jumpToArea = (category: string) => {
+    setOpenAreas(prev => new Set(prev).add(category))
+    // Scroll after the group opens.
+    setTimeout(() => document.getElementById(`area-${areaSlug(category)}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+  }
+
+  // Open the requested area (from a question page's "Back to area"
+  // link), else the first area with unreviewed questions, else the
+  // first area.
   useEffect(() => {
     if (groups.length === 0) return
-    const wanted = topicParam && groups.some(g => g.topicId === topicParam) ? topicParam : undefined
-    const firstOpen = wanted || groups.find(g => g.questions.some(q => !data.interviewReview[q.id]))?.topicId || groups[0].topicId
-    setOpenTopics(new Set([firstOpen]))
+    const wanted = areaParam && groups.some(g => areaSlug(g.category) === areaParam)
+      ? groups.find(g => areaSlug(g.category) === areaParam)!.category
+      : undefined
+    const firstOpen = wanted || groups.find(g => g.questions.some(q => !data.interviewReview[q.id]))?.category || groups[0].category
+    setOpenAreas(new Set([firstOpen]))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedModule, view, loaded])
+  }, [selectedModule, view, loaded, areaParam])
 
   const toggleQuestion = (id: string) => {
     setExpandedIds(prev => {
@@ -245,7 +285,7 @@ export function InterviewIndex() {
   const overall = reviewStats(interviewQuestions, data.interviewReview, data.questionBookmarks)
   const selectedMeta = selectedModule ? moduleMeta(selectedModule) : undefined
   const selectedStats = selectedMeta ? reviewStats(scoped, data.interviewReview, data.questionBookmarks) : null
-  const nextUp = selectedMeta ? firstUnreviewed(scoped, data.interviewReview) : undefined
+  const nextUp = selectedMeta ? firstUnreviewed(scoped, data.interviewReview, SORT_CTX) : undefined
 
   const revealAll = () => setExpandedIds(new Set(filtered.map(q => q.id)))
   const hideAll = () => setExpandedIds(new Set())
@@ -254,16 +294,19 @@ export function InterviewIndex() {
     <div>
       <h1>Interview Preparation</h1>
       <p style={{ color: 'var(--muted)' }}>
-        Pick your experience level, work through questions grouped by topic, and test yourself before you reveal the answer.
+        Pick your experience level, work through questions grouped by broad area, and test yourself before you reveal the answer.
         Every question has a short answer, a detailed answer, follow-ups, tips, and common mistakes.
       </p>
 
       {/* How to use this — the three steps a first-time user needs. */}
       <div className="card iv-howto" aria-label="How to use Interview Prep">
-        <div className="iv-step"><span className="iv-step-num">1</span><div><strong>Pick your level</strong><p>Module 1 for 0–3 years, up to Module 4 for 8–15 years. Module 0 is a one-minute revision of the essentials.</p></div></div>
-        <div className="iv-step"><span className="iv-step-num">2</span><div><strong>Pick a topic</strong><p>Questions are grouped by the Learn topic they belong to, so you revise the topic and its questions together.</p></div></div>
+        <div className="iv-step"><span className="iv-step-num">1</span><div><strong>Pick your level</strong><p>Module 1 for 0–3 years, up to Module 4 for 8–15 years. The Bonus module is resume help, not interview questions.</p></div></div>
+        <div className="iv-step"><span className="iv-step-num">2</span><div><strong>Pick a broad area</strong><p>Questions are grouped by area — Java, Spring, Microservices, System Design and more — in learning order, so you revise a topic and its questions together.</p></div></div>
         <div className="iv-step"><span className="iv-step-num">3</span><div><strong>Test yourself</strong><p>Answer in your own words first, then reveal. Mark each question Confident or Needs review — your progress is saved in this browser.</p></div></div>
       </div>
+      <p style={{ color: 'var(--muted)', marginTop: -8 }}>
+        Want a quick recap instead of interview questions? The one-minute revision prompts live under <Link to="/cheatsheets">Revision &amp; Cheatsheets</Link>.
+      </p>
 
       {/* Overall progress — derived from stored reviews, never hardcoded. */}
       <div className="card iv-progress" aria-label="Your interview progress">
@@ -277,42 +320,49 @@ export function InterviewIndex() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-        <button className="btn secondary" aria-pressed={view === 'module'} onClick={() => setParam({ view: 'module', module: null, topic: null })}>By experience level {view === 'module' ? '✓' : ''}</button>
-        <button className="btn secondary" aria-pressed={view === 'topic'} onClick={() => setParam({ view: 'topic', module: null, topic: null })}>By topic {view === 'topic' ? '✓' : ''}</button>
+        <button className="btn secondary" aria-pressed={view === 'module'} onClick={() => setParam({ view: 'module', module: null, area: null })}>By experience level {view === 'module' ? '✓' : ''}</button>
+        <button className="btn secondary" aria-pressed={view === 'topic'} onClick={() => setParam({ view: 'topic', module: null, area: null })}>By area (all levels) {view === 'topic' ? '✓' : ''}</button>
       </div>
 
       {!loaded && <div className="card"><p>Loading interview questions…</p><div className="skeleton" style={{ height: 24, marginBottom: 10 }} /><div className="skeleton" /><div className="skeleton" style={{ marginTop: 8 }} /></div>}
 
       {loaded && view === 'module' && !selectedModule && (
-        <div className="grid grid-2 module-grid">
-          {INTERVIEW_MODULES.map(mod => {
-            const qs = interviewQuestions.filter(q => q.module === mod.id)
-            const stats = reviewStats(qs, data.interviewReview, data.questionBookmarks)
-            const next = firstUnreviewed(qs, data.interviewReview)
-            return (
-              <article key={mod.id} className={`card module-card${mod.isResume ? ' resume' : ''}`}>
-                <p style={{ margin: 0 }}><span className="badge">{mod.level}</span>{mod.isResume && <span className="badge accent"> Resume, not a question module</span>}</p>
-                <h2 style={{ margin: '8px 0 4px' }}>{mod.title}</h2>
-                <p style={{ color: 'var(--muted)', marginTop: 0 }}>{mod.description}</p>
-                <p><strong>{qs.length} questions</strong> · {stats.reviewed} reviewed · {stats.confident} confident{stats.needsReview > 0 ? ` · ${stats.needsReview} need review` : ''}</p>
-                <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${mod.title}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
-                  <button className="btn" onClick={() => setParam({ view: 'module', module: mod.id, topic: null })}>
-                    <GraduationCap size={16} /> {stats.reviewed === 0 ? 'Start' : stats.reviewed < qs.length ? 'Continue' : 'Review again'}
-                  </button>
-                  {next && <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.9rem' }}>Next up: {next.question.length > 60 ? `${next.question.slice(0, 60)}…` : next.question}</span>}
-                </div>
-              </article>
-            )
-          })}
-        </div>
+        <>
+          <div className="grid grid-2 module-grid">
+            {INTERVIEW_MODULES.map(mod => {
+              const qs = interviewQuestions.filter(q => q.module === mod.id)
+              const stats = reviewStats(qs, data.interviewReview, data.questionBookmarks)
+              const next = firstUnreviewed(qs, data.interviewReview, SORT_CTX)
+              return (
+                <article key={mod.id} className={`card module-card${mod.isResume ? ' resume' : ''}`}>
+                  <p style={{ margin: 0 }}><span className="badge">{mod.level}</span>{mod.isResume && <span className="badge accent"> Resume, not a question module</span>}</p>
+                  <h2 style={{ margin: '8px 0 4px' }}>{mod.title}</h2>
+                  <p style={{ color: 'var(--muted)', marginTop: 0 }}>{mod.description}</p>
+                  <p><strong>{qs.length} questions</strong> · {stats.reviewed} reviewed · {stats.confident} confident{stats.needsReview > 0 ? ` · ${stats.needsReview} need review` : ''}</p>
+                  <div className="progress-bar" aria-label={`${stats.pctReviewed}% reviewed in ${mod.title}`}><div style={{ width: `${stats.pctReviewed}%` }} /></div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+                    <button className="btn" onClick={() => setParam({ view: 'module', module: mod.id, area: null })}>
+                      <GraduationCap size={16} /> {stats.reviewed === 0 ? 'Start' : stats.reviewed < qs.length ? 'Continue' : 'Review again'}
+                    </button>
+                    {next && <span style={{ alignSelf: 'center', color: 'var(--muted)', fontSize: '0.9rem' }}>Next up: {next.question.length > 60 ? `${next.question.slice(0, 60)}…` : next.question}</span>}
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+          <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
+            Counts are by each question&apos;s experience-level module. The same questions are also filed under topic files in the content
+            (Databases, System Design, DSA, DevOps, Testing, Frontend, Behavioural) — so a module total is bigger than any single
+            content file, e.g. Module 1 has {interviewQuestions.filter(q => q.module === 'module-1').length} questions while module-1.json holds fewer.
+          </p>
+        </>
       )}
 
       {loaded && (selectedModule || view === 'topic') && (
         <div>
           {selectedMeta && (
             <div className="card iv-module-head">
-              <button className="btn secondary small" onClick={() => setParam({ view: 'module', module: null, topic: null })}>← All modules</button>
+              <button className="btn secondary small" onClick={() => setParam({ view: 'module', module: null, area: null })}>← All modules</button>
               <h2 style={{ margin: '10px 0 4px' }}>{selectedMeta.title}</h2>
               <p style={{ color: 'var(--muted)', marginTop: 0 }}>{selectedMeta.description}</p>
               {selectedStats && (
@@ -326,12 +376,12 @@ export function InterviewIndex() {
           )}
           {view === 'topic' && (
             <div className="card iv-module-head">
-              <h2 style={{ margin: '0 0 4px' }}>Browse by topic</h2>
-              <p style={{ color: 'var(--muted)', margin: 0 }}>The same {interviewQuestions.length} questions, grouped by the Learn topic they belong to — across all experience levels. Each question shows its module as a badge.</p>
+              <h2 style={{ margin: '0 0 4px' }}>Browse by area</h2>
+              <p style={{ color: 'var(--muted)', margin: 0 }}>The same {interviewQuestions.length} questions, grouped by broad area — across all experience levels. Each question shows its module as a badge.</p>
             </div>
           )}
 
-          {/* Filters that actually help: text, difficulty, category, review status, self-test. */}
+          {/* Filters that actually help: text, difficulty, area, review status, self-test. */}
           <div className="card iv-filters" aria-label="Filter interview questions">
             <label className="iv-filter">
               <span className="sr-only">Search interview questions</span>
@@ -342,9 +392,9 @@ export function InterviewIndex() {
                 <option value="all">All difficulties</option><option>Easy</option><option>Medium</option><option>Hard</option>
               </select>
             </label>
-            <label className="iv-filter">Category
-              <select className="select" value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })} aria-label="Filter by category">
-                <option value="all">All categories</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}
+            <label className="iv-filter">Area
+              <select className="select" value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })} aria-label="Filter by area">
+                <option value="all">All areas</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </label>
             <label className="iv-filter">Review status
@@ -380,21 +430,34 @@ export function InterviewIndex() {
             </div>
           )}
 
-          {groups.map(group => (
-            <TopicGroupCard
-              key={group.topicId}
+          {groups.length > 1 && (
+            <nav className="card iv-area-jump" aria-label="Jump to a broad area">
+              <strong>Jump to area: </strong>
+              {groups.map(g => (
+                <button key={g.category} className="btn secondary small" onClick={() => jumpToArea(g.category)}>
+                  {g.category} ({g.questions.length})
+                </button>
+              ))}
+            </nav>
+          )}
+
+          {groups.map((group, i) => (
+            <AreaGroupCard
+              key={group.category}
               group={group}
               selfTest={selfTest}
               expandedIds={expandedIds}
               onToggleQuestion={toggleQuestion}
-              open={openTopics.has(group.topicId)}
-              onToggleOpen={() => setOpenTopics(prev => {
+              open={openAreas.has(group.category)}
+              onToggleOpen={() => setOpenAreas(prev => {
                 const next = new Set(prev)
-                if (next.has(group.topicId)) next.delete(group.topicId)
-                else next.add(group.topicId)
+                if (next.has(group.category)) next.delete(group.category)
+                else next.add(group.category)
                 return next
               })}
               showModule={view === 'topic'}
+              nextArea={groups[i + 1]}
+              onJumpToArea={jumpToArea}
             />
           ))}
         </div>
@@ -412,7 +475,7 @@ export function InterviewQuestionPage() {
   const [copyFailed, setCopyFailed] = useState(false)
 
   const q = interviewQuestions.find(x => x.id === questionId)
-  const { prev, next } = prevNextQuestion(interviewQuestions, questionId || '')
+  const { prev, next } = prevNextQuestion(interviewQuestions, questionId || '', SORT_CTX)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -443,7 +506,8 @@ export function InterviewQuestionPage() {
         <span className="breadcrumb-item"><Link to="/interview">Interview Prep</Link></span>
         <span className="breadcrumb-sep">/</span>
         {mod && <><span className="breadcrumb-item"><Link to={`/interview?view=module&module=${mod.id}`}>{mod.title}</Link></span><span className="breadcrumb-sep">/</span></>}
-        {topic && <><span className="breadcrumb-item"><Link to={`/interview?view=module&module=${q.module}&topic=${topic.id}`}>{topic.title}</Link></span><span className="breadcrumb-sep">/</span></>}
+        <span className="breadcrumb-item"><Link to={`/interview?view=module&module=${q.module}&area=${areaSlug(q.category)}`}>{q.category}</Link></span>
+        <span className="breadcrumb-sep">/</span>
         <span className="breadcrumb-item"><span className="breadcrumb-current" aria-current="page">{q.question.length > 60 ? `${q.question.slice(0, 60)}…` : q.question}</span></span>
       </nav>
 
@@ -518,7 +582,7 @@ export function InterviewQuestionPage() {
           : <span />}
       </div>
       <p style={{ marginTop: 16 }}>
-        <Link to={topic ? `/interview?view=module&module=${q.module}&topic=${topic.id}` : `/interview?view=module&module=${q.module}`}>← Back to {topic ? `${topic.title} questions` : 'this module'}</Link>
+        <Link to={`/interview?view=module&module=${q.module}&area=${areaSlug(q.category)}`}>← Back to {q.category} in {mod?.title || 'this module'}</Link>
       </p>
     </div>
   )

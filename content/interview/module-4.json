@@ -23,7 +23,7 @@
     "topicId": "design-patterns-solid"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "detailedAnswer": "At moderate scale the right collection is usually obvious, but at large scale the choice is driven by access pattern, memory overhead, and allocation behaviour, not by asymptotic complexity alone. An ArrayList of boxed objects costs far more memory and GC pressure than a primitive array or a specialized collection, a HashMap with a poor hash function degrades under adversarial keys, and a concurrent structure with high contention can be slower than a sharded or thread-local design. For ordered data, a balanced tree gives logarithmic ordered operations that a hash map cannot, and for streaming aggregation, a purpose-built accumulator avoids building intermediate collections entirely. The senior answer quantifies: estimate element count, per-element overhead, read-to-write ratio, and contention, then measure with a realistic workload, because a choice that is correct at ten thousand elements can be wrong at ten million.",
     "difficulty": "Medium",
     "followUps": [
@@ -46,7 +46,7 @@
     "topicId": "collections-deep-dive"
   },
   {
-    "category": "Streams",
+    "category": "Java",
     "detailedAnswer": "Streams excel at declarative, in-memory transformation of finite data, but they are a poor fit for infinite or backpressured sources, for operations that need early exit with complex state, and for pipelines where checked exceptions or resource cleanup must be precise. A reactive stream, by contrast, models asynchronous data flow with demand signalling, so a slow consumer can slow the producer instead of being overwhelmed by an unbounded buffer. Mixing the two naively \u2014 collecting a reactive source into a list just to stream it, or blocking inside a reactive pipeline \u2014 loses the benefits of both. Choose plain streams for bounded in-memory work, reactive streams for asynchronous event flows with backpressure, and plain loops when the logic is stateful, exception-heavy, or performance-critical enough that stream overhead and boxing matter.",
     "difficulty": "Medium",
     "followUps": [
@@ -69,7 +69,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "detailedAnswer": "Lock-free algorithms use atomic compare-and-swap loops instead of locks, so a thread that fails a CAS retries rather than blocking, which avoids deadlock and keeps progress even when some threads stall, but retries under contention can burn CPU and the ABA problem can make a changed-then-restored value look unchanged. False sharing is the subtler trap: two threads updating different variables that share a cache line force the line to bounce between cores, so padding or grouping hot fields apart can yield large speedups in counters and queues. Distributed locking adds another layer: a lock held in Redis or a database must have a lease with expiry, a fencing token to reject stale holders after a pause, and a design that tolerates the lock holder dying, because a lock without expiry becomes a permanent outage. Prefer lock-free structures for single-JVM hot paths, and treat distributed locks as a coordination mechanism of last resort, with idempotent work underneath.",
     "difficulty": "Hard",
     "followUps": [
@@ -92,7 +92,7 @@
     "topicId": "java-memory-model"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "detailedAnswer": "Low-latency collectors such as ZGC and Shenandoah keep pauses in the low milliseconds by doing most work concurrently with the application, at the cost of higher CPU overhead and throughput loss compared with G1 or Parallel. Tuning starts from a latency budget and a measurement: GC logs showing pause distribution, allocation rate, and heap occupancy, plus application latency percentiles, because average pause alone hides the tail that users feel. Escape analysis and JIT inlining reduce allocation in hot code, but they cannot rescue a design that allocates heavily per request, so the first optimization is usually fewer allocations, not more flags. For very large heaps or strict latency targets, evaluate the concurrent collector under production-like load and accept its CPU cost deliberately; for batch or throughput workloads, that trade is usually wrong.",
     "difficulty": "Hard",
     "followUps": [
@@ -115,7 +115,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "Circular dependencies are usually a design smell: two beans needing each other at construction time means their responsibilities are tangled, and the honest fix is to extract the shared logic into a third bean or to invert the dependency. Spring can paper over some cycles with setter injection or proxies, but constructor injection rightly fails fast on a cycle, and suppressing that failure hides the design problem while making startup order fragile. Startup time in a large context comes from eager singleton creation, classpath scanning, and auto-configuration evaluation, so the remedies are lazy initialization for genuinely optional beans, narrower component scans, and fewer, more deliberate auto-configurations, measured with startup reports rather than guessed. For a modular monolith, enforce module boundaries with package rules and internal-only APIs, so the monolith stays decomposable instead of becoming a distributed monolith in disguise.",
     "difficulty": "Medium",
     "followUps": [
@@ -138,7 +138,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "A custom starter should be a thin, opinionated packaging of auto-configuration, default properties, and dependencies, with every bean conditional so applications can override it, and with its own configuration properties namespace so settings do not collide. Multi-tenancy belongs in explicit layers: tenant resolution from a header or token, tenant-scoped data source routing or schema selection, and tenant context propagation through async boundaries, with tests that run the same scenario under two tenants. Observability is part of the starter contract: structured logs with correlation ids, metrics for the operations the starter performs, and health indicators that fail meaningfully rather than always reporting up. Graceful shutdown matters equally: stop accepting new work, drain in-flight requests within a timeout, and only then close resources, so rolling deploys do not drop requests.",
     "difficulty": "Hard",
     "followUps": [
@@ -161,7 +161,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring MVC",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "API versioning is a compatibility strategy, not a URL prefix: version in the URI for coarse, client-visible breaking changes, in headers or content negotiation when clients can handle it, and prefer backwards-compatible evolution \u2014 additive fields, optional parameters, and tolerant readers \u2014 so most changes need no version at all. Contract tests, where consumers publish the expectations they rely on, catch breaking changes before release far more reliably than manual coordination, and a deprecation policy with sunset headers and usage telemetry tells you when an old version can actually be retired. Rate limiting and request validation belong at the gateway or filter layer for coarse protection, with fine-grained business limits in the service layer where domain context lives. Never version by forking controller code without a shared core, or the versions will drift and a bug fix will land in one version only.",
     "difficulty": "Hard",
     "followUps": [
@@ -184,7 +184,7 @@
     "topicId": "spring-mvc-rest"
   },
   {
-    "category": "Spring Data JPA",
+    "category": "Spring & Spring Boot",
     "detailedAnswer": "JPA excels at single-database domain modelling, but it strains at scale in three places: a single write database becomes a bottleneck, a shared entity graph couples read and write shapes, and lazy loading plus the persistence context add overhead to bulk work. The standard responses are read replicas for read-heavy workloads with explicit tolerance for replication lag, CQRS read models that precompute the shapes queries actually need, and bulk operations through JDBC or batch statements that bypass the persistence context for imports and updates. Sharding is a last resort, not a first step, because it breaks joins, transactions, and reporting across shards and forces application-level routing and rebalancing. The senior judgement is knowing which scale problem you actually have \u2014 read volume, write volume, or data volume \u2014 because each has a different remedy.",
     "difficulty": "Hard",
     "followUps": [
@@ -230,7 +230,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "detailedAnswer": "At very large tables, query design is index design: range queries need the range column last in a composite index after equality columns, selective filters beat broad ones, and sorting without an index forces a costly sort of the full result. Partitioning by a natural key such as time lets old partitions be archived or dropped cheaply and keeps working sets small, but queries that do not filter on the partition key must scan every partition. Locking behaviour matters as much as speed: long transactions hold locks and block writers, gap locks under repeatable read can deadlock concurrent inserts, and the remedy is usually shorter transactions, consistent lock ordering, and retrying deadlocked transactions rather than raising timeouts. Always verify with the execution plan on production-sized data, because a plan that is fine at a million rows can be catastrophic at a hundred million.",
     "difficulty": "Hard",
     "followUps": [
@@ -252,7 +252,7 @@
     "topicId": "jdbc-networking"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "detailedAnswer": "The task is to design a rate limiter that works across multiple service instances. The idiomatic approach is a token-bucket or fixed-window counter per key, stored in a shared store with an atomic increment and expiry, so every instance observes the same count. A single-instance in-memory limiter is correct only until the second instance deploys, at which point each instance enforces its own limit and the effective limit multiplies. For strict fairness, use a shared atomic counter with a window, accept the small race window of fixed windows or the complexity of a sliding-window log, and return a standard too-many-requests response with a retry-after hint. Edge cases to name are clock skew between instances, hot keys that concentrate on one store shard, and the failure mode when the store itself is unavailable \u2014 fail open for non-critical endpoints, fail closed for abuse-sensitive ones.",
     "difficulty": "Hard",
     "followUps": [
@@ -275,7 +275,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "Scenario-based",
+    "category": "Microservices",
     "detailedAnswer": "Apply the strangler pattern: put the new service behind the existing monolith's interface, route a slice of traffic or a single capability to it, and expand slice by slice, so every step is reversible and the old system remains the fallback. Data is the hard part: keep a single source of truth during transition, synchronize with change-data-capture or dual writes guarded by reconciliation jobs, and migrate data in small, verifiable batches with checksums rather than one big cutover. Rollback means routing traffic back and reconciling any writes the new service made, which only works if writes are idempotent and the old system can still accept them, so design the new service's writes with that constraint from day one. Success criteria are not the migration itself but the metrics that prove it: error rates, latency, and data-consistency checks at each slice, with a named owner and a decision point for each expansion.",
     "difficulty": "Hard",
     "followUps": [
@@ -298,7 +298,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Scenario-based",
+    "category": "Java",
     "detailedAnswer": "First, establish scope and reversibility: confirm the regression with a controlled comparison, such as canary traffic on the old and new versions under the same load, and check whether the change is the JDK, a library upgrade shipped with it, or a configuration change that rode along. Then narrow with evidence in order: GC logs and pause percentiles, JIT compilation and deoptimization logs, thread and CPU profiles, and dependency changelogs, looking for a behaviour change in a collector, a hashing order, or a default that the application silently depended on. As a staff-level decision, you would halt the rollout at the canary stage, keep the old version deployable, and choose between pinning the old version, tuning the new one, or fixing the application assumption, based on which evidence you have and how long each path takes. The post-incident action is a regression gate: a performance benchmark and a canary comparison in the upgrade pipeline, so the next JDK upgrade cannot regress silently.",
     "difficulty": "Medium",
     "followUps": [
@@ -321,7 +321,7 @@
     "topicId": "performance-best-practices"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Sorting the list first and comparing neighbours, which is slower and more code.",
       "Using a Set to detect duplicates but losing the counts the question asked for."
@@ -347,7 +347,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Coding",
+    "category": "Java",
     "commonMistakes": [
       "Sorting the whole list and taking the first per department, which is wasteful and fiddly.",
       "Forgetting that maxBy returns an Optional and trying to use the result as a plain employee."
@@ -374,7 +374,7 @@
     "topicId": "streams-lambdas"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Saying the two are interchangeable because both make threads wait.",
       "Forgetting that a latch cannot be reused and a barrier releases only when every party arrives."
@@ -400,7 +400,7 @@
     "topicId": "concurrency-basics"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Saying the pool grows to its maximum before using the queue.",
       "Treating the queue size as unimportant when it actually controls saturation behaviour."
@@ -427,7 +427,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Saying weak references are cleared only under memory pressure; that is soft references.",
       "Treating a cache as harmless because it is only a map, while it holds strong references forever."
@@ -508,7 +508,7 @@
     "topicId": "modern-java-features"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Raising the heap or Metaspace limit without finding what is growing.",
       "Treating every OutOfMemoryError as a heap problem."
@@ -535,7 +535,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Saying AOP can intercept any code, including field access and constructors, in Spring.",
       "Putting business logic in an aspect where nobody will look for it."
@@ -562,7 +562,7 @@
     "topicId": "spring-ioc-di"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Caching without an eviction path on writes and relying on TTL alone.",
       "Treating a cache miss storm as a database problem instead of a caching design problem."
@@ -589,7 +589,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Reporting ready before the application can actually serve traffic.",
       "Shipping a breaking database migration in the same release as the code that depends on it."
@@ -616,7 +616,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Assuming tracing works automatically across async boundaries and message queues.",
       "Keeping every trace in production and paying for it in storage and overhead."
@@ -643,7 +643,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Adopting WebFlux for a standard CRUD service and gaining only complexity.",
       "Blocking an event-loop thread and stalling unrelated requests."
@@ -670,7 +670,7 @@
     "topicId": "spring-boot-autoconfig"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Validating only that a token exists, not its signature, expiry, audience, and issuer.",
       "Putting sensitive data into JWT claims because they look protected."
@@ -777,7 +777,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Adding people to a late project as the first response.",
       "Promising a new date before finding out what is actually unfinished."
@@ -804,7 +804,7 @@
     "topicId": "bh-common-behavioral-questions"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Absorbing extra work silently and then missing the deadline.",
       "Arguing technical merit instead of business value when asking for engineering time."
@@ -830,7 +830,7 @@
     "topicId": "bh-tradeoffs-lessons"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Mentoring only by reviewing finished code instead of pairing on the thinking.",
       "Explaining the implementation instead of the risk, cost, and options."
@@ -883,7 +883,7 @@
     "topicId": "design-patterns-solid"
   },
   {
-    "category": "Collections",
+    "category": "Java",
     "commonMistakes": [
       "Synchronizing each method and calling the job done.",
       "Iterating a synchronizedMap without synchronizing on it."
@@ -961,7 +961,7 @@
     "topicId": "modern-java-features"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Declaring a counter volatile and believing it is thread-safe.",
       "Treating visibility and atomicity as the same problem."
@@ -987,7 +987,7 @@
     "topicId": "java-memory-model"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Picking ZGC because it is newest, without a latency requirement.",
       "Tuning collector flags before measuring with GC logs."
@@ -1013,7 +1013,7 @@
     "topicId": "garbage-collection"
   },
   {
-    "category": "Concurrency",
+    "category": "Java",
     "commonMistakes": [
       "Taking one thread dump and guessing from it.",
       "Restarting the service and destroying the evidence."
@@ -1039,7 +1039,7 @@
     "topicId": "executors-completablefuture"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Pooling every object indiscriminately.",
       "Optimising allocation without profiling first."
@@ -1065,7 +1065,7 @@
     "topicId": "performance-best-practices"
   },
   {
-    "category": "JVM",
+    "category": "Java",
     "commonMistakes": [
       "Benchmarking a JVM without warm-up and trusting the numbers.",
       "Disabling the JIT in production to 'simplify' things."
@@ -1091,7 +1091,7 @@
     "topicId": "jdk-jre-jvm"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Trying to absorb the attack in application code alone.",
       "Holding threads on slow downstream calls during an attack."
@@ -1117,7 +1117,7 @@
     "topicId": "security-jwt"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Forgetting RUNTIME retention, so nothing can read the annotation.",
       "Expecting the annotation to execute code by itself."
@@ -1143,7 +1143,7 @@
     "topicId": "enums-annotations"
   },
   {
-    "category": "Scenario-based",
+    "category": "DevOps & Cloud",
     "commonMistakes": [
       "Declaring success because the deploy job went green.",
       "Watching averages instead of percentiles."
@@ -1169,7 +1169,7 @@
     "topicId": "actuator-microservices-deployment"
   },
   {
-    "category": "Spring Boot",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Testing everything with @SpringBootTest and a slow suite nobody runs.",
       "Using an in-memory database that behaves differently from production."
@@ -1195,7 +1195,7 @@
     "topicId": "tst-spring-boot-tests"
   },
   {
-    "category": "SQL",
+    "category": "SQL & Databases",
     "commonMistakes": [
       "Renaming a column in the same release as the code change.",
       "Running a locking migration against a live table."
@@ -1221,7 +1221,7 @@
     "topicId": "db-joins-indexes-transactions"
   },
   {
-    "category": "Spring Framework",
+    "category": "Spring & Spring Boot",
     "commonMistakes": [
       "Using field injection because it is shorter.",
       "Reaching for the ApplicationContext in application code."
@@ -1273,7 +1273,7 @@
     "topicId": "sd-designing-real-systems"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Deciding by seniority instead of by criteria.",
       "Letting the argument run until the sprint fails."
@@ -1299,7 +1299,7 @@
     "topicId": "bh-common-behavioral-questions"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Cutting testing to meet the date.",
       "Accepting every new request after the plan is set."
@@ -1325,7 +1325,7 @@
     "topicId": "bh-tradeoffs-lessons"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Starting a big-bang rewrite with no tests.",
       "Refactoring code nobody needs to change."
@@ -1351,7 +1351,7 @@
     "topicId": "bh-tradeoffs-lessons"
   },
   {
-    "category": "Scenario-based",
+    "category": "Behavioral & Projects",
     "commonMistakes": [
       "Logging personal data in plain text.",
       "Storing data you do not need 'just in case'."
