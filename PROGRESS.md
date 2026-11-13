@@ -2,14 +2,14 @@
 
 This file is the resume point if a session is interrupted or its context is reset. Read it first, then run validation and the build before continuing.
 
-## Current state (2026-11-12, after full final audit — pushed)
+## Current state (2026-11-14, after external review batches 1–4 — pushed)
 
 - **Local directory:** `~/workspace/beanstack` (persistent, not /tmp)
 - **GitHub repo:** Faizxaan/bean-stack, branch `main`
 - **Repo before this work:** only `README.md` (12 bytes, initial commit `d5aa0d451ed5b6a3882979afcff08cccd2efbb92` on 2026-11-03). No other code existed to replace.
 - **App status:** Fully functional end-to-end SPA. Production build, type-check, validation script, and unit tests all pass with no chunk-size warning (see Verification below).
-- **Content status:** 96 topics validated, 19 cheatsheets, 329 interview questions + 37 one-minute revision prompts, 184 practice items, 10 tracks (none Coming Soon), 6 paths. Interview modules 1–4 and Bonus Resume are complete; Module 0 moved out of Interview Prep to Revision & Cheatsheets (see Completed — Interview Prep second pass below).
-- **Push status:** See "Push log" at the bottom. Confirmed pushes on `main`, in order: `81f00e1e…` (foundation + Java), `58f7c452…` (interview/practice/cheatsheets/polish), `666e536d…` (complete all tracks), `c5c4fd2c…` (PROGRESS log sync), `e4be9bdd…` (clickable topic arrows), `5b899e8e…` (critic audit), `d87d9ac0…` (PROGRESS log sync), `89459fe1…` (Desktop Modules interview import, 93 new questions), `ee0da341…` (PROGRESS log sync), `54378363…` (Module 0 topic gaps + chunk split), `3167e995…` (PROGRESS log sync), `85f02d76…` (Interview Prep redesign, UI only), `eca9d6de…` (Interview Prep second pass), `a6f8466c…` (delete content/interview/module-0.json).
+- **Content status:** 105 topics validated, 19 cheatsheets, 358 interview questions + 37 one-minute revision prompts, 214 practice items, 10 tracks (none Coming Soon), 6 paths. Interview total is 317 interview questions + 12 bonus resume entries; Module 0 moved out of Interview Prep to Revision & Cheatsheets (see Completed — Interview Prep second pass below).
+- **Push status:** See "Push log" at the bottom. Confirmed pushes on `main`, in order: `81f00e1e…` (foundation + Java), `58f7c452…` (interview/practice/cheatsheets/polish), `666e536d…` (complete all tracks), `c5c4fd2c…` (PROGRESS log sync), `e4be9bdd…` (clickable topic arrows), `5b899e8e…` (critic audit), `d87d9ac0…` (PROGRESS log sync), `89459fe1…` (Desktop Modules interview import, 93 new questions), `ee0da341…` (PROGRESS log sync), `54378363…` (Module 0 topic gaps + chunk split), `3167e995…` (PROGRESS log sync), `85f02d76…` (Interview Prep redesign, UI only), `eca9d6de…` (Interview Prep second pass), `a6f8466c…` (delete content/interview/module-0.json), `4d8cd664…` (full final audit), `c1810616…` (PROGRESS log sync), `74e2b757…` (external review batches 1–4).
 - **Push permission (2026-11-12):** Faizan said do NOT ask for approval before pushing Beanstack to GitHub; once tested from Jarvis's side, push directly — he has given permission. No approval widget for Beanstack pushes; push, verify the head, and report the commit SHA.
 
 ## Completed
