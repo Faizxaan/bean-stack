@@ -29,9 +29,9 @@ import type { AreaGroup } from '../lib/interview'
 //
 // Second pass, 2026-11-12: Module 0 is gone (its 37 one-minute prompts
 // moved to content/revision and render under Revision & Cheatsheets),
-// the 26 categories are consolidated into 10 broad areas (+ Resume on
+// the 26 categories are consolidated into 11 broad areas (+ Resume on
 // the bonus module only), and questions are grouped by broad area in
-// learning order — not by 77 individual Learn topics, and not
+// learning order — not by individual Learn topics, and not
 // alphabetically by category (which used to put Behavioural first).
 // Only the `category` field of content/interview/*.json was re-labelled;
 // question text, answers, ids, topicIds and modules are unchanged.
@@ -263,8 +263,8 @@ export function InterviewIndex() {
   )
 
   // Batch 3 (2026-11-13): topic sub-filter. The Java area alone holds
-  // 126 questions across 28 Learn topics, so "Java" as a filter is
-  // barely a filter. Options come from the questions in scope after
+  // far more questions than any other area, across many Learn topics,
+  // so "Java" as a filter is barely a filter. Options come from the
   // the area filter (not from the whole bank), in Learn learning
   // order, each with its question count — and the track in the label,
   // since topic titles can repeat across tracks. Questions with no

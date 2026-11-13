@@ -189,6 +189,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+interface PriceRepository {
+    double findPrice(String productCode);
+}
+
 public class InMemoryPriceRepository implements PriceRepository {
 
     private final Map<String, Double> prices = new HashMap<>();

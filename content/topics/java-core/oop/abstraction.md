@@ -103,6 +103,7 @@ class SmsSender extends NotificationSender {
 Output: no output on its own. Using it:
 
 ```java
+// Uses NotificationSender, EmailSender and SmsSender from the example above.
 NotificationSender sender = new EmailSender("asha@example.com");
 sender.sendWelcome();
 NotificationSender sms = new SmsSender("+91-98765-43210");
@@ -141,6 +142,7 @@ class Circle implements Drawable {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Drawable and Circle from the example above.
 Drawable shape = new Circle();
 shape.redraw();
 ```

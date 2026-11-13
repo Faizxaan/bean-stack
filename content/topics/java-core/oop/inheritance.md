@@ -103,6 +103,7 @@ class Manager extends Employee {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Employee and Manager from the example above.
 Employee e = new Manager("Asha", 900000, 150000);
 System.out.println(e.describe());
 System.out.println(e.yearlyPay());
@@ -137,6 +138,7 @@ class ElectricCar extends Vehicle {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Vehicle and ElectricCar from the example above.
 System.out.println(new ElectricCar().start());
 ```
 

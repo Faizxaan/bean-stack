@@ -32,7 +32,13 @@ Streams are not collections and not a replacement for every loop. They shine for
 interface Greeter {
     String greet(String name);
 }
-Greeter g = name -> "Hello, " + name;
+
+public class GreeterDemo {
+    public static void main(String[] args) {
+        Greeter g = name -> "Hello, " + name;
+        System.out.println(g.greet("Asha"));
+    }
+}
 ```
 
 A lambda's parameters and body must match the single abstract method's signature. Common built-in functional interfaces: `Predicate<T>` (test), `Function<T,R>` (transform), `Consumer<T>` (act, no return), `Supplier<T>` (produce), and `BiFunction<T,U,R>`.
@@ -90,8 +96,13 @@ Explanation: `filter` keeps names longer than 4 characters (only "meera", length
 
 ```java
 import java.util.*;
-int sum = List.of(1, 2, 3, 4).stream().reduce(0, Integer::sum);
-System.out.println(sum);
+
+public class ReduceDemo {
+    public static void main(String[] args) {
+        int sum = List.of(1, 2, 3, 4).stream().reduce(0, Integer::sum);
+        System.out.println(sum);
+    }
+}
 ```
 
 Output:
@@ -106,8 +117,13 @@ Explanation: `reduce` starts at 0 and adds each element using `Integer::sum`.
 
 ```java
 import java.util.*;
-Optional<String> name = Optional.ofNullable(null);
-System.out.println(name.orElse("Guest"));
+
+public class OptionalDemo {
+    public static void main(String[] args) {
+        Optional<String> name = Optional.ofNullable(null);
+        System.out.println(name.orElse("Guest"));
+    }
+}
 ```
 
 Output:

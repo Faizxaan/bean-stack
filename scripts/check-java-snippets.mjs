@@ -12,13 +12,24 @@
 //    dir. Fences needing Spring/Jakarta/JUnit/Mockito or another project
 //    are reported as skipped, not as failures, and bare fragments (no
 //    type declaration) are intentional teaching excerpts, not programs.
+//    Preview fences compile with --enable-preview --release <host javac
+//    major>: javac rejects --enable-preview with any older --release
+//    (compiler.err.preview.not.latest — preview features are only
+//    supported for the compiler's own release), so the hardcoded
+//    --release 21 only worked on a JDK 21 host. Non-preview fences
+//    compile with --release 21 (the app's target LTS) when the host
+//    supports it, otherwise with no --release flag. A fence whose
+//    compile failure is deliberate lives in COMPILE_ALLOWLIST below
+//    with a one-line reason, and is reported as allowed, not a failure.
 //  - if no JDK is found it says so plainly and runs the static checks
-//    only. It never claims a compile ran when one did not.
+//    only. It never claims a compile ran when one did not. Preview
+//    fences are still named in the output without a JDK, so the list
+//    does not silently claim "none".
 //
 // Exit code: 1 if any attempted compile failed or any static flag was
 // raised, else 0. A fence that needs --enable-preview (StructuredTaskScope,
 // ScopedValue) is compiled with it and named in the output.
-import { execFileSync } from 'node:child_process'
+import { execFileSync, execSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -71,6 +82,25 @@ const KNOWN = {
 // Preview-only APIs (Java 21): need --enable-preview to compile.
 const PREVIEW_APIS = ['StructuredTaskScope', 'ScopedValue']
 
+// Fences whose compile failure is deliberate, keyed by
+// "<path relative to content/>#<public top-level type>".
+// Keep this small: only fences the checker actually attempts to
+// compile belong here. Bare fragments (no type declaration) are a
+// separate, already-counted category — intentional teaching excerpts,
+// not programs — and do not need an entry.
+const COMPILE_ALLOWLIST = {
+  // TreeNode is defined in the first fence of this topic; the search
+  // class is shown on its own for readability.
+  'topics/dsa-coding/dsa/trees-graphs.md#BstSearch':
+    'TreeNode is defined in an earlier fence of the same topic',
+  // Java 21-24 preview API (StructuredTaskScope.ShutdownOnFailure);
+  // the topic states it does not compile on JDK 25, where the API
+  // was reworked (JEP 505), so on a JDK 25+ host this fence cannot
+  // compile by design.
+  'topics/java-advanced/concurrency/virtual-threads.md#StructuredPageLoader':
+    'Java 21-24 preview API; does not compile on JDK 25 by design (topic says so)',
+}
+
 function walk(dir) {
   const out = []
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -97,8 +127,14 @@ const FRAMEWORK_ANNOTATIONS = new Set(
   'Document Entity Embeddable Table Service Repository RestController Controller Component Configuration Bean Transactional Scheduled Async Cacheable CacheEvict PreAuthorize GetMapping PostMapping PutMapping DeleteMapping RequestMapping Test Mock SpringBootTest DataJpaTest WebMvcTest ExtendWith'.split(' '),
 )
 const FRAMEWORK_TYPES = new Set(
-  'JpaRepository MongoRepository CrudRepository JdbcTemplate NamedParameterJdbcTemplate RestClient RestTemplate WebClient ResponseEntity MultipartFile Page Pageable DataSource EntityManager MockMvc Mockito Assertions MockBean MockitoBean Testcontainers RestClientException HttpServletRequest HttpServletResponse FilterChain OncePerRequestFilter HandlerInterceptor WebMvcConfigurer InterceptorRegistry CorsConfiguration CorsConfigurationSource TaskScheduler ThreadPoolTaskScheduler ThreadPoolTaskExecutor ExpressionParser SpelExpressionParser StandardEvaluationContext Health Jwts Claims'.split(' '),
+  'JpaRepository MongoRepository CrudRepository JdbcTemplate NamedParameterJdbcTemplate RestClient RestTemplate WebClient ResponseEntity MultipartFile Pageable DataSource EntityManager MockMvc Mockito Assertions MockBean MockitoBean Testcontainers RestClientException HttpServletRequest HttpServletResponse FilterChain OncePerRequestFilter HandlerInterceptor WebMvcConfigurer InterceptorRegistry CorsConfiguration CorsConfigurationSource TaskScheduler ThreadPoolTaskScheduler ThreadPoolTaskExecutor ExpressionParser SpelExpressionParser StandardEvaluationContext Health Jwts Claims'.split(' '),
 )
+// NOTE: 'Page' and 'Proxy' are deliberately NOT in FRAMEWORK_TYPES.
+// A plain-Java record named Page (virtual-threads StructuredPageLoader)
+// and java.lang.reflect.Proxy (reflection ProxyDemo) both false-positived
+// as framework excerpts, so the checker never compiled them. Genuine
+// Spring fences using them are still caught by their
+// org.springframework.* imports or other markers above.
 
 function isFrameworkFence(code, importPkgs) {
   if (importPkgs.some(p => !p.startsWith('java.') && !p.startsWith('static java.'))) return true
@@ -117,6 +153,19 @@ function hasJavac() {
   }
 }
 
+// Major version of the host javac (e.g. 25 for "javac 25.0.2"),
+// or null when no javac is on PATH. (javac prints its version to
+// stderr, hence the 2>&1 redirect.)
+function javacMajor() {
+  try {
+    const out = execSync('javac -version 2>&1', { encoding: 'utf8' }).trim()
+    const m = out.match(/javac\s+(\d+)/)
+    return m ? Number(m[1]) : null
+  } catch {
+    return null
+  }
+}
+
 let problems = 0
 let compiled = 0
 let compileFailed = 0
@@ -125,6 +174,7 @@ let skippedFragment = 0
 const previewFences = []
 
 const javac = hasJavac()
+const hostJavacMajor = javac ? javacMajor() : null
 if (!javac) {
   console.log('SKIP: no JDK found (javac not on PATH) — no compile ran; static checks only.')
 }
@@ -203,6 +253,11 @@ for (const file of walk(topicsDir)) {
       // Only plain-Java fences are compilable standalone; framework
       // excerpts were already counted as skipped above.
       const publicTypes = [...code.matchAll(/^public\s+(?:final\s+|abstract\s+)?(?:class|interface|enum|record)\s+(\w+)/gm)].map(m => m[1])
+      // Preview fences are named even without a JDK (previously this
+      // only happened inside the compile branch, so a no-JDK run
+      // wrongly reported "Preview fences: none").
+      const needsPreview = PREVIEW_APIS.some(api => code.includes(api))
+      if (needsPreview && publicTypes.length === 1 && !framework) previewFences.push(label)
       if (!javac) {
         i = j
         continue
@@ -217,19 +272,30 @@ for (const file of walk(topicsDir)) {
         i = j
         continue
       }
-      const needsPreview = PREVIEW_APIS.some(api => code.includes(api))
-      if (needsPreview) previewFences.push(label)
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'beanstack-java-'))
       const javaFile = path.join(dir, `${publicTypes[0]}.java`)
       fs.writeFileSync(javaFile, src + '\n')
       try {
-        const args = needsPreview ? ['--enable-preview', '--release', '21', javaFile] : [javaFile]
+        // Preview features are only supported for the host compiler's
+        // own release; everything else targets the Java 21 LTS when
+        // the host supports it, and falls back to no --release flag
+        // on an older host (where --release 21 would itself fail).
+        const args = needsPreview
+          ? ['--enable-preview', '--release', String(hostJavacMajor), javaFile]
+          : hostJavacMajor !== null && hostJavacMajor >= 21
+            ? ['--release', '21', javaFile]
+            : [javaFile]
         execFileSync('javac', args, { stdio: 'pipe' })
         compiled++
       } catch (e) {
-        console.log(`${label} COMPILE FAILED:\n${(e.stdout || e.stderr || e.message || '').toString().trim()}`)
-        compileFailed++
-        problems++
+        const allowKey = `${rel}#${publicTypes[0]}`
+        if (COMPILE_ALLOWLIST[allowKey]) {
+          console.log(`${label} ALLOWED (not a failure): ${COMPILE_ALLOWLIST[allowKey]}`)
+        } else {
+          console.log(`${label} COMPILE FAILED:\n${(e.stdout || e.stderr || e.message || '').toString().trim()}`)
+          compileFailed++
+          problems++
+        }
       } finally {
         fs.rmSync(dir, { recursive: true, force: true })
       }
@@ -242,5 +308,5 @@ for (const file of walk(topicsDir)) {
 
 console.log(`\nDone: ${compiled} fence(s) compiled${javac ? '' : ' (0 — no JDK)'}${compileFailed ? `, ${compileFailed} failed` : ''}, ${skippedFragment} intentional fragments skipped, ${skippedFramework} framework/project fences skipped, ${problems} problem(s) found.`)
 if (previewFences.length) console.log(`Preview fences (need --enable-preview): ${previewFences.join(', ')}`)
-else console.log('Preview fences: none — no fence uses a preview API (StructuredTaskScope appears only in prose).')
+else console.log('Preview fences: none.')
 process.exit(problems > 0 ? 1 : 0)

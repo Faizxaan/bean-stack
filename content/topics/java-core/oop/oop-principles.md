@@ -85,6 +85,7 @@ public class BankAccount {
 Output: no output on its own — this is a class definition. Using it:
 
 ```java
+// Uses BankAccount from the example above.
 BankAccount account = new BankAccount(100);
 account.deposit(50);
 System.out.println(account.getBalance());

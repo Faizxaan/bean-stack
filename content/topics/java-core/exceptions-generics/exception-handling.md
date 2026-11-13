@@ -130,9 +130,14 @@ public class Box<T> {
     public void set(T value) { this.value = value; }
     public T get() { return value; }
 }
-Box<String> box = new Box<>();
-box.set("bean");
-System.out.println(box.get().toUpperCase());
+
+class BoxDemo {
+    public static void main(String[] args) {
+        Box<String> box = new Box<>();
+        box.set("bean");
+        System.out.println(box.get().toUpperCase());
+    }
+}
 ```
 
 Output:

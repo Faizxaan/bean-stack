@@ -50,10 +50,11 @@ describe('Module 0 exclusion', () => {
 })
 
 describe('category taxonomy', () => {
-  it('is 10 broad areas, in display order starting with Java', () => {
-    expect(INTERVIEW_CATEGORIES).toHaveLength(10)
+  it('is 11 broad areas, in display order starting with Java', () => {
+    expect(INTERVIEW_CATEGORIES).toHaveLength(11)
     expect(INTERVIEW_CATEGORIES[0]).toBe('Java')
     expect(INTERVIEW_CATEGORIES).toContain('Spring & Spring Boot')
+    expect(INTERVIEW_CATEGORIES).toContain('Kafka & Redis')
     expect(INTERVIEW_CATEGORIES).toContain('Behavioral & Projects')
     expect(INTERVIEW_CATEGORIES).not.toContain('Revision')
     expect(INTERVIEW_CATEGORIES).not.toContain('Scenario-based')

@@ -59,8 +59,13 @@ class StudentDiscount implements DiscountStrategy {
 class NoDiscount implements DiscountStrategy {
     public double apply(double price) { return price; }
 }
-DiscountStrategy strategy = new StudentDiscount();
-System.out.println(strategy.apply(100));
+
+public class StrategyDemo {
+    public static void main(String[] args) {
+        DiscountStrategy strategy = new StudentDiscount();
+        System.out.println(strategy.apply(100));
+    }
+}
 ```
 
 Output:
@@ -90,7 +95,12 @@ public class User {
     }
     public String toString() { return name + " <" + email + ">"; }
 }
-System.out.println(new User.Builder().name("Asha").email("asha@example.com").build());
+
+class BuilderDemo {
+    public static void main(String[] args) {
+        System.out.println(new User.Builder().name("Asha").email("asha@example.com").build());
+    }
+}
 ```
 
 Output:

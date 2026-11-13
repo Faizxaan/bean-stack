@@ -371,7 +371,7 @@ export function Practice() {
             <button className="btn secondary" disabled={deckIndex === 0} onClick={() => goToCard(deckIndex - 1)}>← Previous card</button>
             <button className="btn secondary" onClick={() => setDeckFlipped(v => !v)} aria-label={deckFlipped ? 'Flip card to front' : 'Flip card to back'}>{deckFlipped ? 'Flip to front' : 'Flip card'}</button>
             <button className="btn secondary" disabled={deckIndex >= flashcardsShown.length - 1} onClick={() => goToCard(deckIndex + 1)}>Next card →</button>
-            <span style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Tip: ← / → move between cards; Enter or Space flips the card.</span>
+            <span style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Tip: ← / → move between cards while focus is in the deck; Enter or Space flips the card.</span>
           </div>
         </div>
       )}

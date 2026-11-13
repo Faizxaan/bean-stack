@@ -95,7 +95,7 @@ export function MarkdownView({ markdown }: { markdown: string }) {
                 <span className="diagram-scroll" tabIndex={0} role="region" aria-label={`Scrollable diagram: ${label}. Scroll sideways to read it at full size.`}>
                   <img src={src} alt={alt} />
                 </span>
-                <a className="diagram-enlarge" href={src} target="_blank" rel="noreferrer">Open diagram enlarged in a new tab ↗</a>
+                <a className="diagram-enlarge" href={src} target="_blank" rel="noopener noreferrer">Open diagram enlarged in a new tab ↗</a>
               </span>
             )
           },

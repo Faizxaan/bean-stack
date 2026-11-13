@@ -89,6 +89,7 @@ class Checkout {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Checkout, CardPayment and UpiPayment from the example above.
 Checkout checkout = new Checkout();
 System.out.println(checkout.checkout(new CardPayment(), 500));
 System.out.println(checkout.checkout(new UpiPayment(), 250));
@@ -120,6 +121,7 @@ class Printer {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Printer from the example above.
 Printer printer = new Printer();
 System.out.println(printer.print(42));
 System.out.println(printer.print("hello"));
@@ -151,6 +153,7 @@ class Dog extends Animal {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Animal and Dog from the example above.
 Animal animal = new Dog();
 System.out.println(animal.sound());
 if (animal instanceof Dog dog) {

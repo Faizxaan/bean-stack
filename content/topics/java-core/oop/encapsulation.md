@@ -98,6 +98,7 @@ public class Wallet {
 Output: no output on its own — this is a class definition. Using it:
 
 ```java
+// Uses Wallet from the example above.
 Wallet wallet = new Wallet(100);
 wallet.addFunds(50);
 System.out.println(wallet.getBalance());
@@ -130,6 +131,7 @@ public record Point(int x, int y) {
 Output: no output on its own. Using it:
 
 ```java
+// Uses Point from the example above.
 Point p = new Point(3, 4);
 Point q = p.moveBy(1, 1);
 System.out.println(p);

@@ -86,6 +86,7 @@ public class Team implements Cloneable {
 ```
 
 ```java
+// Uses Team from the example above.
 Team original = new Team("Core", List.of("Asha", "Ben"));
 Team copy = original.clone();
 copy.getMembers().add("Cara");

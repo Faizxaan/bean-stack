@@ -49,7 +49,7 @@ describe('split content index', () => {
     expect(questions.some(q => q.module === 'module-0' || q.category === 'Revision')).toBe(false)
     // Every question's category is in the consolidated taxonomy, or
     // 'Resume' on the bonus-resume module only.
-    const allowed = new Set(['Java', 'Spring & Spring Boot', 'Microservices', 'SQL & Databases', 'System Design', 'DSA & Coding', 'Frontend', 'DevOps & Cloud', 'Testing', 'Behavioral & Projects', 'Resume'])
+    const allowed = new Set(['Java', 'Spring & Spring Boot', 'Kafka & Redis', 'Microservices', 'SQL & Databases', 'System Design', 'DSA & Coding', 'Frontend', 'DevOps & Cloud', 'Testing', 'Behavioral & Projects', 'Resume'])
     expect(questions.every(q => allowed.has(q.category))).toBe(true)
     expect(questions.filter(q => q.category === 'Resume').every(q => q.module === 'bonus-resume')).toBe(true)
   })

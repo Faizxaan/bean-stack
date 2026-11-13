@@ -176,6 +176,7 @@ Explanation: the outer loop matters — a graph may be disconnected, and startin
 ### BST search — O(h) time, O(1) iterative space
 
 ```java
+// TreeNode is defined in the first example of this topic.
 public class BstSearch {
     // Iterative search avoids recursion overhead. Time: O(h), where h is height.
     // Space: O(1). Returns the node, or null if the value is absent.

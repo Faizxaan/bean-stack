@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-13T22:15:01.581Z",
+  "generatedAt": "2026-11-13T22:47:28.291Z",
   "interviewQuestions": [
     {
       "category": "Resume",
@@ -4629,7 +4629,7 @@
       "topicId": "actuator-microservices-deployment"
     },
     {
-      "category": "Spring & Spring Boot",
+      "category": "Kafka & Redis",
       "commonMistakes": [
         "Caching without any eviction on writes.",
         "Expecting time-based expiration from the default simple cache.",
@@ -4737,7 +4737,7 @@
       "topicId": "spring-data-jpa"
     },
     {
-      "category": "Microservices",
+      "category": "Kafka & Redis",
       "commonMistakes": [
         "Assuming ordering across a whole topic.",
         "Adding consumers beyond the partition count and expecting more throughput.",
@@ -4764,7 +4764,7 @@
       "topicId": "kafka-spring-boot"
     },
     {
-      "category": "Microservices",
+      "category": "Kafka & Redis",
       "commonMistakes": [
         "Believing acks=all alone prevents duplicates.",
         "Retrying without idempotence and duplicating records.",
@@ -5922,7 +5922,7 @@
       "topicId": "db-joins-indexes-transactions"
     },
     {
-      "category": "Microservices",
+      "category": "Kafka & Redis",
       "commonMistakes": [
         "Retrying a poison message forever with no dead-letter topic.",
         "Assuming the dead-letter topic is monitored just because it exists.",
@@ -5950,7 +5950,7 @@
       "topicId": "kafka-spring-boot"
     },
     {
-      "category": "Spring & Spring Boot",
+      "category": "Kafka & Redis",
       "commonMistakes": [
         "Using condition where unless is needed, and wondering why #result is unavailable.",
         "Caching nulls for missing rows with no TTL.",
@@ -6862,7 +6862,7 @@
       "topicId": "security-jwt"
     },
     {
-      "category": "Microservices",
+      "category": "Kafka & Redis",
       "commonMistakes": [
         "Adding consumers beyond the partition count and expecting more throughput.",
         "Ignoring rebalances as a cause of lag.",

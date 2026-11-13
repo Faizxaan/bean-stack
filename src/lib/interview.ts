@@ -8,7 +8,7 @@ import { normalizeSearchQuery } from './utils'
 // Second pass (2026-11-12): Module 0 is gone from Interview Prep (its
 // 37 one-minute prompts moved to content/revision and render under
 // Revision & Cheatsheets). The old 26 categories are consolidated into
-// 10 broad areas, questions are grouped by broad area (not by 77
+// 11 broad areas, questions are grouped by broad area (not by
 // individual Learn topics), and ordering is learning order, not
 // alphabetical by category.
 
@@ -72,15 +72,19 @@ export function interviewQuestionsOnly(questions: InterviewQuestion[]): Intervie
 }
 
 // The consolidated taxonomy (2026-11-12 second pass): 26 old categories
-// collapsed to 10 broad areas. Order matters — it is the display order
-// of the areas inside a module, and the first area (Java) is where
-// "next unreviewed" starts, so a behavioural question can never come
-// first in Module 1 again. The full old -> new mapping with counts is
-// in DECISIONS.md; the mapping itself lives in the content files (only
-// the `category` field was re-labelled, nothing else).
+// collapsed to 10 broad areas, plus an 11th — 'Kafka & Redis' — added
+// 2026-11-14 for the questions whose Learn topic lives in the Kafka &
+// Redis track (topicIds kafka-spring-boot, spring-cache-redis). Order
+// matters — it is the display order of the areas inside a module, and
+// the first area (Java) is where "next unreviewed" starts, so a
+// behavioural question can never come first in Module 1 again. The
+// full old -> new mapping with counts is in DECISIONS.md; the mapping
+// itself lives in the content files (only the `category` field was
+// re-labelled, nothing else).
 export const INTERVIEW_CATEGORIES = [
   'Java',
   'Spring & Spring Boot',
+  'Kafka & Redis',
   'Microservices',
   'SQL & Databases',
   'System Design',
@@ -179,7 +183,7 @@ export interface AreaGroup {
  * Inside an area, questions are in display order (see sortQuestions);
  * the original Learn topic is only a small sub-label on the question
  * card / a sub-heading when the topic changes — never a separate
- * collapsible section. (The old groupQuestionsByTopic grouped by 77
+ * collapsible section. (The old groupQuestionsByTopic grouped by
  * individual Learn topics; that is what made the module view a wall
  * of tiny sections.)
  */

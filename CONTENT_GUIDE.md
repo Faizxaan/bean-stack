@@ -104,10 +104,11 @@ to `content/revision/one-minute.json` (see below) and render as a
 one-minute revision deck under Revision & Cheatsheets, so they never
 appear in interview counts, filters, or progress.
 
-Questions group by 10 broad areas, in learning order within each module
-(Easy → Hard): Java (130), Spring & Spring Boot (85), SQL & Databases
-(26), Microservices (23), Behavioral & Projects (19), System Design (18),
-DevOps & Cloud (14), DSA & Coding (13), Testing (14), Frontend (12).
+Questions group by 11 broad areas, in learning order within each module
+(Easy → Hard): Java (130), Spring & Spring Boot (83), SQL & Databases
+(26), Microservices (19), Behavioral & Projects (19), System Design (18),
+DevOps & Cloud (14), Testing (14), DSA & Coding (13), Frontend (12),
+Kafka & Redis (6).
 Resume (12) is bonus-only. The UI already lists all modules and shows a
 helpful placeholder state for modules with no questions yet, so adding
 questions is content-only.

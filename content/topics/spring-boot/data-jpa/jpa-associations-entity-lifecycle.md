@@ -136,6 +136,7 @@ Explanation: `LineItem.order` is the owning side — it holds the `order_id` for
 ### Entity states in one transaction
 
 ```java
+// Uses Order (and its entity states) from the example above.
 Order order = new Order();            // transient: no row, no id
 entityManager.persist(order);         // managed: Hibernate tracks it
 order.setStatus("PAID");              // dirty checking: no save call needed
