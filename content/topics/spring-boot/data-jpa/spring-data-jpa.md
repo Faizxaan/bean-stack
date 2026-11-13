@@ -3,12 +3,12 @@ id: spring-data-jpa
 title: Spring Data JPA and Hibernate
 track: spring-boot
 section: data-jpa
-order: 1
+order: 2
 difficulty: Advanced
 importance: 5
 tags: [JPA, Hibernate, Transactions, Pagination]
 prerequisites: [spring-boot-autoconfig, spring-mvc-rest]
-related: [spring-ioc-di, collections-framework]
+related: [spring-ioc-di, collections-framework, jpa-associations-entity-lifecycle]
 status: complete
 lastUpdated: 2026-11-12
 summary: Repositories, query methods, pagination, transactions, and the N+1 problem — the JPA knowledge that shows up in almost every Java backend interview.

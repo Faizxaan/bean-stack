@@ -8,7 +8,7 @@ difficulty: Advanced
 importance: 5
 tags: [JVM, GC, Memory, Performance]
 prerequisites: [jdk-jre-jvm, concurrency-basics]
-related: [concurrency-basics, spring-boot-autoconfig]
+related: [concurrency-basics, spring-boot-autoconfig, jvm-class-loading-oom-diagnostics]
 status: complete
 lastUpdated: 2026-11-12
 summary: How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production.
@@ -73,7 +73,7 @@ public class LeakDemo {
 
 Output:
 
-```
+```text
 Cached entries: 1000
 ```
 

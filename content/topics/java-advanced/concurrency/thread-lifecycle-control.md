@@ -94,7 +94,7 @@ System.out.println(worker.getState());
 
 Output:
 
-```
+```text
 NEW
 TERMINATED
 ```
@@ -125,7 +125,7 @@ System.out.println("main done");
 
 Output:
 
-```
+```text
 working...
 working...
 worker stopping
@@ -146,7 +146,7 @@ System.out.println("Application running");
 
 Output (on a normal exit, for example Ctrl-C):
 
-```
+```text
 Application running
 Shutting down: closing resources
 ```

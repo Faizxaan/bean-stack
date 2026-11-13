@@ -58,7 +58,7 @@ Notice the proportions: the Situation and Task are three sentences, the Action i
 
 Template you can reuse for any story:
 
-```
+```text
 Situation: [Where, when, and what was at stake — 1-2 sentences]
 Task:      [What you personally owned]
 Action:    [Step 1 — what you did and why]

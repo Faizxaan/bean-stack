@@ -85,7 +85,7 @@ public class PoolDemo {
 
 Output:
 
-```
+```text
 14
 ```
 
@@ -110,7 +110,7 @@ public class FuturePipelineDemo {
 
 Output:
 
-```
+```text
 80
 ```
 
@@ -133,7 +133,7 @@ public class ComposeDemo {
 
 Output:
 
-```
+```text
 Profile for user-7
 ```
 

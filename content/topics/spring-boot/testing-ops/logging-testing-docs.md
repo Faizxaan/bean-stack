@@ -155,7 +155,7 @@ class DiscountServiceTest {
 
 Output (test run):
 
-```
+```text
 DiscountServiceTest > tenPercentDiscountApplied() PASSED
 ```
 

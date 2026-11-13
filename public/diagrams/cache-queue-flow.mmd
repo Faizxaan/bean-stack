@@ -1,0 +1,9 @@
+%% Mermaid source for public/diagrams/cache-queue-flow.svg — kept next to the SVG it generates.
+flowchart LR
+    Client[Client] --> App[App Server]
+    App --> Cache[(Cache)]
+    App --> Queue[Message Queue]
+    Queue --> Worker[Worker]
+    Worker --> DB[(Database)]
+    App --> DB
+    DB --> Replica[(Read Replica)]

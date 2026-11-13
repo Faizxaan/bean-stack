@@ -78,7 +78,7 @@ FROM payment;
 
 Output:
 
-```
+```text
  customer | region | amount | rank_in_region
 ----------+--------+--------+----------------
  Meera    | East   |    700 |              1
@@ -100,7 +100,7 @@ FROM payment;
 
 Output:
 
-```
+```text
  customer | region | amount | running_total | share_of_region
 ----------+--------+--------+---------------+-----------------
  Asha     | West   |    500 |           500 |            0.42
@@ -122,7 +122,7 @@ FROM payment;
 
 Output:
 
-```
+```text
  customer | sale_date  | amount | previous_amount | change_vs_previous
 ----------+------------+--------+-----------------+--------------------
  Asha     | 2026-01-05 |    500 |                 | 

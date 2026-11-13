@@ -76,7 +76,7 @@ public class ReflectionDemo {
 
 Output:
 
-```
+```text
 Hello, Ada
 ```
 
@@ -122,7 +122,7 @@ public class SerializationDemo {
 
 Output:
 
-```
+```text
 Alice
 true
 ```
@@ -158,7 +158,7 @@ public class ProxyDemo {
 
 Output:
 
-```
+```text
 Calling greet
 Hello, Ada
 ```

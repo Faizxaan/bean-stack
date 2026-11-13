@@ -1,10 +1,12 @@
 [
   {
-    "description": "Start here if you are new to Java: JVM basics, OOP, Strings, Collections, exceptions, then Streams.",
+    "description": "Start here if you are new to Java: JVM basics, language basics, variables and control flow, OOP, Strings, Collections, exceptions, then Streams.",
     "id": "beginner-roadmap",
     "title": "Beginner Roadmap",
     "topicIds": [
       "jdk-jre-jvm",
+      "language-basics-syntax",
+      "variables-operators-control-flow",
       "oop-principles",
       "strings",
       "collections-framework",
@@ -46,8 +48,8 @@
       "fe-js-dom",
       "fe-ts-types",
       "fe-ts-generics",
-      "fe-ts-react",
       "fe-react-components-hooks",
+      "fe-ts-react",
       "fe-react-state",
       "fe-react-performance"
     ]

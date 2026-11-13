@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 5
 tags: [Scalability, Load Balancing, CAP Theorem, Capacity Estimation, Horizontal Scaling]
 prerequisites: []
-related: [sd-caching-queues-databases, sd-designing-real-systems]
+related: [sd-caching-queues-databases, sd-designing-real-systems, sd-distributed-systems-fundamentals]
 status: complete
 lastUpdated: 2026-11-04
 summary: "How systems grow from one server to many, and how to reason about load, latency, availability, and capacity before you draw a single box."
@@ -52,16 +52,7 @@ Interviewers do not expect exact numbers; they expect defensible arithmetic from
 
 Example: 10 million daily active users, each making 20 requests a day, gives 200 million requests per day, or roughly 2,300 requests per second on average. Peak traffic at 3x the average is about 7,000 requests per second. If each request returns 10 KB, peak bandwidth is about 70 MB/s. Write the assumptions down, show the arithmetic, and say what would change the answer. That discipline matters more than the final number.
 
-```mermaid
-flowchart LR
-    U[Users] --> LB[Load Balancer]
-    LB --> S1[App Server 1]
-    LB --> S2[App Server 2]
-    LB --> S3[App Server 3]
-    S1 --> DB[(Shared Database)]
-    S2 --> DB
-    S3 --> DB
-```
+![Flowchart: users connect to a load balancer, which distributes traffic to three app servers, all sharing one database.](/diagrams/load-balancer-flow.svg)
 
 ## Key Concepts
 

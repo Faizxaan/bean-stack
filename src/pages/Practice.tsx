@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import { getTopic, usePracticeItems } from '../lib/content'
+import { contentIndex, getTopic, getTrack, usePracticeItems } from '../lib/content'
 import type { PracticeItem } from '../types'
 import { useApp } from '../store/AppContext'
-import { accuracyByTopic, isDue, smoothScrollBehavior, topicUrl, weakTopics } from '../lib/utils'
+import { accuracyByTopic, filterByTrackSection, isDue, pickMockQuestions, smoothScrollBehavior, topicUrl, weakTopics } from '../lib/utils'
+import { ProgressBar } from '../components/ProgressBar'
 
 function McqCard({ item }: { item: PracticeItem }) {
   const { recordAttempt } = useApp()
@@ -51,15 +52,20 @@ function McqCard({ item }: { item: PracticeItem }) {
   )
 }
 
-function FlashcardCard({ item }: { item: PracticeItem }) {
+// Batch 3 (2026-11-13): the deck view passes flipped/onFlip so one
+// Flip button and Prev/Next can drive the card; without them the card
+// keeps its own internal flip state exactly as before.
+function FlashcardCard({ item, flipped: controlledFlipped, onFlip }: { item: PracticeItem; flipped?: boolean; onFlip?: () => void }) {
   const { data, setFlashcardBox, toggleList } = useApp()
-  const [flipped, setFlipped] = useState(false)
+  const [internalFlipped, setInternalFlipped] = useState(false)
+  const flipped = controlledFlipped ?? internalFlipped
+  const flip = () => { if (onFlip) onFlip(); else setInternalFlipped(v => !v) }
   const state = data.flashcardStates[item.id]
   const dueLabel = !state ? ' · due today' : Number.isNaN(new Date(state.dueAt).getTime()) ? ' · due today' : ` · due ${new Date(state.dueAt).toLocaleDateString()}`
   return (
     <div className="card" id={`practice-${item.id}`} style={{ marginBottom: 12, overflowWrap: 'break-word' }}>
       <h3 className="practice-title">{item.title}</h3>
-      <div style={{ minHeight: 80, padding: 12, border: '1px solid var(--border)', borderRadius: 8, margin: '10px 0', cursor: 'pointer' }} onClick={() => setFlipped(!flipped)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlipped(!flipped) } }} tabIndex={0} role="button" aria-label={`Flip flashcard: ${item.title} — currently showing ${flipped ? 'back' : 'front'}`}>
+      <div style={{ minHeight: 80, padding: 12, border: '1px solid var(--border)', borderRadius: 8, margin: '10px 0', cursor: 'pointer' }} onClick={flip} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip() } }} tabIndex={0} role="button" aria-label={`Flip flashcard: ${item.title} — currently showing ${flipped ? 'back' : 'front'}`}>
         {flipped ? (item.back || 'Back not provided for this flashcard yet.') : (item.front || 'Front not provided for this flashcard yet.')}
         <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginTop: 8 }}>{flipped ? 'Back — click or press Enter to flip back' : 'Front — click or press Enter to flip'}</div>
       </div>
@@ -109,10 +115,54 @@ export function Practice() {
   const [tab, setTab] = useState<PracticeTab>(initialTab)
   const [retryWrongOnly, setRetryWrongOnly] = useState(false)
   const [dueOnly, setDueOnly] = useState(false)
+  // Batch 3 (2026-11-13): track/section filters, applied to every tab's
+  // list (and to the mock pool — a mock drawn while filtered practises
+  // that track/section). Changing the track resets the section.
+  const [trackFilter, setTrackFilter] = useState('all')
+  const [sectionFilter, setSectionFilter] = useState('all')
+  // Batch 3 (2026-11-13): one-card flashcard deck (see the flashcards
+  // render below). deckFlipped resets on every card change.
+  const [deckIndex, setDeckIndex] = useState(0)
+  const [deckFlipped, setDeckFlipped] = useState(false)
   const [mock, setMock] = useState<{ items: PracticeItem[]; answers: Record<string, number>; finished: boolean; startedAt: number } | null>(null)
+  // Ids of the previous mock, session-only: the next mock avoids them
+  // while the pool allows (60 MCQs, so 50 fresh remain after one mock).
+  // No new LocalStorage field was added for this — a persisted field
+  // would mean a UserData schema change (sanitise + import validation)
+  // for a nicety, and the shuffle already randomises across reloads.
+  const [prevMockIds, setPrevMockIds] = useState<string[]>([])
   const { data, recordAttempt } = useApp()
   const { items: practiceItems, loaded } = usePracticeItems()
-  const byType = (t: string) => practiceItems.filter(i => i.type === t)
+  // Track/section scope: derived from each item's topicId (getTopic),
+  // so no new taxonomy — a track is a Learn track, a section is one
+  // of its Learn sections. Counts in the tab bar and the due/wrong
+  // filters below all read from this scoped list.
+  const scopedItems = useMemo(
+    () => filterByTrackSection(practiceItems, trackFilter, sectionFilter, id => {
+      const t = getTopic(id)
+      return t ? { track: t.track, section: t.section } : undefined
+    }),
+    [practiceItems, trackFilter, sectionFilter],
+  )
+  const byType = (t: string) => scopedItems.filter(i => i.type === t)
+  // Filter options stay stable while filtering (derived from the full
+  // set, not the scoped one), so picking a track never removes the
+  // other tracks from the list.
+  const tracksInPractice = useMemo(
+    () => contentIndex.tracks.filter(tr => practiceItems.some(i => getTopic(i.topicId || '')?.track === tr.id)),
+    [practiceItems],
+  )
+  const sectionsInTrack = useMemo(
+    () => {
+      const track = trackFilter === 'all' ? undefined : getTrack(trackFilter)
+      if (!track) return []
+      return track.sections.filter(sec => practiceItems.some(i => {
+        const t = getTopic(i.topicId || '')
+        return t?.track === track.id && t.section === sec.id
+      }))
+    },
+    [practiceItems, trackFilter],
+  )
   const accuracy = accuracyByTopic(data.practiceAttempts, practiceItems)
   const weak = weakTopics(data.practiceAttempts, practiceItems)
   // Only wrong answers for items that still exist are retryable.
@@ -130,8 +180,13 @@ export function Practice() {
   const outputsShown = retryWrongOnly ? byType('output').filter(i => wrongOutputIds.includes(i.id)) : byType('output')
 
   const startMock = () => {
-    const mcqs = byType('mcq').slice(0, 10)
+    // A mock used to be the first 10 MCQs in file order, every time.
+    // Draw a fresh random set instead, avoiding the previous mock's
+    // questions while the pool allows; recording/review on Finish is
+    // unchanged (see finishMock below).
+    const mcqs = pickMockQuestions(byType('mcq'), 10, prevMockIds)
     if (mcqs.length === 0) return
+    setPrevMockIds(mcqs.map(i => i.id))
     setMock({ items: mcqs, answers: {}, finished: false, startedAt: Date.now() })
   }
   const mockScore = mock ? mock.items.filter(i => mock.answers[i.id] === i.answerIndex).length : 0
@@ -148,15 +203,33 @@ export function Practice() {
     setMock({ ...mock, finished: true })
   }
 
+  // Deck position: clamp when the list shrinks (due-only toggle, or a
+  // track/section filter), and always show the front of a new card.
+  const goToCard = (i: number) => {
+    setDeckIndex(Math.max(0, Math.min(i, Math.max(0, flashcardsShown.length - 1))))
+    setDeckFlipped(false)
+  }
+  useEffect(() => {
+    setDeckIndex(i => Math.min(i, Math.max(0, flashcardsShown.length - 1)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flashcardsShown.length])
+
   // Deep links from Search / the command palette use
   // #practice-<itemId>. Scroll to that card once its tab has loaded —
   // without this, a search result landed at the top of a long list and
   // the user had to hunt for the question they had just clicked.
+  // In the flashcard deck only one card is rendered, so a deep link
+  // first moves the deck to that card (Library links here) and the
+  // scroll then lands on it.
   useEffect(() => {
     if (!loaded || !location.hash.startsWith('#practice-')) return
-    // The card only exists when its tab is showing.
+    if (tab === 'flashcard') {
+      const idx = flashcardsShown.findIndex(i => `practice-${i.id}` === location.hash.slice(1))
+      if (idx >= 0) setDeckIndex(idx)
+    }
     const t = setTimeout(() => document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }), 50)
     return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded, location.hash, tab])
 
   return (
@@ -173,6 +246,30 @@ export function Practice() {
         {PRACTICE_TABS.map(t => (
           <button key={t} className="btn secondary" aria-pressed={tab === t} onClick={() => setTab(t)}>{t === 'mcq' ? `MCQs (${byType('mcq').length})` : t === 'flashcard' ? `Flashcards (${dueFlashcards.length} due of ${byType('flashcard').length})` : t === 'coding' ? `Coding (${byType('coding').length})` : t === 'output' ? `Output-Based (${byType('output').length})` : t === 'scenario' ? `Scenario-Based (${byType('scenario').length})` : 'Mock Interview (10 questions)'} {tab === t ? '✓' : ''}</button>
         ))}
+      </div>
+      {/* Track/section filters (Batch 3): narrow every tab to one Learn
+          track, optionally one section — derived from each item's
+          topicId, so a filter can never offer a track/section with no
+          practice items. The mock pool follows the filter too. */}
+      <div className="card iv-filters" aria-label="Filter practice by track and section">
+        <label className="iv-filter">Track
+          <select className="select" value={trackFilter} onChange={e => { setTrackFilter(e.target.value); setSectionFilter('all') }} aria-label="Filter practice by track">
+            <option value="all">All tracks ({practiceItems.length} items)</option>
+            {tracksInPractice.map(tr => <option key={tr.id} value={tr.id}>{tr.title} ({practiceItems.filter(i => getTopic(i.topicId || '')?.track === tr.id).length})</option>)}
+          </select>
+        </label>
+        <label className="iv-filter">Section
+          <select className="select" value={sectionFilter} disabled={trackFilter === 'all'} onChange={e => setSectionFilter(e.target.value)} aria-label="Filter practice by section">
+            <option value="all">All sections</option>
+            {sectionsInTrack.map(sec => <option key={sec.id} value={sec.id}>{sec.title} ({practiceItems.filter(i => { const t = getTopic(i.topicId || ''); return t?.track === trackFilter && t.section === sec.id }).length})</option>)}
+          </select>
+        </label>
+        {(trackFilter !== 'all' || sectionFilter !== 'all') && (
+          <div className="iv-filter-actions">
+            <span style={{ color: 'var(--muted)', alignSelf: 'center' }}>Showing {scopedItems.length} of {practiceItems.length} items</span>
+            <button className="btn secondary small" onClick={() => { setTrackFilter('all'); setSectionFilter('all') }}>Clear track filter</button>
+          </div>
+        )}
       </div>
       {(tab === 'mcq' || tab === 'output') && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -202,7 +299,7 @@ export function Practice() {
 
       {tab === 'mock' && (
         <div>
-          {!mock && <div className="card"><p>Mock interview: 10 MCQs drawn from the current practice set, in the order they appear there. There is no time limit — answer at your own pace — and you will see a scored summary plus a review of every answer at the end. Your mock answers count towards your accuracy and “retry wrong”.</p>{byType('mcq').length === 0 ? <p style={{ color: 'var(--muted)' }}>No MCQs are available yet, so a mock interview cannot start. Try the other practice sections, or browse Learn.</p> : <button className="btn" onClick={startMock}>Start mock interview ({Math.min(10, byType('mcq').length)} questions)</button>}</div>}
+          {!mock && <div className="card"><p>Mock interview: 10 MCQs drawn at random from the current practice set — a new set each time, avoiding the previous mock&apos;s questions when the pool allows. There is no time limit — answer at your own pace — and you will see a scored summary plus a review of every answer at the end. Your mock answers count towards your accuracy and “retry wrong”.</p>{byType('mcq').length === 0 ? <p style={{ color: 'var(--muted)' }}>No MCQs are available yet, so a mock interview cannot start. Try the other practice sections, or browse Learn.</p> : <button className="btn" onClick={startMock}>Start mock interview ({Math.min(10, byType('mcq').length)} questions)</button>}</div>}
           {mock && mock.items.length === 0 && <div className="card"><p>No questions in this mock interview.</p><button className="btn secondary" onClick={() => setMock(null)}>Back to mock setup</button></div>}
           {mock && !mock.finished && (
             <div>
@@ -246,10 +343,41 @@ export function Practice() {
         </div>
       )}
 
-      {tab === 'mcq' && (mcqsShown.length ? mcqsShown.map(i => <McqCard key={i.id} item={i} />) : <div className="card">{retryWrongOnly ? <><p>No wrong MCQs to retry — nice work. Switch the filter off to practise everything again.</p><button className="btn secondary" onClick={() => setRetryWrongOnly(false)}>Show all MCQs</button></> : 'No MCQs yet in this batch. They are added with each practice batch, linked to topics.'}</div>)}
-      {tab === 'flashcard' && (flashcardsShown.length ? flashcardsShown.map(i => <FlashcardCard key={i.id} item={i} />) : <div className="card">{dueOnly ? <><p>Nothing due today — the Leitner deck is caught up. Come back tomorrow, or review the full deck now.</p><button className="btn secondary" onClick={() => setDueOnly(false)}>Show all flashcards</button></> : 'No flashcards yet. Flashcards are atomic and use Leitner boxes once added.'}</div>)}
+      {tab === 'mcq' && (mcqsShown.length ? mcqsShown.map(i => <McqCard key={i.id} item={i} />) : <div className="card">{retryWrongOnly ? <><p>No wrong MCQs to retry — nice work. Switch the filter off to practise everything again.</p><button className="btn secondary" onClick={() => setRetryWrongOnly(false)}>Show all MCQs</button></> : (trackFilter !== 'all' || sectionFilter !== 'all') ? <><p>No MCQs in this track / section. Clear the filter to see the full set.</p><button className="btn secondary" onClick={() => { setTrackFilter('all'); setSectionFilter('all') }}>Clear track filter</button></> : 'No MCQs yet in this batch. They are added with each practice batch, linked to topics.'}</div>)}
+      {/* One-card deck (Batch 3): the flashcards tab used to render all
+          47 cards as one long scroll. Now it shows one card at a time
+          with Prev / Next / Flip and a progress counter. Leitner is
+          untouched — the card's own Forgot / Got it buttons still call
+          setFlashcardBox, due-today counts still come from isDue, and
+          flipping is still click or Enter/Space on the card itself.
+          Arrow keys move between cards only while focus is in the deck. */}
+      {tab === 'flashcard' && flashcardsShown.length > 0 && (
+        <div
+          onKeyDown={e => {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); goToCard(deckIndex - 1) }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); goToCard(deckIndex + 1) }
+          }}
+        >
+          <p role="status" style={{ color: 'var(--muted)', margin: '0 0 8px' }}>
+            Card {deckIndex + 1} of {flashcardsShown.length}
+            {dueOnly ? ` · due today (${dueFlashcards.length} due)` : ` · ${dueFlashcards.length} due today`}
+            {trackFilter !== 'all' ? ` · ${getTrack(trackFilter)?.title || trackFilter}` : ''}
+          </p>
+          <ProgressBar pct={Math.round(((deckIndex + 1) / flashcardsShown.length) * 100)} label={`Flashcard ${deckIndex + 1} of ${flashcardsShown.length}`} />
+          <div style={{ marginTop: 12 }}>
+            <FlashcardCard key={flashcardsShown[deckIndex].id} item={flashcardsShown[deckIndex]} flipped={deckFlipped} onFlip={() => setDeckFlipped(v => !v)} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <button className="btn secondary" disabled={deckIndex === 0} onClick={() => goToCard(deckIndex - 1)}>← Previous card</button>
+            <button className="btn secondary" onClick={() => setDeckFlipped(v => !v)} aria-label={deckFlipped ? 'Flip card to front' : 'Flip card to back'}>{deckFlipped ? 'Flip to front' : 'Flip card'}</button>
+            <button className="btn secondary" disabled={deckIndex >= flashcardsShown.length - 1} onClick={() => goToCard(deckIndex + 1)}>Next card →</button>
+            <span style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Tip: ← / → move between cards; Enter or Space flips the card.</span>
+          </div>
+        </div>
+      )}
+      {tab === 'flashcard' && flashcardsShown.length === 0 && <div className="card">{dueOnly ? <><p>Nothing due today — the Leitner deck is caught up. Come back tomorrow, or review the full deck now.</p><button className="btn secondary" onClick={() => setDueOnly(false)}>Show all flashcards</button></> : (trackFilter !== 'all' || sectionFilter !== 'all') ? <><p>No flashcards in this track / section. Clear the filter to see the full deck.</p><button className="btn secondary" onClick={() => { setTrackFilter('all'); setSectionFilter('all') }}>Clear track filter</button></> : 'No flashcards yet. Flashcards are atomic and use Leitner boxes once added.'}</div>}
       {tab === 'coding' && (byType('coding').length ? byType('coding').map(i => <CodingCard key={i.id} item={i} />) : <div className="card">No coding questions yet in this batch.</div>)}
-      {tab === 'output' && (outputsShown.length ? outputsShown.map(i => <McqCard key={i.id} item={i} />) : <div className="card">{retryWrongOnly ? <><p>No wrong output questions to retry.</p><button className="btn secondary" onClick={() => setRetryWrongOnly(false)}>Show all output questions</button></> : 'No output-based questions yet. Output questions work like MCQs: read the code, predict the output, check the explanation.'}</div>)}
+      {tab === 'output' && (outputsShown.length ? outputsShown.map(i => <McqCard key={i.id} item={i} />) : <div className="card">{retryWrongOnly ? <><p>No wrong output questions to retry.</p><button className="btn secondary" onClick={() => setRetryWrongOnly(false)}>Show all output questions</button></> : (trackFilter !== 'all' || sectionFilter !== 'all') ? <><p>No output questions in this track / section. Clear the filter to see the full set.</p><button className="btn secondary" onClick={() => { setTrackFilter('all'); setSectionFilter('all') }}>Clear track filter</button></> : 'No output-based questions yet. Output questions work like MCQs: read the code, predict the output, check the explanation.'}</div>)}
       {tab === 'scenario' && (byType('scenario').length ? byType('scenario').map(i => <CodingCard key={i.id} item={i} />) : <div className="card">No scenario-based questions yet. Scenario questions give a real-world situation and a revealable model approach.</div>)}
     </div>
   )

@@ -93,7 +93,7 @@ FROM customer;
 
 Output:
 
-```
+```text
  clean_name  | upper_name  | name_length | first_four
 -------------+-------------+-------------+------------
  Asha Sharma | ASHA SHARMA |          11 | Asha
@@ -114,7 +114,7 @@ FROM customer;
 
 Output:
 
-```
+```text
  join_year | join_month | join_month_start
 -----------+------------+--------------------
       2025 |          3 | 2025-03-01 00:00:00
@@ -136,7 +136,7 @@ FROM customer;
 
 Output:
 
-```
+```text
  name        | contact           | spend_or_zero | per_spend
 -------------+-------------------+---------------+-----------
  Asha Sharma | asha@example.com  |           500 |      2.00

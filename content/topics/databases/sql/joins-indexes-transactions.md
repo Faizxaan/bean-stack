@@ -6,11 +6,11 @@ section: sql
 order: 2
 difficulty: Intermediate
 importance: 5
-tags: [SQL, joins, indexes, transactions, ACID, isolation]
+tags: [SQL, joins, indexes, transactions, ACID, isolation, MVCC, B+Tree]
 prerequisites: [db-sql-fundamentals]
 related: [db-sql-java-developers, spring-data-jpa]
 status: complete
-lastUpdated: 2026-11-12
+lastUpdated: 2026-11-13
 summary: "How joins combine tables, how indexes speed up reads at a cost to writes, and how transactions and isolation levels keep concurrent work correct."
 ---
 
@@ -38,6 +38,14 @@ Without an index, the database scans every row of a table — a full table scan.
 
 Indexes are not free. Every INSERT, UPDATE, and DELETE must maintain every index on the table, so a table with ten indexes writes slowly and consumes extra storage. Indexes also help only when the query is selective: an index on a boolean column with two values rarely beats a scan. The practical rule is to index foreign keys and columns used in WHERE, JOIN, and ORDER BY clauses of frequent queries, then measure with EXPLAIN rather than guessing.
 
+### B+Tree, clustered vs non-clustered indexes
+
+The "B-tree" in most textbooks is, in practice, a **B+Tree**: internal nodes hold keys and pointers, while all the actual row pointers live in the leaf nodes, which are linked together in key order. That linked-leaf structure is what makes range scans fast — the database walks the leaves in order instead of jumping around the tree — and it is why an index can serve an `ORDER BY` without a separate sort.
+
+A **clustered index** decides the physical order of the table's rows: the table itself is stored in index order. A table has at most one clustered index, and it is usually the primary key (InnoDB stores the table clustered by primary key; PostgreSQL tables are heaps, and a clustered index there is a one-off reordering, not a permanent property). A **non-clustered (secondary) index** is a separate structure mapping indexed values to row locations, and the database follows the pointer to fetch the row — an extra hop that matters when many rows are fetched. A secondary index on the primary key's columns can answer a query without touching the table at all, which is the covering-index case: the index contains every column the query needs.
+
+The practical consequence: a range scan on the clustered key is cheap (rows are adjacent on disk), a lookup through a secondary index costs a pointer chase per row, and a secondary index that returns a large fraction of the table can be slower than a full scan, because random row fetches cost more than a sequential read.
+
 ### Transactions and ACID
 
 A transaction is a sequence of statements that succeeds or fails as a unit. ACID describes its guarantees: Atomicity (all statements apply or none do), Consistency (the database moves from one valid state to another, with constraints intact), Isolation (concurrent transactions do not visibly interfere), and Durability (once committed, the result survives crashes, via the write-ahead log).
@@ -46,13 +54,21 @@ Isolation is a spectrum, not a switch. The SQL standard defines four levels, fro
 
 MySQL's InnoDB default is REPEATABLE READ. Lost updates — two transactions reading the same balance and both writing back a stale result — are prevented by locking the row (SELECT ... FOR UPDATE) or by optimistic locking with a version column, both of which Java developers meet through JPA's `@Version`.
 
+### MVCC: how databases actually implement isolation
+
+Most modern databases do not implement isolation by locking every row a transaction reads. They use **MVCC (multi-version concurrency control)**: each row exists in several versions, stamped with the transaction that created it. A transaction sees the version of each row that was committed when the transaction started (or, under READ COMMITTED, when the statement started) — so readers never block writers, and writers never block readers.
+
+That is why, in PostgreSQL, a long-running REPEATABLE READ transaction can still read consistent data while other transactions update the same rows: it is reading old versions, not waiting for locks. The cost is garbage: old versions accumulate until no transaction can still see them, and then they are reclaimed (PostgreSQL's VACUUM, InnoDB's purge). The two databases reach similar guarantees by different means: PostgreSQL's REPEATABLE READ gives each transaction a fixed snapshot, so it never sees rows committed after the snapshot — no phantom reads — while InnoDB's REPEATABLE READ uses next-key locks to block concurrent inserts into the scanned range. They still differ at the edges: PostgreSQL can abort a transaction with a serialization failure on write skew, and SERIALIZABLE in both systems can abort a transaction that must be retried. The SQL standard's level names describe guarantees, not mechanisms — two databases at the same level can behave differently at the edges, which is why interviewers ask about a specific database's behaviour rather than the standard alone.
+
 ## Key Concepts
 
 - **INNER JOIN:** only matching pairs from both tables.
 - **LEFT JOIN:** all left rows, NULLs on the right where there is no match; the tool for "find rows with no match".
 - **Cartesian product:** every combination of rows, from a CROSS JOIN or a missing join condition; usually a bug.
 - **Fan-out:** a join that produces many rows per parent row, which inflates aggregates unless you aggregate first.
-- **B-tree index:** a sorted structure mapping indexed values to rows; supports equality, range, and ordered access.
+- **B+Tree index:** a sorted structure mapping indexed values to rows; leaf nodes are linked in key order, so range scans and ORDER BY are cheap.
+- **Clustered vs non-clustered index:** a clustered index stores the table's rows in index order (one per table, usually the primary key); a secondary index is a separate structure that points at rows.
+- **MVCC:** multi-version concurrency control — readers see a committed version of each row instead of blocking on writers; old versions are reclaimed by VACUUM (PostgreSQL) or purge (InnoDB).
 - **Composite index and leftmost prefix:** a multi-column index serves queries on its leading columns, in order.
 - **Covering index:** an index containing every column a query needs, so the table itself is never touched.
 - **ACID:** atomicity, consistency, isolation, durability — the transaction guarantees.
@@ -120,6 +136,31 @@ LIMIT 10;
 
 Explanation: the composite index serves this query well — it finds customer 7's rows directly and they are already in placed_at order, so no separate sort is needed. In PostgreSQL you would confirm this with `EXPLAIN ANALYZE` before the query and look for an Index Scan rather than a Seq Scan; in MySQL, `EXPLAIN` serves the same purpose.
 
+### Reading an EXPLAIN plan
+
+```sql
+EXPLAIN ANALYZE
+SELECT id, total_amount
+FROM orders
+WHERE customer_id = 7
+ORDER BY placed_at DESC
+LIMIT 10;
+```
+
+Example output (PostgreSQL, simplified):
+
+```text
+Limit  (cost=8.45..8.48 rows=10 width=16) (actual time=0.042..0.045 rows=10 loops=1)
+  ->  Index Scan using idx_orders_customer_placed on orders
+        (cost=0.43..1234.56 rows=1000 width=16)
+        (actual time=0.038..0.041 rows=10 loops=1)
+        Index Cond: (customer_id = 7)
+Planning Time: 0.120 ms
+Execution Time: 0.080 ms
+```
+
+Explanation: read a plan top-down, from the most indented node outward. `Index Scan using idx_orders_customer_placed` with `Index Cond: (customer_id = 7)` means the index was used — the good outcome. `Seq Scan on orders` would mean a full table scan: fine for a tiny table, a warning sign for a large one. `actual time` is measured (from `EXPLAIN ANALYZE`), `cost` is the planner's estimate — trust the actual time when they disagree. Two red flags to name in an interview: a `Seq Scan` on a large table that has an index the query could use, and a `Sort` node under a `Limit`, which means the database sorted the whole result before taking ten rows. A `Bitmap Heap Scan` is the middle ground: the index found the rows, and the heap fetch is batched rather than one pointer chase per row.
+
 ### A transaction with a row lock
 
 ```sql
@@ -154,6 +195,7 @@ Explanation: under REPEATABLE READ the repeated SELECT is stable. Under READ COM
 - Choose the join that matches the question: INNER for "with matches", LEFT plus IS NULL for "without matches". Draw the Venn-style picture mentally, but remember joins are about row matching, not set diagrams.
 - Aggregate before joining when the join fans out, or aggregate over DISTINCT keys.
 - Index foreign keys and the columns of your most frequent WHERE, JOIN, and ORDER BY clauses; then verify with EXPLAIN instead of assuming.
+- Read the plan, not just the query: an Index Scan with an Index Cond is the index working; a Seq Scan on a large table or a Sort under a Limit is the plan telling you something is wrong.
 - Keep transactions short. Long transactions hold locks, block other work, and increase deadlock risk.
 - Access tables in a consistent order across transactions to reduce deadlocks, and be prepared to retry a transaction the database aborts.
 - Prefer optimistic locking (a version column) for low-contention data and pessimistic locking (SELECT ... FOR UPDATE) where contention or correctness demands it, such as money movement.
@@ -165,6 +207,7 @@ Explanation: under REPEATABLE READ the repeated SELECT is stable. Under READ COM
 - Summing a parent column after a fan-out join and reporting inflated totals.
 - Adding indexes to every column, then wondering why writes slowed and storage grew.
 - Creating a composite index in the wrong column order, so the queries you actually run cannot use it.
+- Assuming a clustered index and a secondary index cost the same — a secondary index pays a pointer chase per row, and a large secondary-index result can be slower than a scan.
 - Assuming READ COMMITTED prevents all anomalies — it still permits non-repeatable and phantom reads.
 - Treating a transaction as a performance tool rather than a correctness tool, or wrapping a single SELECT in a transaction and gaining nothing.
 - Catching a deadlock or serialization failure and giving up instead of retrying the transaction.
@@ -181,11 +224,14 @@ Joins, indexes, and transactions are the core of database interview rounds for b
 - **What is the difference between READ COMMITTED and REPEATABLE READ?** REPEATABLE READ guarantees that re-reading a row in the same transaction returns the same value; READ COMMITTED can return a newly committed value on re-read (a non-repeatable read).
 - **What is a deadlock and how do you handle it?** Two transactions waiting on each other's locks. The database aborts one; the application retries its transaction.
 - **When would you use SELECT ... FOR UPDATE?** When you read a row intending to update it based on its current value, such as a balance, and a lost update would be incorrect.
+- **What is the difference between a clustered and a non-clustered index?** A clustered index stores the table's rows in index order (one per table, usually the primary key); a non-clustered index is a separate structure that points at rows, so each lookup costs an extra hop.
+- **How does MVCC let readers and writers run at the same time?** Each row has several versions stamped by transaction; a reader sees the version committed when its transaction (or statement) started, so it never blocks on a writer — and old versions are later reclaimed by VACUUM or purge.
 
 ## Revision Summary
 
 - INNER keeps matches only; LEFT keeps all left rows with NULLs for misses; a missing ON condition gives a Cartesian product.
 - Aggregate before a fan-out join, or your sums will be inflated.
-- B-tree indexes speed selective lookups and ordered access; composite indexes follow the leftmost-prefix rule and every index costs write performance.
+- B+Tree indexes speed selective lookups and ordered access; composite indexes follow the leftmost-prefix rule and every index costs write performance.
+- A clustered index orders the table's rows; a secondary index points at them. MVCC gives readers a consistent version instead of making them wait on writers.
 - ACID guarantees atomicity, consistency, isolation, and durability; isolation levels trade anomaly protection against concurrency.
 - Lock rows you intend to update, keep transactions short, retry on deadlock or serialization failure, and always close a transaction with COMMIT or ROLLBACK.

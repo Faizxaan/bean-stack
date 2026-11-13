@@ -78,7 +78,7 @@ public class ReadDemo {
 
 Output:
 
-```
+```text
 hello
 ```
 
@@ -101,7 +101,7 @@ System.out.println(box.get().toUpperCase());
 
 Output:
 
-```
+```text
 BEAN
 ```
 

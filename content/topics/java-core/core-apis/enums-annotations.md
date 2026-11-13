@@ -78,7 +78,29 @@ public enum OrderStatus {
 }
 ```
 
+The demo below repeats the enum so the snippet compiles on its own as `EnumDemo.java` — the enum is package-private here because a file can hold only one `public` top-level type:
+
 ```java
+enum OrderStatus {
+    PENDING("Waiting to be processed"),
+    SHIPPED("On its way"),
+    DELIVERED("Arrived");
+
+    private final String description;
+
+    OrderStatus(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isFinal() {
+        return this == DELIVERED;
+    }
+}
+
 public class EnumDemo {
     public static void main(String[] args) {
         OrderStatus status = OrderStatus.SHIPPED;
@@ -93,7 +115,7 @@ public class EnumDemo {
 
 Output:
 
-```
+```text
 On its way
 false
 PENDING
@@ -105,7 +127,13 @@ Explanation: each constant carries its own description, set once by the private 
 
 ### Switching on an enum
 
+This snippet repeats the enum in its minimal form so it compiles on its own as `EnumSwitch.java`:
+
 ```java
+enum OrderStatus {
+    PENDING, SHIPPED, DELIVERED
+}
+
 public class EnumSwitch {
     public static String message(OrderStatus status) {
         return switch (status) {
@@ -124,7 +152,7 @@ public class EnumSwitch {
 
 Output:
 
-```
+```text
 Please wait
 DELIVERED
 ```
@@ -161,7 +189,7 @@ public class AnnotationDemo {
 
 Output:
 
-```
+```text
 5
 ```
 

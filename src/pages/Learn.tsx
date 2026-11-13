@@ -176,6 +176,13 @@ export function TopicPage() {
   const [activeHeading, setActiveHeading] = useState('')
   const [copied, setCopied] = useState<'idle' | 'copied' | 'failed'>('idle')
   const [showBackToTop, setShowBackToTop] = useState(false)
+  // Batch 3 (2026-11-13): on mobile the TOC used to render in full
+  // before the article. It is now a disclosure, collapsed by default
+  // on narrow screens — the toggle sits above the article and the
+  // links stay reachable. Desktop is unchanged: the list is always
+  // shown (index.css forces .toc-body visible above 900px regardless
+  // of this state), so scroll-spy keeps working exactly as before.
+  const [tocOpen, setTocOpen] = useState(() => typeof window === 'undefined' || window.innerWidth > 900)
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current) }, [])
@@ -338,15 +345,20 @@ export function TopicPage() {
           </div>
         </div>
         <aside className="toc" aria-label="Table of contents">
-          <strong>On this page</strong>
-          {headings.map(h => {
-            const id = h.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-            return <a key={h} href={`#${id}`} onClick={e => { e.preventDefault(); setActiveHeading(h); const el = document.getElementById(id); el?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }); el?.focus({ preventScroll: true }) }} className={activeHeading === h ? 'active' : ''}>{h}</a>
-          })}
-          {headings.length === 0 && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Headings will appear here when content loads.</p>}
-          <div style={{ marginTop: 16 }}>
-            <strong>Learning path</strong>
-            <p style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{prev ? `Previous: ${prev.title}` : 'First topic in this track'}<br />Current: {topic.title}<br />{next ? `Next: ${next.title}` : 'Last topic in this track'}</p>
+          <button type="button" className="toc-toggle" aria-expanded={tocOpen} aria-controls="toc-list" onClick={() => setTocOpen(v => !v)}>
+            <span>On this page</span><ChevronDown size={16} style={{ transform: tocOpen ? 'rotate(180deg)' : 'none' }} aria-hidden="true" />
+          </button>
+          <strong className="toc-heading">On this page</strong>
+          <div id="toc-list" className="toc-body" data-open={tocOpen}>
+            {headings.map(h => {
+              const id = h.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+              return <a key={h} href={`#${id}`} onClick={e => { e.preventDefault(); setActiveHeading(h); const el = document.getElementById(id); el?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }); el?.focus({ preventScroll: true }) }} className={activeHeading === h ? 'active' : ''}>{h}</a>
+            })}
+            {headings.length === 0 && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Headings will appear here when content loads.</p>}
+            <div style={{ marginTop: 16 }}>
+              <strong>Learning path</strong>
+              <p style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{prev ? `Previous: ${prev.title}` : 'First topic in this track'}<br />Current: {topic.title}<br />{next ? `Next: ${next.title}` : 'Last topic in this track'}</p>
+            </div>
           </div>
         </aside>
       </div>

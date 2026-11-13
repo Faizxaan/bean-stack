@@ -39,15 +39,7 @@ Short code generation has two common approaches. A hash of the long URL (for exa
 
 Reads must be fast and cacheable: a redirect is a lookup of short code to long URL, so a cache in front of the database absorbs the vast majority of traffic, and the database can be replicated for the rest. Click analytics do not belong on the redirect path: enqueue click events and aggregate them asynchronously, so analytics never slow down a redirect.
 
-```mermaid
-flowchart LR
-    User[User] --> LB[Load Balancer]
-    LB --> App[App Server]
-    App --> Cache[(Short Code Cache)]
-    App --> DB[(URL Database)]
-    App --> Queue[Click Event Queue]
-    Queue --> Analytics[Analytics Worker]
-```
+![Flowchart for a URL shortener: a user reaches an app server through a load balancer; the app server consults a short code cache and a URL database, and sends click events to a queue processed by an analytics worker.](/diagrams/url-shortener-flow.svg)
 
 ### Worked example: news feed
 

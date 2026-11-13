@@ -49,6 +49,61 @@ export function weakTopics(attempts: PracticeAttempt[], items: { id: string; top
   return accuracyByTopic(attempts, items).filter(x => x.total >= 2 && x.pct < 70).sort((a, b) => a.pct - b.pct)
 }
 
+// Fisher-Yates shuffle: returns a new array in random order and never
+// mutates the input, so a caller can re-shuffle the same pool safely.
+export function shuffleItems<T>(items: readonly T[]): T[] {
+  const out = [...items]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
+/**
+ * Pick `count` mock questions from a pool: shuffled, with no repeats,
+ * and avoiding `previousIds` (the previous mock's questions) while the
+ * pool still leaves enough fresh questions for a full mock. Only when
+ * the fresh remainder is short of `count` are previous questions
+ * reused, shuffled, to fill the mock — so a small pool can still
+ * produce a full mock instead of a short one.
+ */
+export function pickMockQuestions<T extends { id: string }>(
+  pool: readonly T[],
+  count: number,
+  previousIds: readonly string[] = [],
+): T[] {
+  const prev = new Set(previousIds)
+  const fresh = shuffleItems(pool.filter(i => !prev.has(i.id)))
+  if (fresh.length >= count) return fresh.slice(0, count)
+  const repeats = shuffleItems(pool.filter(i => prev.has(i.id)))
+  return [...fresh, ...repeats].slice(0, count)
+}
+
+export type ResetScope = 'progress' | 'bookmarks' | 'favorites' | 'notes' | 'practice' | 'interview' | 'all'
+
+/**
+ * Pure reset logic, extracted so it can be unit-tested without
+ * rendering. Each scope clears only what it names:
+ * - 'practice' clears practice attempts and Leitner flashcard state
+ *   only — NOT interviewReview (interview marks are their own scope).
+ * - 'interview' clears Confident / Needs review marks only. The map
+ *   also holds marks for one-minute revision prompts, which share the
+ *   interviewReview key, so those marks go with it; question
+ *   bookmarks are untouched here and stay with 'bookmarks'.
+ * - 'all' keeps reading settings, as before.
+ */
+export function applyResetScope(d: UserData, scope: ResetScope): UserData {
+  if (scope === 'all') return { ...EMPTY_USER_DATA, settings: d.settings }
+  if (scope === 'progress') return { ...d, progress: {} }
+  if (scope === 'bookmarks') return { ...d, bookmarks: [], questionBookmarks: [], flashcardBookmarks: [] }
+  if (scope === 'favorites') return { ...d, favorites: [] }
+  if (scope === 'notes') return { ...d, notes: {} }
+  if (scope === 'practice') return { ...d, practiceAttempts: [], flashcardStates: {} }
+  if (scope === 'interview') return { ...d, interviewReview: {} }
+  return d
+}
+
 export function isValidCalendarDate(s: string): boolean {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
   if (!m) return false
@@ -88,6 +143,30 @@ export function nextDueDate(box: number, from = new Date()): string {
   d.setDate(d.getDate() + days)
   return d.toISOString()
 }
+// Practice track/section filter (Batch 3, 2026-11-13): narrow a practice
+// list to one Learn track, optionally one section inside it. The caller
+// supplies the topic lookup (getTopic in the page) so this stays pure
+// and unit-testable. 'all' means no filter on that axis; an item whose
+// topic is unknown matches nothing once any filter is on — every
+// current practice item has a valid topicId, so nothing is hidden by
+// accident, and a future orphan surfaces as "missing" instead of
+// silently appearing under the wrong track.
+export function filterByTrackSection<T extends { topicId?: string }>(
+  items: T[],
+  trackId: string,
+  sectionId: string,
+  topicOf: (topicId: string) => { track: string; section: string } | undefined,
+): T[] {
+  if (trackId === 'all' && sectionId === 'all') return items
+  return items.filter(item => {
+    const topic = item.topicId ? topicOf(item.topicId) : undefined
+    if (!topic) return false
+    if (trackId !== 'all' && topic.track !== trackId) return false
+    if (sectionId !== 'all' && topic.section !== sectionId) return false
+    return true
+  })
+}
+
 export function isDue(dueAt: string, now = new Date()): boolean {
   // A corrupt/missing due date must surface the card for review,
   // never hide it forever (the old NaN <= now === false behaviour).

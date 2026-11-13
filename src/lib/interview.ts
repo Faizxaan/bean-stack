@@ -58,6 +58,19 @@ export function moduleMeta(id: string): InterviewModuleMeta | undefined {
   return INTERVIEW_MODULES.find(m => m.id === id)
 }
 
+// A bonus-resume entry is resume help, not an interview question: its
+// module is flagged isResume above. Progress totals and percentages
+// must count interview questions only (317), never the 12 resume
+// entries — the Bonus card keeps its own count of 12.
+export function isResumeEntry(q: InterviewQuestion): boolean {
+  return moduleMeta(q.module)?.isResume === true
+}
+
+/** Interview questions only: everything except the bonus-resume entries. */
+export function interviewQuestionsOnly(questions: InterviewQuestion[]): InterviewQuestion[] {
+  return questions.filter(q => !isResumeEntry(q))
+}
+
 // The consolidated taxonomy (2026-11-12 second pass): 26 old categories
 // collapsed to 10 broad areas. Order matters — it is the display order
 // of the areas inside a module, and the first area (Java) is where
@@ -199,6 +212,13 @@ export interface InterviewFilters {
   difficulty: string
   category: string
   review: ReviewFilter
+  // Batch 3 (2026-11-13): sub-filter by the Learn topic the question
+  // belongs to (its topicId — no new taxonomy). 'all' is no filter;
+  // 'general' is questions with no Learn topic (today: the 12
+  // bonus-resume entries). The page derives the option list from the
+  // questions in scope, in learning order, so it never offers a topic
+  // with zero questions in the current module/area.
+  topic: string
 }
 
 export const EMPTY_INTERVIEW_FILTERS: InterviewFilters = {
@@ -206,6 +226,7 @@ export const EMPTY_INTERVIEW_FILTERS: InterviewFilters = {
   difficulty: 'all',
   category: 'all',
   review: 'all',
+  topic: 'all',
 }
 
 export function filterQuestions(
@@ -219,6 +240,8 @@ export function filterQuestions(
   return questions.filter(item => {
     if (filters.difficulty !== 'all' && item.difficulty !== filters.difficulty) return false
     if (filters.category !== 'all' && item.category !== filters.category) return false
+    if (filters.topic === 'general' && item.topicId) return false
+    if (filters.topic !== 'all' && filters.topic !== 'general' && item.topicId !== filters.topic) return false
     const status = review[item.id]
     if (filters.review === 'confident' && status !== 'confident') return false
     if (filters.review === 'needs-review' && status !== 'needs-review') return false

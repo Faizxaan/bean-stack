@@ -132,7 +132,7 @@ mvn dependency:tree
 
 Output (abbreviated, for a project that pulls in two versions of a library):
 
-```
+```text
 [INFO] com.example:demo:jar:0.0.1-SNAPSHOT
 [INFO] +- org.springframework.boot:spring-boot-starter-web:jar:3.4.0:compile
 [INFO] |  +- org.springframework:spring-webmvc:jar:6.2.0:compile

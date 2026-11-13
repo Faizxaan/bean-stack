@@ -1,0 +1,9 @@
+%% Mermaid source for public/diagrams/load-balancer-flow.svg — kept next to the SVG it generates.
+flowchart LR
+    U[Users] --> LB[Load Balancer]
+    LB --> S1[App Server 1]
+    LB --> S2[App Server 2]
+    LB --> S3[App Server 3]
+    S1 --> DB[(Shared Database)]
+    S2 --> DB
+    S3 --> DB

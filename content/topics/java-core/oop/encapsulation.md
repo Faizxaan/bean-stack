@@ -108,7 +108,7 @@ System.out.println(wallet.getBalance());
 
 Output:
 
-```
+```text
 150.0
 false
 true
@@ -138,7 +138,7 @@ System.out.println(q);
 
 Output:
 
-```
+```text
 Point[x=3, y=4]
 Point[x=4, y=5]
 ```

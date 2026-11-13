@@ -80,7 +80,7 @@ public class StreamDemo {
 
 Output:
 
-```
+```text
 [MEERA]
 ```
 
@@ -96,7 +96,7 @@ System.out.println(sum);
 
 Output:
 
-```
+```text
 10
 ```
 
@@ -112,7 +112,7 @@ System.out.println(name.orElse("Guest"));
 
 Output:
 
-```
+```text
 Guest
 ```
 

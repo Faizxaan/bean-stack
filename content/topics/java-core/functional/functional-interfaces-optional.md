@@ -86,7 +86,7 @@ public class FunctionalDemo {
 
 Output:
 
-```
+```text
 hello has length 5
 HEY!
 HEY!
@@ -123,7 +123,7 @@ public class OptionalDemo {
 
 Output:
 
-```
+```text
 ADA LOVELACE
 NOT FOUND
 Found: Ada Lovelace
@@ -156,7 +156,7 @@ public class FlatMapDemo {
 
 Output:
 
-```
+```text
 b
 Optional[b]
 ?

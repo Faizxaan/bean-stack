@@ -170,7 +170,7 @@ public class EchoDemo {
 
 Output:
 
-```
+```text
 Echo: hello
 ```
 

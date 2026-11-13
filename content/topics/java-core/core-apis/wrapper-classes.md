@@ -76,7 +76,7 @@ public class WrapperList {
 
 Output:
 
-```
+```text
 30
 ```
 
@@ -100,7 +100,7 @@ public class CacheTrap {
 
 Output:
 
-```
+```text
 true
 false
 true
@@ -126,7 +126,7 @@ public class NullUnboxing {
 
 Output:
 
-```
+```text
 Cannot unbox null
 ```
 

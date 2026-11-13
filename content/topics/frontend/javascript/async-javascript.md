@@ -96,7 +96,7 @@ console.log("4");
 
 Output:
 
-```
+```text
 1
 4
 3

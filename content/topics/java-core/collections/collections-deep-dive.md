@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 5
 tags: [Collections, List, Map, Set]
 prerequisites: [collections-framework]
-related: [streams-lambdas]
+related: [streams-lambdas, hashmap-internals]
 status: complete
 lastUpdated: 2026-11-04
 summary: How the main List, Set, Map, and Queue implementations work and how to choose between them.
@@ -91,7 +91,7 @@ public class ChoiceDemo {
 
 Output:
 
-```
+```text
 [b, a, b]
 [b, a]
 {a=1, b=2}
@@ -145,7 +145,7 @@ public class HashDemo {
 
 Output:
 
-```
+```text
 1
 true
 ```
@@ -172,7 +172,7 @@ public class IterateDemo {
 
 Output:
 
-```
+```text
 [pear, apple, kiwi]
 [kiwi, pear, apple]
 ```

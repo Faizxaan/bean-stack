@@ -91,7 +91,7 @@ public class Box<T> {
 
 Output:
 
-```
+```text
 hello
 43
 ```
@@ -121,7 +121,7 @@ public class NumberUtils {
 
 Output:
 
-```
+```text
 6.0
 4.0
 ```
@@ -161,7 +161,7 @@ public class WildcardDemo {
 
 Output:
 
-```
+```text
 6.0
 4.0
 [10, 20]

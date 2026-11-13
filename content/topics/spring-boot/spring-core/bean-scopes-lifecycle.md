@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 4
 tags: [Spring, Beans, Scopes, Lifecycle]
 prerequisites: [spring-ioc-di]
-related: [spring-boot-autoconfig, spring-mvc-rest]
+related: [spring-boot-autoconfig, spring-mvc-rest, spring-aop-proxies]
 status: complete
 lastUpdated: 2026-11-04
 summary: How long a Spring bean lives, how many instances exist, and which callbacks run when a bean is created and destroyed.
@@ -125,7 +125,7 @@ public class CacheWarmer {
 
 Output (calling `isWarmedUp()` after the context has started):
 
-```
+```text
 true
 ```
 

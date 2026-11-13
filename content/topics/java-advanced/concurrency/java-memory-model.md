@@ -91,7 +91,7 @@ public class StopFlagDemo {
 
 Output:
 
-```
+```text
 Worker stopped
 ```
 
@@ -134,7 +134,7 @@ public class SynchronizedCounterDemo {
 
 Output:
 
-```
+```text
 2000
 ```
 

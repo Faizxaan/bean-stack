@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T13:14:49.721Z",
+  "generatedAt": "2026-11-12T22:05:11.307Z",
   "revisionPrompts": [
     {
       "category": "Revision",
@@ -600,7 +600,7 @@
         "Using fixedRate for a job that must never overlap with itself."
       ],
       "difficulty": "Easy",
-      "topicId": "spring-boot-autoconfig",
+      "topicId": "spring-task-scheduling",
       "relatedTopics": [
         "executors-completablefuture",
         "actuator-microservices-deployment"
@@ -627,7 +627,7 @@
         "Calling a downstream service with no timeout and letting threads pile up."
       ],
       "difficulty": "Medium",
-      "topicId": "spring-mvc-rest",
+      "topicId": "spring-rest-clients",
       "relatedTopics": [
         "spring-boot-autoconfig",
         "actuator-microservices-deployment"
@@ -654,7 +654,7 @@
         "Putting business logic in a filter or interceptor instead of a service."
       ],
       "difficulty": "Medium",
-      "topicId": "spring-mvc-rest",
+      "topicId": "spring-interceptors-filters",
       "relatedTopics": [
         "validation-exception-handling",
         "security-jwt"
@@ -708,7 +708,7 @@
         "Adding retries without backoff and amplifying an outage."
       ],
       "difficulty": "Medium",
-      "topicId": "actuator-microservices-deployment",
+      "topicId": "spring-cloud-basics",
       "relatedTopics": [
         "sd-caching-queues-databases",
         "spring-boot-autoconfig"

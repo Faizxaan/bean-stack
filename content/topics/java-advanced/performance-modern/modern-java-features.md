@@ -8,7 +8,7 @@ difficulty: Advanced
 importance: 5
 tags: [Java 21, Records, Sealed Classes, Pattern Matching, Virtual Threads]
 prerequisites: [streams-lambdas]
-related: [streams-lambdas, concurrency-basics]
+related: [streams-lambdas, concurrency-basics, virtual-threads]
 status: complete
 lastUpdated: 2026-11-12
 summary: Records, sealed classes, pattern matching, virtual threads, and sequenced collections change how modern Java code is written, and knowing which version introduced each one matters in interviews.
@@ -104,7 +104,7 @@ public record Point(int x, int y) {
 
 Output:
 
-```
+```text
 Point[x=1, y=2]
 1
 ```
@@ -139,7 +139,7 @@ public class ShapeDemo {
 
 Output:
 
-```
+```text
 3.141592653589793
 ```
 
@@ -165,7 +165,7 @@ public class InstanceofDemo {
 
 Output:
 
-```
+```text
 Text of length 5
 Not text
 ```
@@ -187,7 +187,7 @@ public class VirtualThreadDemo {
 
 Output:
 
-```
+```text
 Hello from virtual thread
 ```
 
@@ -210,7 +210,7 @@ public class SequencedDemo {
 
 Output:
 
-```
+```text
 a
 c
 [c, b, a]

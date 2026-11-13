@@ -13,14 +13,14 @@ import {
 // bundle has regressed to ~1.15 MB again.
 describe('split content index', () => {
   it('slim index has topics/tracks/cheatsheets and id-only lists, not full bodies', () => {
-    expect(contentIndex.topics.length).toBe(96)
+    expect(contentIndex.topics.length).toBe(105)
     expect(contentIndex.tracks.length).toBe(10)
     expect(contentIndex.cheatsheets.length).toBe(19)
     // Second pass (2026-11-12): 366 interview questions minus the 37
     // Module 0 revision prompts, which moved to content/revision.
-    expect(contentIndex.interviewQuestionIds.length).toBe(329)
+    expect(contentIndex.interviewQuestionIds.length).toBe(358)
     expect(contentIndex.revisionPromptIds.length).toBe(37)
-    expect(contentIndex.practiceItemIds.length).toBe(184)
+    expect(contentIndex.practiceItemIds.length).toBe(214)
     // Full bodies must not be properties of the slim index at all.
     expect('interviewQuestions' in contentIndex).toBe(false)
     expect('practiceItems' in contentIndex).toBe(false)
@@ -29,7 +29,7 @@ describe('split content index', () => {
 
   it('lazy interview loader returns all questions and the ids match the slim index', async () => {
     const questions = await loadInterviewQuestions()
-    expect(questions.length).toBe(329)
+    expect(questions.length).toBe(358)
     expect(new Set(questions.map(q => q.id))).toEqual(new Set(contentIndex.interviewQuestionIds))
     expect(questions.every(q => typeof q.question === 'string' && q.question.length > 0)).toBe(true)
     // No Module 0 / Revision question may remain in Interview Prep.
@@ -53,7 +53,7 @@ describe('split content index', () => {
 
   it('lazy practice loader returns all items and the ids match the slim index', async () => {
     const items = await loadPracticeItems()
-    expect(items.length).toBe(184)
+    expect(items.length).toBe(214)
     expect(new Set(items.map(i => i.id))).toEqual(new Set(contentIndex.practiceItemIds))
   })
 
@@ -66,7 +66,7 @@ describe('split content index', () => {
 
   it('loadFullContent loads both collections together', async () => {
     const full = await loadFullContent()
-    expect(full.interviewQuestions.length).toBe(329)
-    expect(full.practiceItems.length).toBe(184)
+    expect(full.interviewQuestions.length).toBe(358)
+    expect(full.practiceItems.length).toBe(214)
   })
 })

@@ -3,7 +3,7 @@ id: spring-jdbctemplate
 title: JdbcTemplate and Spring Data Access
 track: spring-boot
 section: data-jpa
-order: 2
+order: 3
 difficulty: Intermediate
 importance: 4
 tags: [Spring, JDBC, JdbcTemplate, RowMapper, SQL]

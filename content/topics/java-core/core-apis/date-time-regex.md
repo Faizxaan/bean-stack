@@ -77,7 +77,7 @@ public class DateDemo {
 
 Output:
 
-```
+```text
 2026-12-04
 2026-11-05
 2026-11-04
@@ -105,7 +105,7 @@ public class InstantDemo {
 
 Output:
 
-```
+```text
 2026-11-04T07:30:00Z
 90
 ```
@@ -138,7 +138,7 @@ public class RegexDemo {
 
 Output:
 
-```
+```text
 true
 false
 10

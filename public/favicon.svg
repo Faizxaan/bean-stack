@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Beanstack logo">
+  <!-- Coffee bean in the Beanstack accent teal (#0f766e, the accent token
+       in src/index.css). White bean with a teal S-curve crease, on a
+       rounded teal tile. -->
+  <rect width="64" height="64" rx="14" fill="#0f766e"/>
+  <g transform="rotate(18 32 32)">
+    <ellipse cx="32" cy="32" rx="15" ry="21" fill="#ffffff"/>
+    <path d="M32 12 C 24 22, 40 30, 32 40 C 28 45, 30 49, 32 52" fill="none" stroke="#0f766e" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+</svg>

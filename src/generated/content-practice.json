@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T13:14:49.721Z",
+  "generatedAt": "2026-11-12T22:05:11.307Z",
   "practiceItems": [
     {
       "answer": "String is immutable; operations return a new String.",
@@ -809,7 +809,7 @@
       ],
       "prompt": "Service A calls a failing Service B, and retries pile up until A also collapses. Which pattern prevents this cascade?",
       "title": "Circuit breaker",
-      "topicId": "actuator-microservices-deployment",
+      "topicId": "spring-cloud-basics",
       "type": "mcq"
     },
     {
@@ -1059,8 +1059,469 @@
       "id": "p3-scen-microservice-resilience",
       "solution": "Give every downstream call an explicit timeout (shorter than the caller's own timeout) so a slow service fails fast instead of holding threads. Isolate each dependency with a bulkhead — a dedicated thread pool or concurrency limit — so payment slowness cannot exhaust the pool used for inventory. Add a circuit breaker so repeated failures fail fast and recover gradually, and retry only idempotent calls with backoff and a cap. Make payment calls idempotent with an idempotency key so a retried request cannot double-charge. Expose health, metrics and traces (via Actuator and distributed tracing) so the slow dependency is visible before it cascades, and design the checkout to degrade gracefully — for example, queue the notification instead of blocking checkout on it.",
       "title": "Resilient checkout across microservices",
-      "topicId": "actuator-microservices-deployment",
+      "topicId": "spring-cloud-basics",
       "type": "scenario"
+    },
+    {
+      "id": "pr-b2-mcq-aop-proxy",
+      "type": "mcq",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "JDK proxy vs CGLIB",
+      "prompt": "A Spring bean implements an interface and is advised by an aspect. Which proxy can Spring use, and which can it not use for a final method?",
+      "options": [
+        "Only a JDK dynamic proxy; CGLIB cannot proxy beans with interfaces.",
+        "Either a JDK dynamic proxy or a CGLIB proxy; a CGLIB proxy cannot advise a final method.",
+        "Only a CGLIB proxy; JDK proxies cannot advise interface methods.",
+        "Neither — aspects require AspectJ load-time weaving."
+      ],
+      "answerIndex": 1,
+      "answer": "Either a JDK dynamic proxy or a CGLIB proxy; a CGLIB proxy cannot advise a final method.",
+      "explanation": "Both proxy kinds can advise an interface method. The difference is the mechanism: a JDK proxy implements the interface, a CGLIB proxy subclasses the target — and a subclass cannot override a final method, so final methods escape CGLIB advice.",
+      "topicId": "spring-aop-proxies"
+    },
+    {
+      "id": "pr-b2-mcq-aop-self",
+      "type": "mcq",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "Self-invocation and @Transactional",
+      "prompt": "In a Spring service, checkout() calls saveOrder() in the same class, and saveOrder() is annotated @Transactional. What happens?",
+      "options": [
+        "A transaction starts, because the annotation is on the called method.",
+        "No transaction starts: the call on this bypasses the proxy, so the advice never runs.",
+        "A transaction starts, but only if checkout() is also annotated.",
+        "Spring throws an exception at startup for the self-invocation."
+      ],
+      "answerIndex": 1,
+      "answer": "No transaction starts: the call on this bypasses the proxy, so the advice never runs.",
+      "explanation": "Transactional behaviour lives on the proxy. A call from inside the same object goes directly to this and never passes through the proxy, so the annotation is silently ignored — no error, no transaction.",
+      "topicId": "spring-aop-proxies"
+    },
+    {
+      "id": "pr-b2-fc-aop-advice",
+      "type": "flashcard",
+      "category": "Spring",
+      "difficulty": "Easy",
+      "title": "Advice types",
+      "front": "Which Spring AOP advice type wraps the method call and can time or retry it?",
+      "back": "@Around, with a ProceedingJoinPoint: it decides whether and when to call proceed(), and can change the arguments, result, or exception. @Before, @AfterReturning, @AfterThrowing, and @After only observe the call.",
+      "topicId": "spring-aop-proxies"
+    },
+    {
+      "id": "pr-b2-mcq-jpa-owning",
+      "type": "mcq",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "Owning side of an association",
+      "prompt": "Order has @OneToMany(mappedBy = \"order\") items, and LineItem has @ManyToOne Order order. Which side owns the relationship, and what happens if you only add a LineItem to order.getItems()?",
+      "options": [
+        "Order owns it; the foreign key is written from the collection.",
+        "LineItem owns it; the foreign key is null unless item.setOrder(order) is also called.",
+        "Both sides own it; Hibernate writes whichever side changed last.",
+        "Neither owns it; the join table is written instead."
+      ],
+      "answerIndex": 1,
+      "answer": "LineItem owns it; the foreign key is null unless item.setOrder(order) is also called.",
+      "explanation": "mappedBy marks the inverse side. The @ManyToOne side holds the foreign key (@JoinColumn) and is the only side Hibernate writes — adding to the collection alone leaves the foreign key null.",
+      "topicId": "jpa-associations-entity-lifecycle"
+    },
+    {
+      "id": "pr-b2-mcq-jpa-orphan",
+      "type": "mcq",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "orphanRemoval",
+      "prompt": "An Order has @OneToMany(mappedBy = \"order\", orphanRemoval = true) items. What happens when an item is removed from order.getItems() and the transaction commits?",
+      "options": [
+        "Nothing — the item stays in the database until explicitly deleted.",
+        "The item's row is deleted from the database.",
+        "The item's foreign key is set to null and the row stays.",
+        "The whole order is deleted."
+      ],
+      "answerIndex": 1,
+      "answer": "The item's row is deleted from the database.",
+      "explanation": "orphanRemoval means a child removed from the parent's collection is deleted at flush time. It is correct for privately owned children such as line items, and wrong for shared entities.",
+      "topicId": "jpa-associations-entity-lifecycle"
+    },
+    {
+      "id": "pr-b2-fc-jpa-states",
+      "type": "flashcard",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "Entity states",
+      "front": "Name the four JPA entity states.",
+      "back": "Transient (new, never persisted), managed (attached to a persistence context, changes dirty-checked), detached (was managed, context closed, changes ignored), removed (scheduled for deletion).",
+      "topicId": "jpa-associations-entity-lifecycle"
+    },
+    {
+      "id": "pr-b2-mcq-lock-trylock",
+      "type": "mcq",
+      "category": "Concurrency",
+      "difficulty": "Medium",
+      "title": "ReentrantLock tryLock",
+      "prompt": "Which of these can ReentrantLock do that synchronized cannot?",
+      "options": [
+        "Release the lock automatically when the block exits.",
+        "Attempt to acquire the lock with a timeout and give up, via tryLock(timeout, unit).",
+        "Guarantee fairness by default.",
+        "Be used on a static method."
+      ],
+      "answerIndex": 1,
+      "answer": "Attempt to acquire the lock with a timeout and give up, via tryLock(timeout, unit).",
+      "explanation": "tryLock with a timeout lets a thread give up instead of blocking forever; lockInterruptibly lets a waiting thread be cancelled; fairness is optional, not default; and the lock must be released explicitly in finally — there is no automatic release.",
+      "topicId": "concurrency-locks-synchronizers"
+    },
+    {
+      "id": "pr-b2-mcq-latch-barrier",
+      "type": "mcq",
+      "category": "Concurrency",
+      "difficulty": "Medium",
+      "title": "Latch vs barrier",
+      "prompt": "Three worker threads must finish before the main thread continues, and the same wait will happen again in a second round. Which synchronizer fits, and why?",
+      "options": [
+        "CountDownLatch, because it can be reset for the second round.",
+        "CyclicBarrier, because it is reusable — a CountDownLatch is one-shot.",
+        "Semaphore with three permits.",
+        "Phaser, because the worker count changes."
+      ],
+      "answerIndex": 1,
+      "answer": "CyclicBarrier, because it is reusable — a CountDownLatch is one-shot.",
+      "explanation": "A CountDownLatch cannot be reset, so a second round needs a new one. A CyclicBarrier resets after each trip, so it fits repeated rendezvous; a Semaphore limits concurrent access rather than coordinating timing.",
+      "topicId": "concurrency-locks-synchronizers"
+    },
+    {
+      "id": "pr-b2-fc-aba",
+      "type": "flashcard",
+      "category": "Concurrency",
+      "difficulty": "Hard",
+      "title": "ABA problem",
+      "front": "What is the ABA problem in CAS, and how do you fix it?",
+      "back": "A value changes A → B → A between a thread's read and its CAS, so the CAS succeeds even though the state changed. Fix it with AtomicStampedReference (value plus version stamp) or AtomicMarkableReference.",
+      "topicId": "concurrency-locks-synchronizers"
+    },
+    {
+      "id": "pr-b2-mcq-vt-pinning",
+      "type": "mcq",
+      "category": "Concurrency",
+      "difficulty": "Medium",
+      "title": "Virtual thread pinning",
+      "prompt": "A virtual thread blocks for a second inside a synchronized method. What is the likely effect?",
+      "options": [
+        "Nothing special — it unmounts from its carrier like any blocking call.",
+        "It may pin to its carrier thread, occupying the carrier for that second so it cannot run other virtual threads.",
+        "The JVM converts it to a platform thread permanently.",
+        "It throws an exception, because blocking is forbidden in synchronized code."
+      ],
+      "answerIndex": 1,
+      "answer": "It may pin to its carrier thread, occupying the carrier for that second so it cannot run other virtual threads.",
+      "explanation": "Blocking inside synchronized (or a native call) pins the virtual thread to its carrier. Prefer ReentrantLock in virtual-thread code, because locking with it does not pin.",
+      "topicId": "virtual-threads"
+    },
+    {
+      "id": "pr-b2-mcq-vt-executor",
+      "type": "mcq",
+      "category": "Concurrency",
+      "difficulty": "Easy",
+      "title": "Virtual thread executor",
+      "prompt": "Which executor is the idiomatic way to run tasks on virtual threads?",
+      "options": [
+        "Executors.newFixedThreadPool(200)",
+        "Executors.newVirtualThreadPerTaskExecutor(), one fresh virtual thread per task.",
+        "Executors.newCachedThreadPool(), which creates virtual threads on demand.",
+        "A single-thread executor shared by all tasks."
+      ],
+      "answerIndex": 1,
+      "answer": "Executors.newVirtualThreadPerTaskExecutor(), one fresh virtual thread per task.",
+      "explanation": "Virtual threads are cheap to create, so pooling them defeats the point: one fresh virtual thread per task is the idiomatic shape, and the executor should be closed when done.",
+      "topicId": "virtual-threads"
+    },
+    {
+      "id": "pr-b2-fc-vt-carrier",
+      "type": "flashcard",
+      "category": "Concurrency",
+      "difficulty": "Medium",
+      "title": "Carrier threads",
+      "front": "What is a carrier thread?",
+      "back": "A platform thread from a small pool that actually executes virtual-thread code. When a virtual thread blocks on I/O it unmounts from its carrier, freeing the carrier to run another virtual thread.",
+      "topicId": "virtual-threads"
+    },
+    {
+      "id": "pr-b2-mcq-hashmap-treeify",
+      "type": "mcq",
+      "category": "Java",
+      "difficulty": "Medium",
+      "title": "HashMap treeify threshold",
+      "prompt": "A HashMap has a table of 32 buckets and one bucket's chain grows to 8 entries. What happens?",
+      "options": [
+        "The bucket becomes a tree immediately.",
+        "The map resizes, because treeify requires a table of at least 64 buckets.",
+        "The map throws an exception — 8 is the maximum chain length.",
+        "The bucket becomes a tree only after 16 entries."
+      ],
+      "answerIndex": 1,
+      "answer": "The map resizes, because treeify requires a table of at least 64 buckets.",
+      "explanation": "Treeify at 8 applies only when the table has at least 64 buckets. With a smaller table the map resizes instead, spreading entries across more buckets.",
+      "topicId": "hashmap-internals"
+    },
+    {
+      "id": "pr-b2-mcq-hashmap-index",
+      "type": "mcq",
+      "category": "Java",
+      "difficulty": "Hard",
+      "title": "HashMap bucket index",
+      "prompt": "How does HashMap compute the bucket index for a key?",
+      "options": [
+        "hashCode() % capacity",
+        "(n - 1) & hash, where hash is the spread hashCode and n is the power-of-two capacity.",
+        "hashCode() / capacity",
+        "The key's identity hash code, used directly as the index."
+      ],
+      "answerIndex": 1,
+      "answer": "(n - 1) & hash, where hash is the spread hashCode and n is the power-of-two capacity.",
+      "explanation": "The spread hash is (h ^ (h >>> 16)), mixing high bits into the low bits, and the index is (n - 1) & hash — equivalent to hash % n only because capacity is always a power of two, and far cheaper.",
+      "topicId": "hashmap-internals"
+    },
+    {
+      "id": "pr-b2-fc-chm-null",
+      "type": "flashcard",
+      "category": "Java",
+      "difficulty": "Easy",
+      "title": "ConcurrentHashMap nulls",
+      "front": "Why does ConcurrentHashMap forbid null keys and values?",
+      "back": "So that get() returning null unambiguously means 'absent'. With null values allowed, a null result could mean absent or present-with-null, and no atomic check could tell them apart.",
+      "topicId": "hashmap-internals"
+    },
+    {
+      "id": "pr-b2-mcq-oauth2-pkce",
+      "type": "mcq",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "PKCE purpose",
+      "prompt": "In the authorization code flow with PKCE, what does the code_verifier prove at the token endpoint?",
+      "options": [
+        "That the user authenticated with a password.",
+        "That the token exchange comes from the same client that started the flow.",
+        "That the access token has not expired.",
+        "That the client knows the authorization server's secret."
+      ],
+      "answerIndex": 1,
+      "answer": "That the token exchange comes from the same client that started the flow.",
+      "explanation": "The client sends the hash of the verifier as the challenge at the start, then presents the verifier itself when exchanging the code. Only the client that started the flow has it, so a leaked code cannot be redeemed by anyone else.",
+      "topicId": "spring-security-oauth2-oidc"
+    },
+    {
+      "id": "pr-b2-mcq-oauth2-token",
+      "type": "mcq",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "Access token vs id_token",
+      "prompt": "A client receives both an access token and an id_token from an OIDC login. Which one should it send to your API as a Bearer token?",
+      "options": [
+        "The id_token — it identifies the user.",
+        "The access token — it authorizes API calls; the id_token only identifies the user.",
+        "Either — they are interchangeable.",
+        "Neither — Bearer tokens are only for JWT login flows."
+      ],
+      "answerIndex": 1,
+      "answer": "The access token — it authorizes API calls; the id_token only identifies the user.",
+      "explanation": "The access token carries scopes and is the credential a resource server validates. The id_token is for the client to learn who the user is; an API cannot validate its audience or scopes as authorization.",
+      "topicId": "spring-security-oauth2-oidc"
+    },
+    {
+      "id": "pr-b2-fc-oauth2-jwks",
+      "type": "flashcard",
+      "category": "Spring",
+      "difficulty": "Medium",
+      "title": "JWKS",
+      "front": "What is JWKS, and what does a resource server use it for?",
+      "back": "A JSON Web Key Set: the authorization server's published public keys. The resource server fetches and caches them to verify JWT signatures locally, without calling the provider per request — plus issuer, audience, and expiry checks.",
+      "topicId": "spring-security-oauth2-oidc"
+    },
+    {
+      "id": "pr-b2-mcq-sd-limiter",
+      "type": "mcq",
+      "category": "System Design",
+      "difficulty": "Medium",
+      "title": "Fixed window burst",
+      "prompt": "A fixed-window limiter allows 100 requests per minute. What is its well-known flaw?",
+      "options": [
+        "It needs one counter per request, using too much memory.",
+        "A client can send 100 requests at the end of one window and 100 at the start of the next — double the rate across the boundary.",
+        "It cannot allow bursts at all.",
+        "It requires a distributed lock for every request."
+      ],
+      "answerIndex": 1,
+      "answer": "A client can send 100 requests at the end of one window and 100 at the start of the next — double the rate across the boundary.",
+      "explanation": "The counter resets at the boundary, so the two bursts either side of it are both allowed. A sliding window counter weights the previous window's count and closes this hole.",
+      "topicId": "sd-distributed-systems-fundamentals"
+    },
+    {
+      "id": "pr-b2-mcq-sd-snowflake",
+      "type": "mcq",
+      "category": "System Design",
+      "difficulty": "Hard",
+      "title": "Snowflake IDs",
+      "prompt": "A Snowflake-style ID combines a timestamp, a worker id, and a per-millisecond sequence. What is its main operational risk?",
+      "options": [
+        "It needs a central database to hand out IDs.",
+        "Worker ids must be unique and the clock must not move backwards, or IDs can collide or go out of order.",
+        "IDs are random, so database indexes fragment.",
+        "It can only generate 12 IDs per second per worker."
+      ],
+      "answerIndex": 1,
+      "answer": "Worker ids must be unique and the clock must not move backwards, or IDs can collide or go out of order.",
+      "explanation": "Snowflake IDs are coordination-free at generation time, but they assume unique worker ids (usually assigned at startup) and a sane clock — a backwards clock jump can duplicate an earlier ID, and the generator must refuse or wait.",
+      "topicId": "sd-distributed-systems-fundamentals"
+    },
+    {
+      "id": "pr-b2-fc-pacelc",
+      "type": "flashcard",
+      "category": "System Design",
+      "difficulty": "Medium",
+      "title": "PACELC",
+      "front": "What does PACELC add to CAP?",
+      "back": "The 'else': during a partition choose availability or consistency; otherwise — with no partition — choose latency or consistency. The choice is made per dataset, not once for the whole system.",
+      "topicId": "sd-distributed-systems-fundamentals"
+    },
+    {
+      "id": "pr-b2-mcq-pbv-reassign",
+      "type": "mcq",
+      "category": "Java",
+      "difficulty": "Easy",
+      "title": "Pass-by-value reassignment",
+      "prompt": "What does this print? void reassign(List<String> xs) { xs = new ArrayList<>(); xs.add(\"x\"); } called with a list containing \"a\".",
+      "options": [
+        "[x]",
+        "[a]",
+        "[a, x]",
+        "It throws an exception."
+      ],
+      "answerIndex": 1,
+      "answer": "[a]",
+      "explanation": "Java passes a copy of the reference. Reassigning the parameter points the local copy at a new list; the caller's list is untouched, so it still contains only \"a\". Mutating the shared list would have been visible.",
+      "topicId": "java-pass-by-value",
+      "code": "void reassign(List<String> xs) {\n    xs = new ArrayList<>();\n    xs.add(\"x\");\n}\n// caller: List<String> items = new ArrayList<>(List.of(\"a\"));\n// reassign(items); System.out.println(items);"
+    },
+    {
+      "id": "pr-b2-mcq-pbv-stack",
+      "type": "mcq",
+      "category": "Java",
+      "difficulty": "Medium",
+      "title": "Primitives and the stack",
+      "prompt": "Which statement about where values live is correct?",
+      "options": [
+        "All primitives live on the stack and all objects live on the heap.",
+        "Primitive locals live in stack frames, but a primitive field lives on the heap as part of its object.",
+        "Reference variables live on the heap and objects live on the stack.",
+        "The stack holds objects and the heap holds method frames."
+      ],
+      "answerIndex": 1,
+      "answer": "Primitive locals live in stack frames, but a primitive field lives on the heap as part of its object.",
+      "explanation": "Where a value lives depends on whether it is a local or part of an object, not on its type: locals live in stack frames, objects and their fields live on the heap — and escape analysis can even stack-allocate non-escaping objects.",
+      "topicId": "java-pass-by-value"
+    },
+    {
+      "id": "pr-b2-fc-pbv",
+      "type": "flashcard",
+      "category": "Java",
+      "difficulty": "Easy",
+      "title": "Pass-by-value in one sentence",
+      "front": "In one sentence, what does Java's pass-by-value mean for objects?",
+      "back": "The argument's value is copied into the parameter — and for an object, the value copied is the reference: mutating the shared object is visible to the caller, reassigning the parameter is not.",
+      "topicId": "java-pass-by-value"
+    },
+    {
+      "id": "pr-b2-mcq-cl-ncdef",
+      "type": "mcq",
+      "category": "Java",
+      "difficulty": "Medium",
+      "title": "ClassNotFoundException vs NoClassDefFoundError",
+      "prompt": "Code compiled against library v2 but runs with library v1 on the classpath, and a class present in v2 is missing in v1. What is thrown when the code first uses it?",
+      "options": [
+        "ClassNotFoundException — the class was requested by name and not found.",
+        "NoClassDefFoundError — the class existed at compile time but is missing at runtime.",
+        "NoSuchMethodError — the method is missing, not the class.",
+        "ClassCastException — the wrong version was loaded."
+      ],
+      "answerIndex": 1,
+      "answer": "NoClassDefFoundError — the class existed at compile time but is missing at runtime.",
+      "explanation": "ClassNotFoundException is a lookup by name that failed. NoClassDefFoundError means the definition was there at compile time and is absent at runtime — the 'Def' is the giveaway. A missing method in a present class gives NoSuchMethodError.",
+      "topicId": "jvm-class-loading-oom-diagnostics"
+    },
+    {
+      "id": "pr-b2-mcq-oom-metaspace",
+      "type": "mcq",
+      "category": "Java",
+      "difficulty": "Hard",
+      "title": "Metaspace OOM fix",
+      "prompt": "A service throws OutOfMemoryError: Metaspace after repeated redeploys. What is the most likely cause, and the wrong fix?",
+      "options": [
+        "Too many live objects on the heap; raise -Xmx.",
+        "A classloader leak — for example a static map holding classes from the old deployment; raising -Xmx does not help.",
+        "Too many threads; reduce the heap to leave room for stacks.",
+        "Direct buffer exhaustion; raise MaxDirectMemorySize."
+      ],
+      "answerIndex": 1,
+      "answer": "A classloader leak — for example a static map holding classes from the old deployment; raising -Xmx does not help.",
+      "explanation": "Metaspace holds class metadata. Redeploy leaks happen when something reachable from a GC root (a static map, a ThreadLocal, a registered driver) keeps an old classloader — and all its classes — alive. -Xmx sizes the Java heap, a separate area.",
+      "topicId": "jvm-class-loading-oom-diagnostics"
+    },
+    {
+      "id": "pr-b2-fc-oom-dump",
+      "type": "flashcard",
+      "category": "Java",
+      "difficulty": "Medium",
+      "title": "Heap dump flag",
+      "front": "Which JVM flag captures a heap dump automatically when an OutOfMemoryError occurs?",
+      "back": "-XX:+HeapDumpOnOutOfMemoryError (with -XX:HeapDumpPath= to choose where it is written). Diagnose from that dump — histogram, dominator tree, biggest retainer — instead of restarting blind.",
+      "topicId": "jvm-class-loading-oom-diagnostics"
+    },
+    {
+      "id": "pr-b2-mcq-db-clustered",
+      "type": "mcq",
+      "category": "SQL",
+      "difficulty": "Medium",
+      "title": "Clustered index",
+      "prompt": "A table's primary key is its clustered index. What does that mean for a range scan on the primary key?",
+      "options": [
+        "Each row needs a pointer chase through a secondary index.",
+        "Rows are stored in primary-key order, so the range scan reads adjacent rows cheaply.",
+        "The scan must read the whole table first, then sort.",
+        "The primary key cannot be used for range scans."
+      ],
+      "answerIndex": 1,
+      "answer": "Rows are stored in primary-key order, so the range scan reads adjacent rows cheaply.",
+      "explanation": "A clustered index stores the table's rows in index order, so a range scan on the clustered key reads adjacent rows. A secondary index would pay a pointer chase per row instead.",
+      "topicId": "db-joins-indexes-transactions"
+    },
+    {
+      "id": "pr-b2-mcq-db-mvcc",
+      "type": "mcq",
+      "category": "SQL",
+      "difficulty": "Hard",
+      "title": "MVCC readers and writers",
+      "prompt": "Under MVCC, why does a long-running REPEATABLE READ transaction not block writers updating the same rows?",
+      "options": [
+        "Because it holds shared locks on every row it reads.",
+        "Because it reads old versions of the rows from its snapshot, while writers create new versions.",
+        "Because REPEATABLE READ disables all locking.",
+        "Because writers wait for readers to commit first."
+      ],
+      "answerIndex": 1,
+      "answer": "Because it reads old versions of the rows from its snapshot, while writers create new versions.",
+      "explanation": "MVCC keeps several versions of each row. The reader sees the version committed when its transaction started, so it never waits on a writer; old versions are reclaimed later by VACUUM (PostgreSQL) or purge (InnoDB).",
+      "topicId": "db-joins-indexes-transactions"
+    },
+    {
+      "id": "pr-b2-fc-db-explain",
+      "type": "flashcard",
+      "category": "SQL",
+      "difficulty": "Medium",
+      "title": "Reading EXPLAIN",
+      "front": "In an EXPLAIN plan, what tells you the index is actually being used, and what is a red flag?",
+      "back": "An Index Scan with an Index Cond on your column means the index is used. Red flags: a Seq Scan on a large table that has a usable index, or a Sort node under a Limit (the database sorted everything to return ten rows).",
+      "topicId": "db-joins-indexes-transactions"
     },
     {
       "answerIndex": 1,

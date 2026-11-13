@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 789.5 325" width="789.5" height="325" role="img" aria-label="Flowchart: users connect to a load balancer, which distributes traffic to three app servers, all sharing one database.">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/></marker></defs>
+<style>text{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;fill:#0f172a}</style>
+<line x1="143" y1="180" x2="218.5" y2="180" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="359.5" y1="180" x2="427.5" y2="70" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="359.5" y1="180" x2="427.5" y2="180" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="359.5" y1="180" x2="427.5" y2="290" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="560.5" y1="70" x2="620.5" y2="180" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="560.5" y1="180" x2="620.5" y2="180" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="560.5" y1="290" x2="620.5" y2="180" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="47" y="157" width="96" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="95" y="185" text-anchor="middle">Users</text>
+<rect x="220.5" y="157" width="139" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="290" y="185" text-anchor="middle">Load Balancer</text>
+<rect x="429.5" y="47" width="131" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="495" y="75" text-anchor="middle">App Server 1</text>
+<rect x="429.5" y="157" width="131" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="495" y="185" text-anchor="middle">App Server 2</text>
+<rect x="429.5" y="267" width="131" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="495" y="295" text-anchor="middle">App Server 3</text>
+<path d="M 622.5 166 a 77.5 9 0 0 0 155 0 v 28 a 77.5 9 0 0 1 -155 0 z" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
+<ellipse cx="700" cy="166" rx="77.5" ry="9" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5"/>
+<text x="700" y="185" text-anchor="middle">Shared Database</text>
+</svg>

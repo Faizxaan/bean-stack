@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T13:14:49.721Z",
+  "generatedAt": "2026-11-12T22:05:11.307Z",
   "tracks": [
     {
       "comingSoon": false,
@@ -446,11 +446,13 @@
   ],
   "paths": [
     {
-      "description": "Start here if you are new to Java: JVM basics, OOP, Strings, Collections, exceptions, then Streams.",
+      "description": "Start here if you are new to Java: JVM basics, language basics, variables and control flow, OOP, Strings, Collections, exceptions, then Streams.",
       "id": "beginner-roadmap",
       "title": "Beginner Roadmap",
       "topicIds": [
         "jdk-jre-jvm",
+        "language-basics-syntax",
+        "variables-operators-control-flow",
         "oop-principles",
         "strings",
         "collections-framework",
@@ -492,8 +494,8 @@
         "fe-js-dom",
         "fe-ts-types",
         "fe-ts-generics",
-        "fe-ts-react",
         "fe-react-components-hooks",
+        "fe-ts-react",
         "fe-react-state",
         "fe-react-performance"
       ]
@@ -796,7 +798,9 @@
         "indexes",
         "transactions",
         "ACID",
-        "isolation"
+        "isolation",
+        "MVCC",
+        "B+Tree"
       ],
       "prerequisites": [
         "db-sql-fundamentals"
@@ -806,9 +810,9 @@
         "spring-data-jpa"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-12T00:00:00.000Z",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
       "file": "topics/databases/sql/joins-indexes-transactions.md",
-      "readingMinutes": 9,
+      "readingMinutes": 14,
       "summary": "How joins combine tables, how indexes speed up reads at a cost to writes, and how transactions and isolation levels keep concurrent work correct."
     },
     {
@@ -1617,7 +1621,9 @@
       ],
       "related": [
         "garbage-collection",
-        "spring-ioc-di"
+        "spring-ioc-di",
+        "virtual-threads",
+        "concurrency-locks-synchronizers"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
@@ -1711,6 +1717,67 @@
       "summary": "The six thread states, and how to start, pause, join, interrupt, and shut down threads safely."
     },
     {
+      "id": "concurrency-locks-synchronizers",
+      "title": "Explicit Locks, Synchronizers, and Atomics",
+      "track": "java-advanced",
+      "section": "concurrency",
+      "order": 5,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Concurrency",
+        "Locks",
+        "ReentrantLock",
+        "CountDownLatch",
+        "Atomics",
+        "CAS"
+      ],
+      "prerequisites": [
+        "concurrency-basics",
+        "java-memory-model"
+      ],
+      "related": [
+        "executors-completablefuture",
+        "thread-lifecycle-control",
+        "collections-framework"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/java-advanced/concurrency/concurrency-locks-synchronizers.md",
+      "readingMinutes": 8,
+      "summary": "When synchronized is not enough — ReentrantLock, Condition, ReadWriteLock, StampedLock, latches, barriers, semaphores, Phaser, and lock-free atomics with CAS."
+    },
+    {
+      "id": "virtual-threads",
+      "title": "Virtual Threads",
+      "track": "java-advanced",
+      "section": "concurrency",
+      "order": 6,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Concurrency",
+        "Virtual Threads",
+        "Java 21",
+        "Carrier Threads",
+        "Pinning"
+      ],
+      "prerequisites": [
+        "concurrency-basics",
+        "executors-completablefuture"
+      ],
+      "related": [
+        "modern-java-features",
+        "concurrency-locks-synchronizers",
+        "jdbc-networking"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/java-advanced/concurrency/virtual-threads.md",
+      "readingMinutes": 7,
+      "summary": "Lightweight JVM-managed threads for blocking code at scale — carrier threads, pinning, the per-task executor, and when virtual threads are the wrong tool."
+    },
+    {
       "id": "jdbc-networking",
       "title": "JDBC and Networking",
       "track": "java-advanced",
@@ -1758,13 +1825,44 @@
       ],
       "related": [
         "concurrency-basics",
-        "spring-boot-autoconfig"
+        "spring-boot-autoconfig",
+        "jvm-class-loading-oom-diagnostics"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
       "file": "topics/java-advanced/jvm-memory/garbage-collection.md",
       "readingMinutes": 4,
       "summary": "How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production."
+    },
+    {
+      "id": "jvm-class-loading-oom-diagnostics",
+      "title": "Class Loading and OutOfMemoryError Diagnostics",
+      "track": "java-advanced",
+      "section": "jvm-memory",
+      "order": 2,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "JVM",
+        "Class Loading",
+        "OutOfMemoryError",
+        "Diagnostics",
+        "Heap Dump"
+      ],
+      "prerequisites": [
+        "jdk-jre-jvm",
+        "garbage-collection"
+      ],
+      "related": [
+        "garbage-collection",
+        "performance-best-practices",
+        "reflection-serialization"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/java-advanced/jvm-memory/jvm-class-loading-oom-diagnostics.md",
+      "readingMinutes": 8,
+      "summary": "How classes are loaded — loaders, delegation, linking — and how to diagnose each kind of OutOfMemoryError instead of just raising -Xmx."
     },
     {
       "id": "design-patterns-solid",
@@ -1813,7 +1911,8 @@
       ],
       "related": [
         "streams-lambdas",
-        "concurrency-basics"
+        "concurrency-basics",
+        "virtual-threads"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
@@ -1940,12 +2039,44 @@
       "prerequisites": [
         "language-basics-syntax"
       ],
-      "related": [],
+      "related": [
+        "java-pass-by-value"
+      ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/java-core/basics/variables-operators-control-flow.md",
       "readingMinutes": 8,
       "summary": "How Java stores data in variables, combines values with operators, and directs execution with branches and loops."
+    },
+    {
+      "id": "java-pass-by-value",
+      "title": "Primitives, References, and Pass-by-Value",
+      "track": "java-core",
+      "section": "basics",
+      "order": 4,
+      "difficulty": "Beginner",
+      "importance": 5,
+      "tags": [
+        "Java Basics",
+        "Primitives",
+        "References",
+        "Pass-by-Value",
+        "Memory"
+      ],
+      "prerequisites": [
+        "variables-operators-control-flow",
+        "language-basics-syntax"
+      ],
+      "related": [
+        "jdk-jre-jvm",
+        "garbage-collection",
+        "oop-principles"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/java-core/basics/java-pass-by-value.md",
+      "readingMinutes": 7,
+      "summary": "Java is always pass-by-value — for primitives and for references. What that means for method calls, mutation, and where values actually live."
     },
     {
       "id": "collections-framework",
@@ -1968,7 +2099,8 @@
       ],
       "related": [
         "streams-lambdas",
-        "concurrency-basics"
+        "concurrency-basics",
+        "hashmap-internals"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
@@ -1994,13 +2126,44 @@
         "collections-framework"
       ],
       "related": [
-        "streams-lambdas"
+        "streams-lambdas",
+        "hashmap-internals"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/java-core/collections/collections-deep-dive.md",
       "readingMinutes": 9,
       "summary": "How the main List, Set, Map, and Queue implementations work and how to choose between them."
+    },
+    {
+      "id": "hashmap-internals",
+      "title": "HashMap and ConcurrentHashMap Internals",
+      "track": "java-core",
+      "section": "collections",
+      "order": 3,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "Collections",
+        "HashMap",
+        "ConcurrentHashMap",
+        "Hashing",
+        "Internals"
+      ],
+      "prerequisites": [
+        "collections-framework",
+        "collections-deep-dive"
+      ],
+      "related": [
+        "concurrency-basics",
+        "concurrency-locks-synchronizers",
+        "generics-deep-dive"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/java-core/collections/hashmap-internals.md",
+      "readingMinutes": 8,
+      "summary": "How HashMap really works — hash spreading, power-of-two buckets, resize, treeify at 8, untreeify at 6 — and how ConcurrentHashMap makes it thread-safe."
     },
     {
       "id": "strings",
@@ -2071,7 +2234,7 @@
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/java-core/core-apis/enums-annotations.md",
-      "readingMinutes": 7,
+      "readingMinutes": 8,
       "summary": "Type-safe fixed sets of values with enums and metadata with annotations."
     },
     {
@@ -2237,14 +2400,16 @@
         "jdk-jre-jvm"
       ],
       "related": [
-        "strings",
-        "collections-framework"
+        "oop-encapsulation",
+        "oop-inheritance",
+        "oop-polymorphism",
+        "oop-abstraction"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-12T00:00:00.000Z",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
       "file": "topics/java-core/oop/oop-principles.md",
-      "readingMinutes": 4,
-      "summary": "Encapsulation, inheritance, polymorphism, and abstraction in plain language, plus how constructors and initialization actually run."
+      "readingMinutes": 5,
+      "summary": "A map of the four OOP pillars — each explained in depth in its own topic — plus how constructors and initialization actually run."
     },
     {
       "id": "oop-encapsulation",
@@ -2367,11 +2532,41 @@
       "summary": "Showing only the essential features of something and hiding the implementation behind a contract."
     },
     {
+      "id": "jpa-associations-entity-lifecycle",
+      "title": "JPA Associations and Entity Lifecycle",
+      "track": "spring-boot",
+      "section": "data-jpa",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 5,
+      "tags": [
+        "JPA",
+        "Hibernate",
+        "Associations",
+        "Entity Lifecycle",
+        "N+1"
+      ],
+      "prerequisites": [
+        "db-sql-java-developers",
+        "spring-ioc-di"
+      ],
+      "related": [
+        "spring-data-jpa",
+        "db-joins-indexes-transactions",
+        "validation-exception-handling"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/spring-boot/data-jpa/jpa-associations-entity-lifecycle.md",
+      "readingMinutes": 9,
+      "summary": "How entities relate — @OneToOne, @ManyToOne, @OneToMany, @ManyToMany, ownership, cascade, orphan removal — and the four entity states that decide what Hibernate actually writes."
+    },
+    {
       "id": "spring-data-jpa",
       "title": "Spring Data JPA and Hibernate",
       "track": "spring-boot",
       "section": "data-jpa",
-      "order": 1,
+      "order": 2,
       "difficulty": "Advanced",
       "importance": 5,
       "tags": [
@@ -2386,7 +2581,8 @@
       ],
       "related": [
         "spring-ioc-di",
-        "collections-framework"
+        "collections-framework",
+        "jpa-associations-entity-lifecycle"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
@@ -2399,7 +2595,7 @@
       "title": "JdbcTemplate and Spring Data Access",
       "track": "spring-boot",
       "section": "data-jpa",
-      "order": 2,
+      "order": 3,
       "difficulty": "Intermediate",
       "importance": 4,
       "tags": [
@@ -2591,13 +2787,45 @@
       ],
       "related": [
         "validation-exception-handling",
-        "spring-boot-autoconfig"
+        "spring-boot-autoconfig",
+        "spring-security-oauth2-oidc"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
       "file": "topics/spring-boot/security/security-jwt.md",
       "readingMinutes": 9,
       "summary": "How Spring Security authenticates requests with filters and how stateless JWT authentication replaces server-side sessions."
+    },
+    {
+      "id": "spring-security-oauth2-oidc",
+      "title": "Spring Security OAuth2 and OIDC",
+      "track": "spring-boot",
+      "section": "security",
+      "order": 2,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Spring Security",
+        "OAuth2",
+        "OIDC",
+        "PKCE",
+        "JWT",
+        "JWKS"
+      ],
+      "prerequisites": [
+        "security-jwt",
+        "spring-mvc-rest"
+      ],
+      "related": [
+        "security-jwt",
+        "spring-rest-clients",
+        "spring-cloud-basics"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/spring-boot/security/spring-security-oauth2-oidc.md",
+      "readingMinutes": 8,
+      "summary": "Delegated authorization with OAuth2 and OpenID Connect — authorization code with PKCE, resource servers, JWKS validation, and method security."
     },
     {
       "id": "spring-boot-autoconfig",
@@ -2758,7 +2986,8 @@
       ],
       "related": [
         "spring-boot-autoconfig",
-        "spring-mvc-rest"
+        "spring-mvc-rest",
+        "spring-aop-proxies"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
@@ -2767,11 +2996,41 @@
       "summary": "How long a Spring bean lives, how many instances exist, and which callbacks run when a bean is created and destroyed."
     },
     {
+      "id": "spring-aop-proxies",
+      "title": "Spring AOP and Proxies",
+      "track": "spring-boot",
+      "section": "spring-core",
+      "order": 3,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Spring AOP",
+        "Proxies",
+        "Aspect",
+        "Transactional",
+        "Advice"
+      ],
+      "prerequisites": [
+        "spring-ioc-di",
+        "bean-scopes-lifecycle"
+      ],
+      "related": [
+        "spring-data-jpa",
+        "spring-task-scheduling",
+        "design-patterns-solid"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/spring-boot/spring-core/spring-aop-proxies.md",
+      "readingMinutes": 8,
+      "summary": "Aspects, join points, pointcuts, and advice — plus how JDK dynamic proxies and CGLIB work, and why self-invocation breaks @Transactional and @Async."
+    },
+    {
       "id": "spring-spel",
       "title": "Spring Expression Language (SpEL)",
       "track": "spring-boot",
       "section": "spring-core",
-      "order": 3,
+      "order": 4,
       "difficulty": "Intermediate",
       "importance": 3,
       "tags": [
@@ -2905,7 +3164,8 @@
       "prerequisites": [],
       "related": [
         "sd-caching-queues-databases",
-        "sd-designing-real-systems"
+        "sd-designing-real-systems",
+        "sd-distributed-systems-fundamentals"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
@@ -2969,6 +3229,36 @@
       "file": "topics/system-design/hld/designing-real-systems.md",
       "readingMinutes": 10,
       "summary": "A repeatable method for tackling real design questions, from clarifying requirements and estimating capacity to choosing components and naming bottlenecks."
+    },
+    {
+      "id": "sd-distributed-systems-fundamentals",
+      "title": "Distributed Systems Fundamentals — PACELC, Rate Limiting, and Distributed IDs",
+      "track": "system-design",
+      "section": "hld",
+      "order": 4,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "System Design",
+        "PACELC",
+        "Rate Limiting",
+        "Distributed IDs",
+        "Snowflake"
+      ],
+      "prerequisites": [
+        "sd-scalability-basics",
+        "sd-caching-queues-databases"
+      ],
+      "related": [
+        "sd-scalability-basics",
+        "sd-designing-real-systems",
+        "db-choosing-nosql"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "file": "topics/system-design/hld/sd-distributed-systems-fundamentals.md",
+      "readingMinutes": 9,
+      "summary": "The three distributed-systems tools every design interview reuses — PACELC trade-offs, rate limiting algorithms, and generating unique IDs across machines."
     },
     {
       "id": "sd-class-design",
@@ -3521,6 +3811,9 @@
     "iq-m1src2-monolith-vs-microservices",
     "iq-m1src2-thread-lifecycle",
     "iq-m1src2-jvm-memory-areas",
+    "iq-b2-hashmap-treeify",
+    "iq-b2-pbv-value",
+    "iq-b2-pbv-swap",
     "iq-m2-checked-unchecked-exceptions",
     "iq-m2-concurrenthashmap",
     "iq-m2-parallel-streams",
@@ -3584,6 +3877,18 @@
     "iq-m2src2-eventual-consistency",
     "iq-m2src2-service-registry-failure",
     "iq-m2src2-coding-numbers-starting-with-1",
+    "iq-b2-aop-proxies",
+    "iq-b2-aop-self-invocation",
+    "iq-b2-jpa-mappedby",
+    "iq-b2-jpa-orphan-removal",
+    "iq-b2-locks-reentrant",
+    "iq-b2-vt-carrier-pinning",
+    "iq-b2-vt-when-not",
+    "iq-b2-hashmap-spreading",
+    "iq-b2-chm-nulls",
+    "iq-b2-oauth2-pkce",
+    "iq-b2-pbv-stack-myth",
+    "iq-b2-db-clustered",
     "iq-m3-generics-pecs-erasure",
     "iq-m3-concurrenthashmap-deep",
     "iq-m3-streams-parallel-reduction",
@@ -3643,6 +3948,18 @@
     "iq-m3src2-service-mesh",
     "iq-m3src2-coding-first-repeated-char",
     "iq-m3src2-scenario-traffic-spike",
+    "iq-b2-aop-around",
+    "iq-b2-jpa-detached-merge",
+    "iq-b2-locks-stampedlock",
+    "iq-b2-locks-latch-barrier",
+    "iq-b2-vt-threadlocal",
+    "iq-b2-oauth2-jwks",
+    "iq-b2-oauth2-access-vs-id",
+    "iq-b2-sd-pacelc",
+    "iq-b2-sd-rate-limiting",
+    "iq-b2-cl-delegation",
+    "iq-b2-oom-metaspace",
+    "iq-b2-db-mvcc",
     "iq-m4-api-evolution-plugins",
     "iq-m4-collections-at-scale",
     "iq-m4-streams-vs-reactive",
@@ -3696,7 +4013,9 @@
     "iq-m4src2-lead-team-conflicts",
     "iq-m4src2-lead-prioritisation",
     "iq-m4src2-lead-legacy-code",
-    "iq-m4src2-lead-data-privacy"
+    "iq-m4src2-lead-data-privacy",
+    "iq-b2-sd-snowflake",
+    "iq-b2-oom-diagnosis"
   ],
   "revisionPromptIds": [
     "iq-rev-jvm",
@@ -3812,6 +4131,36 @@
     "p3-scen-jwt-refresh",
     "p3-scen-lazy-init-prod",
     "p3-scen-microservice-resilience",
+    "pr-b2-mcq-aop-proxy",
+    "pr-b2-mcq-aop-self",
+    "pr-b2-fc-aop-advice",
+    "pr-b2-mcq-jpa-owning",
+    "pr-b2-mcq-jpa-orphan",
+    "pr-b2-fc-jpa-states",
+    "pr-b2-mcq-lock-trylock",
+    "pr-b2-mcq-latch-barrier",
+    "pr-b2-fc-aba",
+    "pr-b2-mcq-vt-pinning",
+    "pr-b2-mcq-vt-executor",
+    "pr-b2-fc-vt-carrier",
+    "pr-b2-mcq-hashmap-treeify",
+    "pr-b2-mcq-hashmap-index",
+    "pr-b2-fc-chm-null",
+    "pr-b2-mcq-oauth2-pkce",
+    "pr-b2-mcq-oauth2-token",
+    "pr-b2-fc-oauth2-jwks",
+    "pr-b2-mcq-sd-limiter",
+    "pr-b2-mcq-sd-snowflake",
+    "pr-b2-fc-pacelc",
+    "pr-b2-mcq-pbv-reassign",
+    "pr-b2-mcq-pbv-stack",
+    "pr-b2-fc-pbv",
+    "pr-b2-mcq-cl-ncdef",
+    "pr-b2-mcq-oom-metaspace",
+    "pr-b2-fc-oom-dump",
+    "pr-b2-mcq-db-clustered",
+    "pr-b2-mcq-db-mvcc",
+    "pr-b2-fc-db-explain",
     "pr-bh-star-proportions",
     "pr-bh-star-parts",
     "pr-bh-weak-answer",

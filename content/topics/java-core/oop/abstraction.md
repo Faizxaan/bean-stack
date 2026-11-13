@@ -111,7 +111,7 @@ sms.sendWelcome();
 
 Output:
 
-```
+```text
 Email to asha@example.com: Welcome, asha@example.com!
 SMS to +91-98765-43210: Welcome, +91-98765-43210!
 ```
@@ -147,7 +147,7 @@ shape.redraw();
 
 Output:
 
-```
+```text
 Clearing the canvas
 Drawing a circle
 ```

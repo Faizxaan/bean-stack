@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 5
 tags: [Collections, List, Set, Map, HashMap]
 prerequisites: [oop-principles, strings]
-related: [streams-lambdas, concurrency-basics]
+related: [streams-lambdas, concurrency-basics, hashmap-internals]
 status: complete
 lastUpdated: 2026-11-12
 summary: List, Set, Map, and Queue in one mental model, how to choose between them, and the HashMap internals interviewers probe.
@@ -73,7 +73,7 @@ public class CollectionsDemo {
 
 Output:
 
-```
+```text
 3
 2
 90

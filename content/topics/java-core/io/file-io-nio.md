@@ -78,7 +78,7 @@ public class SmallFileDemo {
 
 Output:
 
-```
+```text
 Hello, Beanstack
 true
 ```
@@ -115,7 +115,7 @@ public class LineDemo {
 
 Output:
 
-```
+```text
 one
 two
 three
@@ -151,7 +151,7 @@ public class ListDemo {
 
 Output:
 
-```
+```text
 a.txt
 b.txt
 ```

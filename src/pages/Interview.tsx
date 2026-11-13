@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, Eye, EyeOff, GraduationCap, Search, X } from 'lucide-react'
-import { contentIndex, getTopic, useInterviewQuestions } from '../lib/content'
+import { contentIndex, getTopic, getTrack, useInterviewQuestions } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { topicUrl, smoothScrollBehavior } from '../lib/utils'
 import { ProgressBar } from '../components/ProgressBar'
@@ -13,11 +13,13 @@ import {
   filterQuestions,
   firstUnreviewed,
   groupQuestionsByArea,
+  interviewQuestionsOnly,
   moduleMeta,
   prevNextQuestion,
   reviewStats,
+  topicRankMap,
 } from '../lib/interview'
-import type { InterviewQuestion } from '../types'
+import type { InterviewQuestion, TopicMeta } from '../types'
 import type { AreaGroup } from '../lib/interview'
 
 // Interview Prep, redesigned 2026-11-12 (UI only — no question, answer,
@@ -247,6 +249,35 @@ export function InterviewIndex() {
     [scoped],
   )
 
+  // Batch 3 (2026-11-13): topic sub-filter. The Java area alone holds
+  // 126 questions across 28 Learn topics, so "Java" as a filter is
+  // barely a filter. Options come from the questions in scope after
+  // the area filter (not from the whole bank), in Learn learning
+  // order, each with its question count — and the track in the label,
+  // since topic titles can repeat across tracks. Questions with no
+  // Learn topic (the bonus-resume entries) get one "General" option.
+  const topicBase = useMemo(
+    () => (filters.category === 'all' ? scoped : scoped.filter(q => q.category === filters.category)),
+    [scoped, filters.category],
+  )
+  const topicOptions = useMemo(() => {
+    const ranks = topicRankMap(SORT_CTX)
+    const ids = [...new Set(topicBase.map(q => q.topicId).filter((t): t is string => Boolean(t)))]
+    ids.sort((a, b) => (ranks.get(a) ?? Number.MAX_SAFE_INTEGER) - (ranks.get(b) ?? Number.MAX_SAFE_INTEGER))
+    return ids.map(id => getTopic(id)).filter((t): t is TopicMeta => Boolean(t))
+  }, [topicBase])
+  const hasGeneralTopic = useMemo(() => topicBase.some(q => !q.topicId), [topicBase])
+
+  // Narrowing the area can strand the selected topic (it has no
+  // questions in the new area). Reset to All topics instead of
+  // showing an empty list under a filter that matches nothing.
+  useEffect(() => {
+    if (filters.topic !== 'all' && filters.topic !== 'general' && !topicOptions.some(t => t.id === filters.topic)) {
+      setFilters(f => ({ ...f, topic: 'all' }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topicOptions])
+
   const filtered = useMemo(
     () => filterQuestions(scoped, filters, data.interviewReview, data.questionBookmarks),
     [scoped, filters, data.interviewReview, data.questionBookmarks],
@@ -287,8 +318,14 @@ export function InterviewIndex() {
 
   const clearFilters = () => setFilters(EMPTY_INTERVIEW_FILTERS)
   const filtersActive =
-    filters.query !== '' || filters.difficulty !== 'all' || filters.category !== 'all' || filters.review !== 'all'
-  const overall = reviewStats(interviewQuestions, data.interviewReview, data.questionBookmarks)
+    filters.query !== '' || filters.difficulty !== 'all' || filters.category !== 'all' || filters.review !== 'all' || filters.topic !== 'all'
+  // Overall progress counts interview questions only (317): the 12
+  // bonus-resume entries are resume help, not interview questions, so
+  // they must not inflate the total or the percentage. The Bonus
+  // module card below still shows its own count of 12.
+  const interviewOnly = useMemo(() => interviewQuestionsOnly(interviewQuestions), [interviewQuestions])
+  const bonusCount = interviewQuestions.length - interviewOnly.length
+  const overall = reviewStats(interviewOnly, data.interviewReview, data.questionBookmarks)
   const selectedMeta = selectedModule ? moduleMeta(selectedModule) : undefined
   const selectedStats = selectedMeta ? reviewStats(scoped, data.interviewReview, data.questionBookmarks) : null
   const nextUp = selectedMeta ? firstUnreviewed(scoped, data.interviewReview, SORT_CTX) : undefined
@@ -369,7 +406,7 @@ export function InterviewIndex() {
             })}
           </div>
           <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>
-            Counts are by experience level: each question belongs to exactly one module, so the module totals add up to {interviewQuestions.length} questions.
+            Counts are by experience level: each question belongs to exactly one module. Modules 1–4 add up to {interviewOnly.length} interview questions; the Bonus module adds {bonusCount} resume items, for {interviewQuestions.length} entries in total.
             The Bonus module is resume help, not interview questions.
           </p>
         </>
@@ -394,7 +431,7 @@ export function InterviewIndex() {
           {view === 'topic' && (
             <div className="card iv-module-head">
               <h2 style={{ margin: '0 0 4px' }}>Browse by area</h2>
-              <p style={{ color: 'var(--muted)', margin: 0 }}>The same {interviewQuestions.length} questions, grouped by broad area — across all experience levels. Each question shows its module as a badge.</p>
+              <p style={{ color: 'var(--muted)', margin: 0 }}>The same {interviewOnly.length} interview questions{bonusCount > 0 ? `, plus ${bonusCount} resume items` : ''}, grouped by broad area — across all experience levels. Each question shows its module as a badge.</p>
             </div>
           )}
 
@@ -412,6 +449,17 @@ export function InterviewIndex() {
             <label className="iv-filter">Area
               <select className="select" value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })} aria-label="Filter by area">
                 <option value="all">All areas</option>{categories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label className="iv-filter">Topic
+              <select className="select" value={filters.topic} onChange={e => setFilters({ ...filters, topic: e.target.value })} aria-label="Filter by Learn topic">
+                <option value="all">All topics</option>
+                {hasGeneralTopic && <option value="general">General (no Learn topic)</option>}
+                {topicOptions.map(t => {
+                  const count = topicBase.filter(q => q.topicId === t.id).length
+                  const track = getTrack(t.track)
+                  return <option key={t.id} value={t.id}>{t.title}{track ? ` — ${track.title}` : ''} ({count})</option>
+                })}
               </select>
             </label>
             <label className="iv-filter">Review status

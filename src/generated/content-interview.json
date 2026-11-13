@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T13:14:49.721Z",
+  "generatedAt": "2026-11-12T22:05:11.307Z",
   "interviewQuestions": [
     {
       "category": "Resume",
@@ -8,15 +8,11 @@
       "id": "iq-resume-tips",
       "module": "bonus-resume",
       "question": "How should a Java full stack developer structure a resume for a job switch?",
-      "relatedTopics": [
-        "spring-boot-autoconfig"
-      ],
       "shortAnswer": "Lead with impact and stack, tailor the top third to the job, keep it concise, and start every bullet with a strong verb and a measurable outcome where honest.",
       "tips": [
         "The top third of page one decides whether the rest is read: name, target role, core stack, and your strongest achievement belong there."
       ],
-      "title": "Resume structure for Java full stack developers",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume structure for Java full stack developers"
     },
     {
       "category": "Resume",
@@ -25,16 +21,11 @@
       "id": "iq-resume-template-0-3",
       "module": "bonus-resume",
       "question": "Resume template for 0–3 years of experience (copy-ready)",
-      "relatedTopics": [
-        "spring-mvc-rest",
-        "spring-ioc-di"
-      ],
       "shortAnswer": "One page: target role, core stack, 2–4 bullets per role, one strong project with a GitHub link, education. Projects carry equal weight to jobs at this stage.",
       "tips": [
         "One strong, complete project beats five half-finished ones. Show the README, tests, and a running demo."
       ],
-      "title": "Resume template: 0–3 years",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume template: 0–3 years"
     },
     {
       "category": "Resume",
@@ -43,13 +34,8 @@
       "id": "iq-resume-template-3-5",
       "module": "bonus-resume",
       "question": "Resume template for 3–5 years of experience (copy-ready)",
-      "relatedTopics": [
-        "spring-data-jpa",
-        "spring-mvc-rest"
-      ],
       "shortAnswer": "One to two pages with a tailored 3-line summary, skills, and ownership-focused bullets: the module you owned, the decisions you made, and the production outcome.",
-      "title": "Resume template: 3–5 years",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume template: 3–5 years"
     },
     {
       "category": "Resume",
@@ -58,13 +44,8 @@
       "id": "iq-resume-template-5-8",
       "module": "bonus-resume",
       "question": "Resume template for 5–8 years of experience (copy-ready)",
-      "relatedTopics": [
-        "actuator-microservices-deployment",
-        "spring-data-jpa"
-      ],
       "shortAnswer": "Two pages: senior-targeted summary, scope and decisions up front, leadership and mentoring evidence, and outcomes at system level — not a longer task list.",
-      "title": "Resume template: 5–8 years",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume template: 5–8 years"
     },
     {
       "category": "Resume",
@@ -73,13 +54,8 @@
       "id": "iq-resume-template-8-15",
       "module": "bonus-resume",
       "question": "Resume template for 8–15 years of experience (copy-ready)",
-      "relatedTopics": [
-        "actuator-microservices-deployment",
-        "design-patterns-solid"
-      ],
       "shortAnswer": "Two pages maximum: scope and outcomes at system level, architecture decisions with reasons, leadership evidence, and older roles compressed to one line each.",
-      "title": "Resume template: 8–15 years",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume template: 8–15 years"
     },
     {
       "category": "Resume",
@@ -93,16 +69,11 @@
       "id": "iq-resume-ats-tailoring",
       "module": "bonus-resume",
       "question": "How do I make a resume pass ATS and tailor it to a job description?",
-      "relatedTopics": [
-        "spring-boot-autoconfig",
-        "spring-mvc-rest"
-      ],
       "shortAnswer": "Use a single-column, text-based resume with standard headings for ATS parsing, then tailor per job by reordering skills and leading with the most relevant experience — using only keywords you can defend.",
       "tips": [
         "Mirror the posting's exact skill names for skills you genuinely have; ATS matching is often literal."
       ],
-      "title": "Resume: ATS and tailoring to a job description",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: ATS and tailoring to a job description"
     },
     {
       "category": "Resume",
@@ -111,16 +82,11 @@
       "id": "iq-resume-impact-bullets",
       "module": "bonus-resume",
       "question": "How do I turn duties into impact bullets with honest metrics?",
-      "relatedTopics": [
-        "spring-mvc-rest",
-        "spring-data-jpa"
-      ],
       "shortAnswer": "Use verb + what you built + technology + honest outcome. Measure time, scale, defects, or manual work saved — and if you lack production numbers, use honest proxies like users served or tests written.",
       "tips": [
         "Write the bullet, then ask: 'So what?' If the bullet has no answer, it is a duty, not an impact — rewrite it."
       ],
-      "title": "Resume: duties into impact bullets",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: duties into impact bullets"
     },
     {
       "category": "Resume",
@@ -133,16 +99,11 @@
       "id": "iq-resume-projects-github",
       "module": "bonus-resume",
       "question": "How should I present projects and GitHub on a resume?",
-      "relatedTopics": [
-        "spring-boot-autoconfig",
-        "logging-testing-docs"
-      ],
       "shortAnswer": "Show one or two projects that prove something your jobs do not, link interview-ready repositories with a real README and tests, and be ready to walk through the architecture and your exact contribution.",
       "tips": [
         "Before linking GitHub, open your own profile as a stranger would: if the pinned repos do not look like the engineer you want to be hired as, fix them first."
       ],
-      "title": "Resume: projects and GitHub",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: projects and GitHub"
     },
     {
       "category": "Resume",
@@ -151,15 +112,11 @@
       "id": "iq-resume-switch-gaps",
       "module": "bonus-resume",
       "question": "How do I explain a job switch and employment gaps on a resume?",
-      "relatedTopics": [
-        "spring-boot-autoconfig"
-      ],
       "shortAnswer": "Frame a switch as moving toward a goal, state gaps briefly and factually with what you did during them, keep dates honest, and give the same short calm answer in interviews.",
       "tips": [
         "Prepare the one-sentence version of your switch story and rehearse it until it sounds boring — boring is good; it means there is nothing to probe."
       ],
-      "title": "Resume: explaining a job switch and gaps",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: explaining a job switch and gaps"
     },
     {
       "category": "Resume",
@@ -168,13 +125,8 @@
       "id": "iq-resume-mistakes",
       "module": "bonus-resume",
       "question": "What are the common resume mistakes for Java full stack developers?",
-      "relatedTopics": [
-        "spring-boot-autoconfig",
-        "spring-mvc-rest"
-      ],
       "shortAnswer": "The big ones: skills you cannot defend, no stack per role, vague verbs with no outcomes, typos in technology names, one generic resume for every job, and your best achievement buried on page two.",
-      "title": "Resume: common mistakes for Java full stack developers",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: common mistakes for Java full stack developers"
     },
     {
       "category": "Resume",
@@ -183,15 +135,11 @@
       "id": "iq-resume-interview-prep",
       "module": "bonus-resume",
       "question": "How do I use my resume to prepare for the interview itself?",
-      "relatedTopics": [
-        "spring-boot-autoconfig"
-      ],
       "shortAnswer": "Prepare a 60-second problem–action–outcome story for every bullet, expect probing on your weakest bullet, and keep your interview numbers identical to your resume numbers.",
       "tips": [
         "Save a dated copy per application so you know exactly which version the interviewer is reading."
       ],
-      "title": "Resume: using your resume for interview preparation",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: using your resume for interview preparation"
     },
     {
       "category": "Resume",
@@ -204,12 +152,8 @@
       "id": "iq-resume-final-checklist",
       "module": "bonus-resume",
       "question": "What is the final checklist before sending a resume?",
-      "relatedTopics": [
-        "spring-boot-autoconfig"
-      ],
       "shortAnswer": "Check the filename, test contact details and links, match LinkedIn dates and titles, enforce the page limit, proofread aloud, and confirm you can defend every claim in an interview.",
-      "title": "Resume: final checklist before sending",
-      "topicId": "spring-boot-autoconfig"
+      "title": "Resume: final checklist before sending"
     },
     {
       "category": "Behavioral & Projects",
@@ -3126,7 +3070,7 @@
         "Mention the security warning — interviewers ask about it for actuator specifically."
       ],
       "title": "Spring Boot Actuator",
-      "topicId": "spring-boot-autoconfig"
+      "topicId": "actuator-microservices-deployment"
     },
     {
       "category": "Spring & Spring Boot",
@@ -3315,7 +3259,7 @@
         "Name the trade-off in the same breath: single point of failure unless deployed redundantly."
       ],
       "title": "API Gateway in microservices",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "DevOps & Cloud",
@@ -3967,6 +3911,85 @@
       "topicId": "jdk-jre-jvm"
     },
     {
+      "id": "iq-b2-hashmap-treeify",
+      "module": "module-1",
+      "category": "Java",
+      "title": "HashMap treeify rules",
+      "question": "When does a HashMap bucket turn from a list into a tree?",
+      "shortAnswer": "When a bucket's chain reaches 8 entries — but only if the table already has at least 64 buckets. With a smaller table, the map resizes instead. A tree shrinks back to a list at 6 entries.",
+      "detailedAnswer": "Since Java 8, collisions in a bucket form a linked list that converts to a balanced red-black tree when the chain reaches 8 entries, so a bad hash degrades to logarithmic lookup instead of a linear scan. The conversion happens only when the table has at least 64 buckets: with a smaller table, resizing spreads the entries across more buckets and is the better fix. When removals shrink a tree bucket to 6 entries it converts back to a list — the gap between 8 and 6 is deliberate hysteresis, so a bucket hovering at the threshold does not flip on every insert and remove.",
+      "followUps": [
+        "Why 6 for untreeify and 8 for treeify?",
+        "What does the tree compare when keys are not Comparable?"
+      ],
+      "tips": [
+        "Give all three numbers: 8, 64, 6.",
+        "Explain why the resize happens instead — the map is simply too small."
+      ],
+      "commonMistakes": [
+        "Saying treeify happens at 8 unconditionally.",
+        "Forgetting the 64-bucket condition."
+      ],
+      "difficulty": "Medium",
+      "topicId": "hashmap-internals",
+      "relatedTopics": [
+        "collections-framework",
+        "collections-deep-dive"
+      ]
+    },
+    {
+      "id": "iq-b2-pbv-value",
+      "module": "module-1",
+      "category": "Java",
+      "title": "Is Java pass-by-value?",
+      "question": "Is Java pass-by-value or pass-by-reference?",
+      "shortAnswer": "Always pass-by-value: the argument's value is copied into the parameter, and for objects the value copied is the reference.",
+      "detailedAnswer": "When a method is called, each argument is evaluated and a copy of its value is placed in the parameter. For a primitive the copy is the value itself, so changing the parameter cannot affect the caller. For an object the copy is the reference — the method's parameter and the caller's variable point at the same object, so mutating the object through the parameter is visible, but reassigning the parameter only changes the local copy. That one sentence explains both observations that confuse candidates: mutation is visible, replacement is not.",
+      "followUps": [
+        "Why can't you write a swap method in Java?",
+        "What happens if a method reassigns its object parameter?"
+      ],
+      "tips": [
+        "Lead with the one sentence, then give the mutation-versus-reassignment test.",
+        "Use the swap example — it is the standard follow-up."
+      ],
+      "commonMistakes": [
+        "Saying Java is pass-by-reference because mutation is visible.",
+        "Saying primitives are pass-by-value but objects are pass-by-reference."
+      ],
+      "difficulty": "Easy",
+      "topicId": "java-pass-by-value",
+      "relatedTopics": [
+        "variables-operators-control-flow"
+      ]
+    },
+    {
+      "id": "iq-b2-pbv-swap",
+      "module": "module-1",
+      "category": "Java",
+      "title": "Why swap does not work in Java",
+      "question": "Why can you not write a swap method for two objects in Java?",
+      "shortAnswer": "Because the method receives copies of the references: swapping its parameters swaps only its own copies, and the caller's variables still point at the original objects.",
+      "detailedAnswer": "A swap method would need to change the caller's variables themselves — to make variable a point at what b pointed at. Java passes a copy of each reference into the parameters, so the method can swap the copies freely and the caller's variables are untouched when it returns. The same reasoning explains why a method can sort an array you pass in (mutation through the shared reference) but cannot make your variable point at a new array. To return more than one value, return an object or a record holding them.",
+      "followUps": [
+        "What is the difference between mutating an object and reassigning a reference?",
+        "How would you return two values from a method?"
+      ],
+      "tips": [
+        "Explain it with the caller's variables, not with the word reference alone.",
+        "Contrast with sorting an array, which does work."
+      ],
+      "commonMistakes": [
+        "Claiming swap fails because Java copies the object.",
+        "Expecting reassignment of a parameter to affect the caller."
+      ],
+      "difficulty": "Medium",
+      "topicId": "java-pass-by-value",
+      "relatedTopics": [
+        "variables-operators-control-flow"
+      ]
+    },
+    {
       "category": "Java",
       "detailedAnswer": "Checked exceptions must be declared or handled, and they are meant for recoverable conditions such as a missing file or a failed network call, while unchecked exceptions usually signal programming errors such as a null dereference or an illegal argument. Overusing checked exceptions leaks implementation details through every caller, so many modern codebases wrap them in a meaningful unchecked exception at a boundary. Try-with-resources guarantees that each resource is closed in reverse order of opening, even when an exception occurs, and any exception thrown during close is added as a suppressed exception rather than hiding the original failure. Always close resources you open, log the original exception with context, and avoid catching Exception just to swallow it.",
       "difficulty": "Medium",
@@ -4188,7 +4211,7 @@
         "Flag non-idempotent retries, such as payments, as the classic mistake."
       ],
       "title": "Microservice resilience patterns",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "SQL & Databases",
@@ -4210,7 +4233,7 @@
         "Mention checking the execution plan before adding indexes."
       ],
       "title": "SQL joins, duplicates, and orphans",
-      "topicId": "jdbc-networking"
+      "topicId": "db-joins-indexes-transactions"
     },
     {
       "category": "Java",
@@ -4792,7 +4815,7 @@
         "Mention cached instance lists — that is why a registry outage is partial, not total."
       ],
       "title": "API gateway and service discovery in microservices",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "Spring & Spring Boot",
@@ -5395,7 +5418,7 @@
         "Mention the size-limit exception and its handler."
       ],
       "title": "Handling file uploads in Spring MVC",
-      "topicId": "spring-mvc-rest"
+      "topicId": "spring-file-handling"
     },
     {
       "category": "SQL & Databases",
@@ -5447,7 +5470,7 @@
         "Mention EXPLAIN as the arbiter."
       ],
       "title": "JOIN versus subquery: how to choose",
-      "topicId": "db-sql-java-developers"
+      "topicId": "db-joins-indexes-transactions"
     },
     {
       "category": "Spring & Spring Boot",
@@ -5551,7 +5574,7 @@
         "Name the real casualty: change and discovery of new instances."
       ],
       "title": "What happens when the service registry fails?",
-      "topicId": "sd-designing-real-systems"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "Java",
@@ -5578,6 +5601,325 @@
       ],
       "title": "Coding: numbers starting with 1 using streams",
       "topicId": "streams-lambdas"
+    },
+    {
+      "id": "iq-b2-aop-proxies",
+      "module": "module-2",
+      "category": "Spring & Spring Boot",
+      "title": "JDK dynamic proxy vs CGLIB",
+      "question": "How does Spring decide between a JDK dynamic proxy and a CGLIB proxy, and what can each one not do?",
+      "shortAnswer": "A JDK proxy implements the bean's interfaces and needs one; a CGLIB proxy subclasses the bean and works without an interface, but cannot proxy final classes or methods. Spring Boot uses CGLIB by default.",
+      "detailedAnswer": "A JDK dynamic proxy is a runtime-generated class that implements the same interfaces as the target, so it only works when the bean implements an interface and only intercepts interface methods. A CGLIB proxy is a runtime-generated subclass of the target class, so it works with no interface, but a subclass cannot override a final method or extend a final class, so those are never advised. Spring Boot defaults to CGLIB proxies, which is why injecting a bean by its concrete class usually works even when the bean implements an interface.",
+      "followUps": [
+        "What happens if you inject a JDK-proxied bean by its concrete class?",
+        "Why can't a CGLIB proxy advise a final method?"
+      ],
+      "tips": [
+        "Name the default first: Spring Boot uses CGLIB unless configured otherwise.",
+        "Tie the answer to a failure: a final method silently skipping advice is the classic symptom."
+      ],
+      "commonMistakes": [
+        "Saying JDK proxies work for any class.",
+        "Forgetting that final methods escape CGLIB proxies."
+      ],
+      "difficulty": "Medium",
+      "topicId": "spring-aop-proxies",
+      "relatedTopics": [
+        "bean-scopes-lifecycle",
+        "spring-ioc-di"
+      ]
+    },
+    {
+      "id": "iq-b2-aop-self-invocation",
+      "module": "module-2",
+      "category": "Spring & Spring Boot",
+      "title": "Why @Transactional fails on self-invocation",
+      "question": "A service method calls another @Transactional method in the same class, and no transaction starts. Why?",
+      "shortAnswer": "Spring applies transactions through a proxy, and a call on this never passes through the proxy, so the transactional advice never runs.",
+      "detailedAnswer": "The @Transactional behaviour is an interceptor on the proxy that wraps the bean. Calls arriving from outside go through the proxy and start a transaction; a method calling another method on the same object calls this directly, bypassing the proxy entirely. The annotation is silently ignored — no error, no warning. The same applies to @Async, @Cacheable, and @PreAuthorize. Fixes: have another bean call the annotated method, inject the bean into itself through the proxy, or restructure so the caller invokes the transactional method directly.",
+      "followUps": [
+        "Does @Transactional work on a private method?",
+        "How would you fix it without restructuring the classes?"
+      ],
+      "tips": [
+        "Draw the proxy in words: outside call goes through it, internal call does not.",
+        "Mention that the same trap applies to @Async and @Cacheable — interviewers love the generalisation."
+      ],
+      "commonMistakes": [
+        "Claiming Spring will warn you — it does not.",
+        "Suggesting @Transactional on the calling method as a fix when the point is the called method's own boundary."
+      ],
+      "difficulty": "Medium",
+      "topicId": "spring-aop-proxies",
+      "relatedTopics": [
+        "spring-data-jpa"
+      ]
+    },
+    {
+      "id": "iq-b2-jpa-mappedby",
+      "module": "module-2",
+      "category": "Spring & Spring Boot",
+      "title": "mappedBy and association ownership",
+      "question": "What does mappedBy mean on a @OneToMany, and which side of the association owns the relationship?",
+      "shortAnswer": "mappedBy marks the inverse side. The owning side — usually the @ManyToOne — holds the foreign key and is the only side Hibernate writes.",
+      "detailedAnswer": "In a bidirectional association only one side owns the foreign key. For an order and its line items, the @ManyToOne side (LineItem.order, with @JoinColumn) owns it, and the @OneToMany side declares mappedBy = \"order\" to say so. Hibernate writes only the owning side's state: adding a child to the parent's collection without setting child.setOrder(parent) inserts the child with a null foreign key. The standard fix is a helper method on the parent that sets both sides, so the in-memory graph and the database row cannot disagree.",
+      "followUps": [
+        "What happens if you set only the inverse side?",
+        "When would you model a many-to-many with an explicit link entity?"
+      ],
+      "tips": [
+        "Answer with the foreign key: whoever holds it owns the relationship.",
+        "Mention the helper-method pattern — it shows you have debugged this."
+      ],
+      "commonMistakes": [
+        "Saying mappedBy owns the relationship.",
+        "Claiming both sides are written to the database."
+      ],
+      "difficulty": "Medium",
+      "topicId": "jpa-associations-entity-lifecycle",
+      "relatedTopics": [
+        "spring-data-jpa",
+        "db-sql-java-developers"
+      ]
+    },
+    {
+      "id": "iq-b2-jpa-orphan-removal",
+      "module": "module-2",
+      "category": "Spring & Spring Boot",
+      "title": "Cascade REMOVE vs orphanRemoval",
+      "question": "What is the difference between CascadeType.REMOVE and orphanRemoval on a @OneToMany?",
+      "shortAnswer": "Cascade REMOVE deletes children when you explicitly delete the parent; orphanRemoval deletes a child when it is removed from the parent's collection, even though the parent still exists.",
+      "detailedAnswer": "Cascade propagates an operation you perform: with CascadeType.REMOVE, calling remove() on the parent deletes the children too. orphanRemoval is different — it reacts to the state of the collection: removing a child from the parent's list deletes that child's row at flush time, with no explicit delete call. orphanRemoval is the right tool for privately owned children such as order line items, and the wrong tool for shared entities, where removing a reference from one parent should not delete a row other parents still use.",
+      "followUps": [
+        "Would you cascade REMOVE from a parent to a shared entity?",
+        "What does CascadeType.PERSIST do?"
+      ],
+      "tips": [
+        "Contrast the trigger: an explicit operation versus a missing reference.",
+        "Give the line-item example for orphanRemoval."
+      ],
+      "commonMistakes": [
+        "Treating the two as the same feature.",
+        "Enabling orphanRemoval on a shared association."
+      ],
+      "difficulty": "Medium",
+      "topicId": "jpa-associations-entity-lifecycle",
+      "relatedTopics": [
+        "spring-data-jpa"
+      ]
+    },
+    {
+      "id": "iq-b2-locks-reentrant",
+      "module": "module-2",
+      "category": "Java",
+      "title": "ReentrantLock vs synchronized",
+      "question": "When would you choose ReentrantLock over synchronized?",
+      "shortAnswer": "When you need a timeout, an interruptible wait, fairness, or multiple Conditions — none of which synchronized offers.",
+      "detailedAnswer": "synchronized is the default: simple, automatically released, and understood by the JVM. ReentrantLock adds tryLock() (attempt without blocking), tryLock(timeout, unit) (give up after a wait instead of blocking forever), lockInterruptibly() (let a waiting thread be cancelled), an optional fairness policy, and multiple Condition objects per lock (for example separate not-full and not-empty conditions in a bounded buffer). The price is explicit release: every lock() must be paired with unlock() in a finally block, or an exception leaves the lock held forever.",
+      "followUps": [
+        "What does a Condition give you that wait/notify does not?",
+        "Why is fairness usually left off?"
+      ],
+      "tips": [
+        "List the four features, then name the cost: manual unlock in finally.",
+        "Give the bounded-buffer example for multiple Conditions."
+      ],
+      "commonMistakes": [
+        "Saying ReentrantLock is faster — it is not, it is more flexible.",
+        "Forgetting unlock() on the exception path."
+      ],
+      "difficulty": "Medium",
+      "topicId": "concurrency-locks-synchronizers",
+      "relatedTopics": [
+        "concurrency-basics",
+        "java-memory-model"
+      ]
+    },
+    {
+      "id": "iq-b2-vt-carrier-pinning",
+      "module": "module-2",
+      "category": "Java",
+      "title": "Virtual threads, carriers, and pinning",
+      "question": "How does a virtual thread differ from a platform thread, and what is pinning?",
+      "shortAnswer": "A virtual thread is JVM-managed and cheap to block: it unmounts from its carrier platform thread while waiting. Pinning is when it cannot unmount — blocking inside synchronized or a native call — so the carrier stays occupied.",
+      "detailedAnswer": "A platform thread maps one-to-one to an operating system thread and occupies it while blocked. A virtual thread runs on a carrier thread from a small pool; when it blocks on I/O, the JVM unmounts it and the carrier runs another virtual thread, so a million virtual threads can be alive at once. Pinning breaks that: blocking while holding a monitor (synchronized) or inside a native call keeps the virtual thread mounted, so the carrier cannot do other work and the pool can starve under load. The fix is to use ReentrantLock, which does not pin, and to keep blocking calls out of synchronized blocks.",
+      "followUps": [
+        "Why should you not pool virtual threads?",
+        "Does a virtual thread help CPU-bound work?"
+      ],
+      "tips": [
+        "Explain mount and unmount before naming pinning.",
+        "Give the ReentrantLock remedy, not just the problem."
+      ],
+      "commonMistakes": [
+        "Saying virtual threads are faster — they make blocking cheap, not computation fast.",
+        "Forgetting that synchronized is the pinning cause."
+      ],
+      "difficulty": "Medium",
+      "topicId": "virtual-threads",
+      "relatedTopics": [
+        "concurrency-basics",
+        "executors-completablefuture"
+      ]
+    },
+    {
+      "id": "iq-b2-vt-when-not",
+      "module": "module-2",
+      "category": "Java",
+      "title": "When not to use virtual threads",
+      "question": "When should you not use virtual threads?",
+      "shortAnswer": "For CPU-bound work, for a small fixed set of long-lived tasks, or when the downstream system cannot handle unbounded concurrency — virtual threads remove the thread bottleneck, not the resource bottleneck.",
+      "detailedAnswer": "Virtual threads help when threads block on I/O: the cost they remove is the cost of a blocked thread. A computation that never blocks gains nothing and pays scheduling overhead, so CPU-bound work belongs on a bounded platform-thread pool. A small, fixed number of tasks is simpler on a platform pool too. And a million concurrent requests still hit one database: without a limit such as a semaphore or a bounded connection pool, virtual threads can overwhelm a downstream service faster than a bounded pool would. They also multiply ThreadLocal state — a million virtual threads can mean a million copies of a ThreadLocal value.",
+      "followUps": [
+        "What executor would you use for virtual threads?",
+        "How do you bound concurrency to a database with virtual threads?"
+      ],
+      "tips": [
+        "Name the bottleneck virtual threads do not remove.",
+        "Mention ThreadLocal as the less obvious hazard."
+      ],
+      "commonMistakes": [
+        "Claiming virtual threads make everything faster.",
+        "Creating unbounded virtual threads against a 20-connection pool."
+      ],
+      "difficulty": "Medium",
+      "topicId": "virtual-threads",
+      "relatedTopics": [
+        "executors-completablefuture",
+        "modern-java-features"
+      ]
+    },
+    {
+      "id": "iq-b2-hashmap-spreading",
+      "module": "module-2",
+      "category": "Java",
+      "title": "HashMap hash spreading and indexing",
+      "question": "Why does HashMap spread the hash code, and how is the bucket index computed?",
+      "shortAnswer": "The index uses only the low bits of the hash, so spreading XORs the high bits down ((h ^ (h >>> 16))). The index is (n - 1) & hash, which works because capacity is always a power of two.",
+      "detailedAnswer": "A key's bucket index is (n - 1) & hash, where n is the table length. Because capacity is always a power of two, n - 1 is a run of 1-bits, so this is equivalent to hash % n but costs a bitwise AND instead of a division. The catch is that only the low bits of the hash decide the bucket — so HashMap first spreads the hash by XOR-ing it with its own top 16 bits, mixing the high bits into the low ones. Without spreading, keys whose hash codes differ only in the high bits would all collide in the same bucket.",
+      "followUps": [
+        "Why must capacity stay a power of two?",
+        "What is the default load factor, and when does the table resize?"
+      ],
+      "tips": [
+        "Write the two formulas: the spread and (n - 1) & hash.",
+        "Explain why the power-of-two capacity matters for the AND trick."
+      ],
+      "commonMistakes": [
+        "Saying the index is hash % capacity.",
+        "Saying spreading is done to make hashes random."
+      ],
+      "difficulty": "Medium",
+      "topicId": "hashmap-internals",
+      "relatedTopics": [
+        "collections-framework"
+      ]
+    },
+    {
+      "id": "iq-b2-chm-nulls",
+      "module": "module-2",
+      "category": "Java",
+      "title": "ConcurrentHashMap nulls and locking",
+      "question": "Why does ConcurrentHashMap forbid null keys and values, and how does it stay thread-safe without one big lock?",
+      "shortAnswer": "Null is forbidden so that get() returning null unambiguously means absent. Safety comes from CAS on empty bins and synchronizing on the first node of an occupied bin — reads never block.",
+      "detailedAnswer": "In concurrent code, map.get(key) returning null must mean one thing: the key is absent. If null values were allowed, a null result could mean absent or present-with-null, and no atomic check could distinguish them. For safety, ConcurrentHashMap inserts into an empty bin with a compare-and-swap (no lock), synchronizes on the first node of an occupied bin so only writers to that bucket contend, lets multiple threads cooperate on a resize, and counts size with counter cells instead of one contended counter. Iterators are weakly consistent: they never throw ConcurrentModificationException and may or may not show concurrent updates.",
+      "followUps": [
+        "How would you atomically increment a counter in a ConcurrentHashMap?",
+        "When would you still use Collections.synchronizedMap?"
+      ],
+      "tips": [
+        "Answer the null question first — it is about ambiguity, not convenience.",
+        "Contrast bin-level locking with the old whole-map lock."
+      ],
+      "commonMistakes": [
+        "Saying ConcurrentHashMap locks the whole map.",
+        "Storing null and expecting it to work like HashMap."
+      ],
+      "difficulty": "Hard",
+      "topicId": "hashmap-internals",
+      "relatedTopics": [
+        "concurrency-basics",
+        "concurrency-locks-synchronizers"
+      ]
+    },
+    {
+      "id": "iq-b2-oauth2-pkce",
+      "module": "module-2",
+      "category": "Spring & Spring Boot",
+      "title": "Authorization code flow with PKCE",
+      "question": "Walk through the authorization code flow with PKCE. What does the code verifier prove?",
+      "shortAnswer": "The client creates a random verifier, sends its hash as the challenge, and presents the verifier when exchanging the code for tokens — proving the exchange comes from the client that started the flow.",
+      "detailedAnswer": "The client redirects the user to the authorization server with the requested scopes and a code_challenge (a hash of a random code_verifier). The user authenticates and consents, and the server redirects back with a short-lived authorization code. The client exchanges the code for tokens, sending the original code_verifier; the server checks it against the challenge. Even if the code leaks from the redirect, nobody else can redeem it, because they do not have the verifier. PKCE is required for public clients such as mobile and single-page apps, which cannot keep a secret, and recommended for every client. The older implicit flow, which returned tokens in the redirect itself, is deprecated.",
+      "followUps": [
+        "What is the difference between an access token and an id_token?",
+        "Why is the implicit flow deprecated?"
+      ],
+      "tips": [
+        "Walk the four steps in order: challenge, consent, code, exchange.",
+        "Say what the verifier proves — same client, not just any client."
+      ],
+      "commonMistakes": [
+        "Describing the implicit flow as the current standard.",
+        "Confusing the code with the token."
+      ],
+      "difficulty": "Medium",
+      "topicId": "spring-security-oauth2-oidc",
+      "relatedTopics": [
+        "security-jwt"
+      ]
+    },
+    {
+      "id": "iq-b2-pbv-stack-myth",
+      "module": "module-2",
+      "category": "Java",
+      "title": "Do primitives always live on the stack?",
+      "question": "Do primitives always live on the stack?",
+      "shortAnswer": "No. Primitive locals live in stack frames, but primitive fields live on the heap as part of their object — and escape analysis can stack-allocate objects too.",
+      "detailedAnswer": "The stack holds method frames: local variables (primitive locals and reference variables) and return addresses, freed when the method returns. Objects live on the heap — including their fields, so an int field of an object lives on the heap inside that object, and an int array's elements live on the heap in the array. The JIT compiler can also invert the rule through escape analysis: an object that never escapes its method may be allocated on the stack instead of the heap. The right mental model is about lifetimes, not types: stack data dies with the method call, heap data lives until unreachable.",
+      "followUps": [
+        "Where does a local reference variable live, and where does its object live?",
+        "What is escape analysis?"
+      ],
+      "tips": [
+        "Answer with locals versus fields, not with primitives versus objects.",
+        "Mention escape analysis as the exception that proves the rule."
+      ],
+      "commonMistakes": [
+        "Saying primitives always live on the stack.",
+        "Saying objects always live on the heap with no exception."
+      ],
+      "difficulty": "Medium",
+      "topicId": "java-pass-by-value",
+      "relatedTopics": [
+        "jdk-jre-jvm",
+        "garbage-collection"
+      ]
+    },
+    {
+      "id": "iq-b2-db-clustered",
+      "module": "module-2",
+      "category": "SQL & Databases",
+      "title": "Clustered vs non-clustered indexes",
+      "question": "What is the difference between a clustered and a non-clustered index?",
+      "shortAnswer": "A clustered index stores the table's rows in index order (one per table, usually the primary key); a non-clustered index is a separate structure that points at rows, so each lookup costs an extra hop.",
+      "detailedAnswer": "A clustered index decides the physical order of the table's rows — the table itself is stored in index order, and a table has at most one, usually its primary key (InnoDB stores tables clustered by primary key). A non-clustered (secondary) index maps indexed values to row locations in a separate structure, and the database follows the pointer to fetch the row. A range scan on the clustered key is cheap because the rows are adjacent; a lookup through a secondary index costs a pointer chase per row, and a secondary index returning a large fraction of the table can be slower than a full scan, because random fetches cost more than a sequential read.",
+      "followUps": [
+        "What is a covering index, and why does it avoid the extra hop?",
+        "Why can a table have only one clustered index?"
+      ],
+      "tips": [
+        "Lead with physical order versus pointer.",
+        "Mention InnoDB's primary-key clustering as the concrete case."
+      ],
+      "commonMistakes": [
+        "Saying the two cost the same.",
+        "Assuming PostgreSQL tables are clustered like InnoDB's."
+      ],
+      "difficulty": "Medium",
+      "topicId": "db-joins-indexes-transactions",
+      "relatedTopics": [
+        "db-sql-java-developers"
+      ]
     },
     {
       "category": "Java",
@@ -5758,7 +6100,7 @@
         "Flag wrapping a blocking call in a reactive type as fake async."
       ],
       "title": "Filters, interceptors, and async MVC",
-      "topicId": "spring-mvc-rest"
+      "topicId": "spring-interceptors-filters"
     },
     {
       "category": "Spring & Spring Boot",
@@ -5824,7 +6166,7 @@
         "State the OFFSET weakness in terms of scanning, not just slowness."
       ],
       "title": "Window functions and keyset pagination",
-      "topicId": "spring-data-jpa"
+      "topicId": "sql-window-functions"
     },
     {
       "category": "Java",
@@ -6240,7 +6582,7 @@
         "Name the executor configuration as a production requirement."
       ],
       "title": "@Async, executors, and the self-invocation trap",
-      "topicId": "executors-completablefuture"
+      "topicId": "spring-task-scheduling"
     },
     {
       "category": "Spring & Spring Boot",
@@ -6470,7 +6812,7 @@
         "State the breaker difference as limit versus stop."
       ],
       "title": "The Bulkhead pattern in practice",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "Java",
@@ -6652,7 +6994,7 @@
         "Name the limit: one variable, not a compound update."
       ],
       "title": "Atomicity without synchronized: Atomic classes and CAS",
-      "topicId": "executors-completablefuture"
+      "topicId": "concurrency-basics"
     },
     {
       "category": "Java",
@@ -6782,7 +7124,7 @@
         "Mention the single-threaded default as the gotcha."
       ],
       "title": "Scheduling with @Scheduled in Spring Boot",
-      "topicId": "spring-boot-autoconfig"
+      "topicId": "spring-task-scheduling"
     },
     {
       "category": "Spring & Spring Boot",
@@ -7016,7 +7358,7 @@
         "Stress fail-fast as the point of the pattern."
       ],
       "title": "Circuit Breaker states: closed, open, and half-open",
-      "topicId": "sd-designing-real-systems"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "Microservices",
@@ -7042,7 +7384,7 @@
         "Mention the service mesh as the modern convergence."
       ],
       "title": "Client-side versus server-side service discovery",
-      "topicId": "sd-designing-real-systems"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "Microservices",
@@ -7121,6 +7463,319 @@
       ],
       "title": "Scenario: handling a sudden traffic spike",
       "topicId": "sd-scalability-basics"
+    },
+    {
+      "id": "iq-b2-aop-around",
+      "module": "module-3",
+      "category": "Spring & Spring Boot",
+      "title": "When to use @Around advice",
+      "question": "When would you use @Around advice instead of @Before or @AfterReturning, and what can go wrong with it?",
+      "shortAnswer": "@Around is the only advice that wraps the call: it can time it, retry it, or replace its result. Forgetting proceed() skips the method; calling it twice runs it twice.",
+      "detailedAnswer": "@Before and @AfterReturning observe a call; only @Around controls it, because it receives a ProceedingJoinPoint and decides whether and when to call proceed(). That makes it the right tool for timing, retrying, caching a result, or short-circuiting a call. The risks follow from the power: forgetting proceed() means the method never executes and the caller gets whatever the advice returns; calling proceed() twice executes the method twice, which is dangerous for writes; and an @Around advice that swallows exceptions changes the method's contract silently. Prefer the narrower advice types unless you need to control the call.",
+      "followUps": [
+        "How would you write a retry aspect with @Around?",
+        "Why is a broad pointcut dangerous?"
+      ],
+      "tips": [
+        "Give the timing-aspect example, then name the two proceed() mistakes.",
+        "Say when you would not use @Around: pure logging belongs in @Before."
+      ],
+      "commonMistakes": [
+        "Using @Around for simple logging.",
+        "Forgetting that proceed() can throw the method's checked exceptions."
+      ],
+      "difficulty": "Hard",
+      "topicId": "spring-aop-proxies",
+      "relatedTopics": [
+        "bean-scopes-lifecycle"
+      ]
+    },
+    {
+      "id": "iq-b2-jpa-detached-merge",
+      "module": "module-3",
+      "category": "Spring & Spring Boot",
+      "title": "Detached entities and merge()",
+      "question": "An entity is loaded in one transaction, modified after the transaction closes, and passed to merge(). What happens — and which object is managed afterwards?",
+      "shortAnswer": "merge() copies the detached object's state onto a managed instance and returns it. The object you passed in stays detached; changes to it after the merge are ignored.",
+      "detailedAnswer": "When the persistence context closes, a managed entity becomes detached: Hibernate stops tracking it, so setter calls change the object but write nothing. merge() takes that detached state, loads or creates the corresponding managed instance, copies the state onto it, and returns the managed instance. The common bug is continuing to use the original reference — it is still detached, so further changes to it are silently lost. persist() is different: it makes a transient object managed, and throws if the object already has an identity.",
+      "followUps": [
+        "How is persist() different from merge()?",
+        "Why does dirty checking not need an explicit save?"
+      ],
+      "tips": [
+        "Stress the return value: merge() returns the managed object; the argument stays detached.",
+        "Connect it to the four states: transient, managed, detached, removed."
+      ],
+      "commonMistakes": [
+        "Using the passed-in object after merge() as if it were managed.",
+        "Calling persist() on a detached entity."
+      ],
+      "difficulty": "Hard",
+      "topicId": "jpa-associations-entity-lifecycle",
+      "relatedTopics": [
+        "spring-data-jpa"
+      ]
+    },
+    {
+      "id": "iq-b2-locks-stampedlock",
+      "module": "module-3",
+      "category": "Java",
+      "title": "StampedLock optimistic reads",
+      "question": "How does a StampedLock optimistic read work, and what is its main danger?",
+      "shortAnswer": "You take a stamp without locking, read, then validate(stamp): if a writer changed the data, validation fails and you retry under a read lock. The danger is that StampedLock is not reentrant — re-acquiring it in the same thread deadlocks.",
+      "detailedAnswer": "StampedLock has three modes: write, read, and optimistic read. tryOptimisticRead() returns a stamp without acquiring any lock, so the read runs fully concurrently; afterwards validate(stamp) checks whether a write happened in between, and if it did, the code falls back to a read lock and re-reads. This is faster than a ReadWriteLock when writes are rare. The trap is reentrancy: unlike synchronized or ReentrantLock, acquiring a read or write lock twice in the same thread deadlocks, so StampedLock suits short, carefully written sections, not general-purpose locking.",
+      "followUps": [
+        "When would ReadWriteLock beat StampedLock?",
+        "Why validate instead of just trusting the read?"
+      ],
+      "tips": [
+        "Explain the retry loop: optimistic read, validate, fall back to a read lock.",
+        "Name the non-reentrancy trap explicitly."
+      ],
+      "commonMistakes": [
+        "Treating StampedLock as a drop-in replacement for ReentrantLock.",
+        "Skipping validation and using a possibly stale read."
+      ],
+      "difficulty": "Hard",
+      "topicId": "concurrency-locks-synchronizers",
+      "relatedTopics": [
+        "concurrency-basics"
+      ]
+    },
+    {
+      "id": "iq-b2-locks-latch-barrier",
+      "module": "module-3",
+      "category": "Java",
+      "title": "CountDownLatch vs CyclicBarrier",
+      "question": "What is the difference between a CountDownLatch and a CyclicBarrier, and when would you use each?",
+      "shortAnswer": "A latch is a one-shot countdown that waiting threads observe; a barrier is a reusable rendezvous where all parties wait for each other. Use a latch to wait for completion, a barrier for repeated phases.",
+      "detailedAnswer": "A CountDownLatch is created with a count; workers call countDown() as they finish and other threads block in await() until the count reaches zero. It cannot be reset — a second round needs a new latch. A CyclicBarrier makes N threads wait at a point until all N arrive, then releases them all together, optionally running a barrier action once; it resets automatically, so it fits repeated phases such as iterations of a parallel computation. A Semaphore is the third shape: permits limiting concurrent access to a resource, rather than coordinating timing.",
+      "followUps": [
+        "What would you use to limit concurrent access to a pool of ten connections?",
+        "Can a CountDownLatch be reused?"
+      ],
+      "tips": [
+        "Answer by coordination shape first, class second.",
+        "Add the Semaphore contrast to show the family."
+      ],
+      "commonMistakes": [
+        "Saying a latch is reusable.",
+        "Using a barrier where a latch would do, or vice versa."
+      ],
+      "difficulty": "Medium",
+      "topicId": "concurrency-locks-synchronizers",
+      "relatedTopics": [
+        "executors-completablefuture"
+      ]
+    },
+    {
+      "id": "iq-b2-vt-threadlocal",
+      "module": "module-3",
+      "category": "Java",
+      "title": "Virtual threads and ThreadLocal",
+      "question": "Why is ThreadLocal dangerous with virtual threads, and what should you use instead?",
+      "shortAnswer": "ThreadLocal state is per virtual thread, so a million virtual threads can mean a million copies of a value — a memory hazard. Pass context explicitly instead.",
+      "detailedAnswer": "With platform threads, a ThreadLocal costs one copy per pooled thread — a small, bounded number. Virtual threads are cheap and numerous by design, so the same pattern multiplies the state by the number of live virtual threads, and values can linger as long as the virtual thread does. The replacement is to pass context explicitly as a method argument, or to use scoped values, which are designed for carrying immutable context across virtual threads without per-thread storage.",
+      "followUps": [
+        "What is pinning, and how does it relate?",
+        "Would you use a thread pool for virtual threads?"
+      ],
+      "tips": [
+        "Quantify it: bounded pool versus unbounded virtual threads.",
+        "Name scoped values as the intended replacement."
+      ],
+      "commonMistakes": [
+        "Treating ThreadLocal as free because virtual threads are cheap.",
+        "Using ThreadLocal for request context in a per-request virtual thread server."
+      ],
+      "difficulty": "Hard",
+      "topicId": "virtual-threads",
+      "relatedTopics": [
+        "concurrency-basics"
+      ]
+    },
+    {
+      "id": "iq-b2-oauth2-jwks",
+      "module": "module-3",
+      "category": "Spring & Spring Boot",
+      "title": "Resource server JWKS validation",
+      "question": "How does a resource server validate a JWT without calling the authorization server on every request?",
+      "shortAnswer": "It verifies the signature against the provider's public keys from the JWKS endpoint, and checks issuer, audience, and expiry locally — the keys are fetched once and cached.",
+      "detailedAnswer": "A resource server does not ask the authorization server about each token. It fetches the provider's public keys from the JWKS endpoint (published at /.well-known/jwks.json), caches them, and verifies the token's signature, issuer (iss), audience (aud), and expiry (exp) locally. In Spring Boot, setting spring.security.oauth2.resourceserver.jwt.issuer-uri is enough: Boot discovers the JWKS endpoint from the provider's OpenID configuration and the framework's BearerTokenAuthenticationFilter does the validation before the request reaches a controller. A token with a valid signature but the wrong audience must still be rejected — signature alone is not enough.",
+      "followUps": [
+        "What is the difference between a scope and a role?",
+        "Where would you configure the issuer URI?"
+      ],
+      "tips": [
+        "Name the four checks: signature, issuer, audience, expiry.",
+        "Mention the issuer-uri one-liner — it shows you have configured one."
+      ],
+      "commonMistakes": [
+        "Saying the resource server calls the provider per request.",
+        "Accepting a token on signature alone."
+      ],
+      "difficulty": "Hard",
+      "topicId": "spring-security-oauth2-oidc",
+      "relatedTopics": [
+        "security-jwt"
+      ]
+    },
+    {
+      "id": "iq-b2-oauth2-access-vs-id",
+      "module": "module-3",
+      "category": "Spring & Spring Boot",
+      "title": "Access token vs id_token",
+      "question": "What is the difference between an access token and an id_token, and what goes wrong if you confuse them?",
+      "shortAnswer": "The access token authorizes API calls; the OIDC id_token identifies the user. Sending an id_token to an API as a Bearer token is wrong — it was not issued for that API.",
+      "detailedAnswer": "The access token is what a client presents to a resource server: it carries scopes and is accepted as proof that the caller may do something. The id_token is an OpenID Connect JWT that states who the user is (subject, issuer, expiry, and profile claims) for the client that logged them in. An id_token is not an authorization credential for an API: the API cannot validate its audience or scopes, and accepting it would let a token minted for login authorize API access. Keep them separate — id_token for identity at the client, access token for authorization at the API.",
+      "followUps": [
+        "What does the refresh token do?",
+        "How do scopes appear as authorities in Spring Security?"
+      ],
+      "tips": [
+        "One sentence each, then the failure mode.",
+        "Mention SCOPE_ prefix mapping for scopes."
+      ],
+      "commonMistakes": [
+        "Sending the id_token as a Bearer token to an API.",
+        "Treating the id_token as proof of authorization."
+      ],
+      "difficulty": "Medium",
+      "topicId": "spring-security-oauth2-oidc",
+      "relatedTopics": [
+        "security-jwt"
+      ]
+    },
+    {
+      "id": "iq-b2-sd-pacelc",
+      "module": "module-3",
+      "category": "System Design",
+      "title": "PACELC trade-offs",
+      "question": "What does PACELC add to CAP?",
+      "shortAnswer": "CAP covers the partition case (availability vs consistency); PACELC adds the normal case (latency vs consistency), so the trade-off is made per dataset in both situations.",
+      "detailedAnswer": "CAP says that during a partition a system chooses availability or consistency. PACELC adds the else: when there is no partition, the system chooses latency or consistency. Strongly consistent reads usually cost a round trip to the leader or a quorum; reading the nearest replica is faster but possibly stale. So a system can be PA/EL (available during partitions, low-latency reads otherwise, like a social feed), PC/EC (consistent in both cases, slower, like a bank ledger), or mixed per dataset — strong consistency for payments, eventual consistency for recommendations. The interview point is naming the trade-off per dataset and what breaks if you choose wrong.",
+      "followUps": [
+        "Give an example of a PA/EL system and a PC/EC system.",
+        "How does Cassandra make this choice concrete?"
+      ],
+      "tips": [
+        "Say the acronym out: Partition, Availability/Consistency, Else, Latency/Consistency.",
+        "Answer per dataset, not once for the whole system."
+      ],
+      "commonMistakes": [
+        "Treating CAP as a one-time global choice.",
+        "Forgetting the latency half entirely."
+      ],
+      "difficulty": "Medium",
+      "topicId": "sd-distributed-systems-fundamentals",
+      "relatedTopics": [
+        "sd-scalability-basics",
+        "db-choosing-nosql"
+      ]
+    },
+    {
+      "id": "iq-b2-sd-rate-limiting",
+      "module": "module-3",
+      "category": "System Design",
+      "title": "Comparing rate limiting algorithms",
+      "question": "Compare token bucket and leaky bucket rate limiting. When would you choose each?",
+      "shortAnswer": "Token bucket allows bursts up to its capacity and bounds the long-run rate; leaky bucket smooths bursts into a fixed rate but queueing adds latency. Choose token bucket for bursty legitimate traffic, leaky bucket for a downstream that needs a steady rate.",
+      "detailedAnswer": "Both bound the rate, but they treat bursts differently. A token bucket holds up to N tokens, refills at a fixed rate, and serves a request immediately if a token is available — so a user opening an app and firing ten requests at once is served, while the long-run rate stays bounded. A leaky bucket queues requests and drains them at a fixed rate, so bursts wait instead of being served, adding latency but giving the downstream system a perfectly smooth load. A fixed-window counter is simpler but allows double the rate across a window boundary; a sliding window counter fixes that with one counter per window. A distributed limiter needs shared state, usually Redis, or each instance enforces its own limit.",
+      "followUps": [
+        "What status code and header should a rate-limited response carry?",
+        "Why does a per-instance limiter multiply the real limit?"
+      ],
+      "tips": [
+        "Compare on bursts: allowed versus smoothed.",
+        "Add the 429 with Retry-After detail — it is often the follow-up."
+      ],
+      "commonMistakes": [
+        "Recommending a fixed window without naming the boundary burst.",
+        "Rate-limiting per instance in a multi-instance service."
+      ],
+      "difficulty": "Hard",
+      "topicId": "sd-distributed-systems-fundamentals",
+      "relatedTopics": [
+        "sd-scalability-basics"
+      ]
+    },
+    {
+      "id": "iq-b2-cl-delegation",
+      "module": "module-3",
+      "category": "Java",
+      "title": "Parent delegation in class loading",
+      "question": "Why can two classes with the same name be different types in one JVM?",
+      "shortAnswer": "Because class identity is the name plus the defining classloader, and parent delegation means each loader asks its parent first — so two loaders can each define their own copy.",
+      "detailedAnswer": "Classes are loaded on demand by a hierarchy of loaders (bootstrap, platform, application, custom), and each loader asks its parent first before loading a class itself. That is why application code cannot shadow java.lang.String. A class is identified by its name plus the loader that defined it, so the same class loaded by two different loaders — for example, two web applications each loading their own copy of a library — is two different types, and casting between them throws ClassCastException even though the names match. The fix is to share the class through a common parent loader or communicate through an interface loaded by that parent.",
+      "followUps": [
+        "What is the difference between ClassNotFoundException and NoClassDefFoundError?",
+        "When would you write a custom classloader?"
+      ],
+      "tips": [
+        "Start with the identity rule: name plus loader.",
+        "Use the two-web-apps example — it is the concrete case."
+      ],
+      "commonMistakes": [
+        "Reading the ClassCastException as a type error.",
+        "Saying parent delegation means the child never loads anything."
+      ],
+      "difficulty": "Medium",
+      "topicId": "jvm-class-loading-oom-diagnostics",
+      "relatedTopics": [
+        "jdk-jre-jvm"
+      ]
+    },
+    {
+      "id": "iq-b2-oom-metaspace",
+      "module": "module-3",
+      "category": "Java",
+      "title": "OutOfMemoryError: Metaspace",
+      "question": "Your service throws OutOfMemoryError: Metaspace. What do you check?",
+      "shortAnswer": "Class metadata, not the heap: classloader leaks (static references, ThreadLocal values, registered drivers keeping a loader alive) or unbounded class generation. Raising -Xmx does not help.",
+      "detailedAnswer": "Metaspace holds class metadata, and it fills for two reasons: loaders that cannot be collected, or classes generated without bound (dynamic proxies, generated bytecode). A classloader leak usually means something reachable from a GC root — a static map, a ThreadLocal, a JDBC driver registered in a shared registry — still references classes from a loader that should have been collected, for example on web-app redeploy. The diagnosis is a heap dump and a dominator-tree search for the loader and its classes, not a bigger heap: -Xmx sizes the Java heap, and Metaspace is a separate area.",
+      "followUps": [
+        "What is the difference between heap-space and Metaspace OOMs?",
+        "How do you capture a heap dump automatically?"
+      ],
+      "tips": [
+        "Name the two causes: leaks and unbounded generation.",
+        "Say explicitly that -Xmx is the wrong fix here."
+      ],
+      "commonMistakes": [
+        "Raising -Xmx for a Metaspace error.",
+        "Restarting without a heap dump and destroying the evidence."
+      ],
+      "difficulty": "Hard",
+      "topicId": "jvm-class-loading-oom-diagnostics",
+      "relatedTopics": [
+        "garbage-collection"
+      ]
+    },
+    {
+      "id": "iq-b2-db-mvcc",
+      "module": "module-3",
+      "category": "SQL & Databases",
+      "title": "MVCC and isolation",
+      "question": "How does MVCC let readers and writers run at the same time?",
+      "shortAnswer": "Each row exists in several versions stamped by transaction; a reader sees the version committed when its transaction (or statement) started, so it never blocks on a writer — old versions are later reclaimed.",
+      "detailedAnswer": "Most modern databases implement isolation with multi-version concurrency control rather than locking every row a transaction reads. Each row has several versions, and a transaction sees the version that was committed when it started (or, under READ COMMITTED, when the statement started). Readers never block writers and writers never block readers, which is why a long REPEATABLE READ transaction can read consistent data while other transactions update the same rows. The cost is garbage: old versions accumulate until no transaction can see them, then PostgreSQL's VACUUM or InnoDB's purge reclaims them. The mechanism also explains why databases differ at the edges — PostgreSQL uses a fixed snapshot, InnoDB uses next-key locks — even at the same isolation level.",
+      "followUps": [
+        "Why does a long transaction make VACUUM's job harder?",
+        "How does MVCC relate to phantom reads?"
+      ],
+      "tips": [
+        "Explain versions first, then the snapshot rule, then the cleanup cost.",
+        "Name VACUUM and purge as the concrete cleanup."
+      ],
+      "commonMistakes": [
+        "Saying isolation is implemented by locking everything.",
+        "Assuming two databases behave identically at the same isolation level."
+      ],
+      "difficulty": "Hard",
+      "topicId": "db-joins-indexes-transactions",
+      "relatedTopics": [
+        "spring-data-jpa"
+      ]
     },
     {
       "category": "Java",
@@ -7372,7 +8027,7 @@
         "Name gap locks as the deadlock mechanism, not just deadlocks in general."
       ],
       "title": "SQL at very large scale",
-      "topicId": "jdbc-networking"
+      "topicId": "db-joins-indexes-transactions"
     },
     {
       "category": "Java",
@@ -7395,7 +8050,7 @@
         "Name the fail-open versus fail-closed decision for store outages."
       ],
       "title": "Coding: distributed rate limiter",
-      "topicId": "executors-completablefuture"
+      "topicId": "sd-scalability-basics"
     },
     {
       "category": "Microservices",
@@ -7709,7 +8364,7 @@
         "Name the stampede as the failure that only appears at real traffic."
       ],
       "title": "Caching done right: stale data, eviction, and stampedes",
-      "topicId": "spring-boot-autoconfig"
+      "topicId": "performance-best-practices"
     },
     {
       "category": "Spring & Spring Boot",
@@ -7897,7 +8552,7 @@
         "Name the alternative so the trade-off is visible."
       ],
       "title": "The API Gateway pattern: what it owns and what breaks it",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "spring-cloud-basics"
     },
     {
       "category": "Behavioral & Projects",
@@ -8159,7 +8814,7 @@
         "Name the pool-exhaustion cause explicitly."
       ],
       "title": "Diagnosing thread starvation and deadlock in production",
-      "topicId": "executors-completablefuture"
+      "topicId": "concurrency-basics"
     },
     {
       "category": "Java",
@@ -8289,7 +8944,7 @@
         "Name the rollback trigger as a number, not a feeling."
       ],
       "title": "Scenario: verifying a deployment in production",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "dv-cicd-pipelines"
     },
     {
       "category": "Spring & Spring Boot",
@@ -8393,7 +9048,7 @@
         "Name the timeout as the most common production failure."
       ],
       "title": "Service-to-service calls: RestTemplate, WebClient, and Feign",
-      "topicId": "sd-designing-real-systems"
+      "topicId": "spring-rest-clients"
     },
     {
       "category": "Behavioral & Projects",
@@ -8498,6 +9153,59 @@
       ],
       "title": "Scenario: handling data privacy and security in your projects",
       "topicId": "bh-common-behavioral-questions"
+    },
+    {
+      "id": "iq-b2-sd-snowflake",
+      "module": "module-4",
+      "category": "System Design",
+      "title": "Distributed ID generation",
+      "question": "How would you generate unique IDs across many machines without coordination, and what are the trade-offs?",
+      "shortAnswer": "Use time-ordered UUID v7 for coordination-free ordered IDs, or Snowflake-style IDs (timestamp + worker id + sequence) when IDs must be compact 64-bit numbers — accepting the need for unique worker ids and clock discipline.",
+      "detailedAnswer": "A database sequence is simple and ordered but a single point of contention. Random UUID v4 needs no coordination but is unordered, so database indexes fragment. UUID v7 adds a timestamp prefix, giving roughly time-ordered IDs with no coordination — the modern default. Snowflake-style IDs pack a timestamp, a worker id, and a per-millisecond sequence into 64 bits: ordered, compact, and sortable, at about 4,096 IDs per millisecond per worker — but worker ids must be unique (assigned at startup) and a clock moving backwards can duplicate IDs. Choose by the requirement: sortable (Snowflake or UUID v7), unpredictable (random UUIDs, which do not leak creation order or volume), or no coordination at all (UUIDs, not a sequence).",
+      "followUps": [
+        "Why are random UUIDs bad as a clustered primary key?",
+        "How do you assign Snowflake worker ids?"
+      ],
+      "tips": [
+        "Start from the requirement: sortable, unpredictable, or coordination-free.",
+        "Give the Snowflake bit layout: 41 timestamp, 10 worker, 12 sequence."
+      ],
+      "commonMistakes": [
+        "Using sequential IDs for public resources, leaking order and volume.",
+        "Using random UUIDs as a clustered key and wondering why inserts are slow."
+      ],
+      "difficulty": "Hard",
+      "topicId": "sd-distributed-systems-fundamentals",
+      "relatedTopics": [
+        "sd-designing-real-systems"
+      ]
+    },
+    {
+      "id": "iq-b2-oom-diagnosis",
+      "module": "module-4",
+      "category": "Java",
+      "title": "Diagnosing OutOfMemoryError",
+      "question": "Your service throws OutOfMemoryError: Java heap space in production. What do you do?",
+      "shortAnswer": "Read the message, capture a heap dump with -XX:+HeapDumpOnOutOfMemoryError, find the biggest retainer with a histogram and dominator tree, and fix the retention — not the heap size.",
+      "detailedAnswer": "The message names the resource, and each one has a different fix: heap space means live objects fill the heap, GC overhead limit means the collector is spending almost all its time recovering almost nothing, Metaspace means class metadata, and unable to create a new native thread means too many threads, not too little heap. For heap space, enable -XX:+HeapDumpOnOutOfMemoryError (with a HeapDumpPath) so the dump is captured at the moment of failure, look at jmap -histo to see which classes dominate, then open the dump in an analyzer and follow the dominator tree to the retainer — usually one collection holding references the application forgot. Raising -Xmx helps only if the application genuinely needs more heap; for a retention leak it delays the same crash. GC logs show whether the heap grew steadily (a leak) or spiked (a burst).",
+      "followUps": [
+        "How do you tell a leak from a workload spike?",
+        "What would you do for OutOfMemoryError: unable to create new native thread?"
+      ],
+      "tips": [
+        "Give the sequence: message, dump, histogram, dominator tree, retainer.",
+        "Say when raising -Xmx is right — genuinely more live data — and when it is not."
+      ],
+      "commonMistakes": [
+        "Answering 'increase the heap' with no diagnosis.",
+        "Restarting without capturing a dump."
+      ],
+      "difficulty": "Hard",
+      "topicId": "jvm-class-loading-oom-diagnostics",
+      "relatedTopics": [
+        "garbage-collection",
+        "performance-best-practices"
+      ]
     }
   ]
 }

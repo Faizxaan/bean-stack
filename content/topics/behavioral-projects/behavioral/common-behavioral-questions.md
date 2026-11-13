@@ -56,7 +56,7 @@ The facts stay the same; the emphasis and the Result sentence change. That is ho
 
 Template for mapping a question quickly, in the interview itself:
 
-```
+```text
 1. What competency is this asking about? (ownership / collaboration / judgement / growth)
 2. Which story in my bank shows that competency most clearly?
 3. Which part of that story should I emphasize?

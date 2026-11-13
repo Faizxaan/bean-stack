@@ -62,7 +62,7 @@ public class Hello {
 
 Output:
 
-```
+```text
 Hello, Beanstack
 ```
 

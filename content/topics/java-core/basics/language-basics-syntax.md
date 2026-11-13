@@ -76,7 +76,7 @@ public class Greeting {
 
 Output:
 
-```
+```text
 Hello, Beanstack
 ```
 
@@ -99,7 +99,7 @@ public class ScopeDemo {
 
 Output:
 
-```
+```text
 30
 10
 ```
@@ -121,7 +121,7 @@ public class ArgsDemo {
 
 Running `java ArgsDemo hello` prints:
 
-```
+```text
 1
 hello
 ```

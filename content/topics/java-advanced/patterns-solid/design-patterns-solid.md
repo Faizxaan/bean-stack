@@ -65,7 +65,7 @@ System.out.println(strategy.apply(100));
 
 Output:
 
-```
+```text
 90.0
 ```
 
@@ -95,7 +95,7 @@ System.out.println(new User.Builder().name("Asha").email("asha@example.com").bui
 
 Output:
 
-```
+```text
 Asha <asha@example.com>
 ```
 

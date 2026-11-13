@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { BookOpen, Coffee, Home, Library, Search, Settings, Target, Layers, GraduationCap, PenLine, FileText } from 'lucide-react'
+import { BookOpen, Coffee, Home, Library, Menu, Search, Settings, Target, Layers, GraduationCap, PenLine, FileText, X } from 'lucide-react'
 import { contentIndex, getTopic, getTrack, useFullContent, useRevisionPrompts } from '../lib/content'
 import { searchScore, topicUrl } from '../lib/utils'
 import { useApp } from '../store/AppContext'
@@ -17,12 +17,68 @@ const NAV = [
 
 export function Layout() {
   const [paletteOpen, setPaletteOpen] = useState(false)
+  // Batch 3 (2026-11-13): on mobile (<=900px) the sidebar is off-canvas
+  // instead of stacking above every page — see index.css. Desktop is
+  // unchanged: the sidebar is always visible and this state is inert.
+  const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
   const { storageError, dismissStorageError } = useApp()
   const paletteRef = useRef<HTMLDivElement>(null)
   const searchBtnRef = useRef<HTMLButtonElement>(null)
+  const menuBtnRef = useRef<HTMLButtonElement>(null)
+  const sidebarRef = useRef<HTMLElement>(null)
+
+  // Closing the menu returns focus to the hamburger that opened it,
+  // so focus is never left on a hidden element. Navigating (a NavLink
+  // click, or any route change) closes it without stealing focus.
+  const closeMenu = () => {
+    setMenuOpen(false)
+    requestAnimationFrame(() => menuBtnRef.current?.focus())
+  }
+  useEffect(() => { setMenuOpen(false) }, [location.pathname])
+  // A menu left open across a resize to desktop would leave the focus
+  // trap running over a permanently visible sidebar.
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth > 900) setMenuOpen(false) }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // Escape closes the mobile menu (and returns focus to the hamburger);
+  // the palette's own Escape handling in the effect below is untouched.
+  // If the palette is open on top of the menu, Escape belongs to it.
+  useEffect(() => {
+    if (!menuOpen || paletteOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeMenu() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuOpen, paletteOpen])
+
+  // Focus trap for the mobile menu, mirroring the palette trap below:
+  // while the off-canvas menu is open, Tab cycles inside it instead of
+  // walking the page behind the backdrop.
+  useEffect(() => {
+    if (!menuOpen) return
+    const el = sidebarRef.current
+    if (!el) return
+    // Opening focuses the first link, so a keyboard user starts in the menu.
+    el.querySelector<HTMLElement>('a[href], button:not([disabled])')?.focus()
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+      const focusables = [...el.querySelectorAll<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')]
+        .filter(n => !n.hasAttribute('disabled') && n.offsetParent !== null)
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', onTab)
+    return () => document.removeEventListener('keydown', onTab)
+  }, [menuOpen])
 
   // Dismissing the palette returns focus to the button that opened it;
   // navigating from it moves focus to the new page instead, so focus
@@ -120,8 +176,13 @@ export function Layout() {
       {/* Skip link: without this, keyboard users Tab through the whole
           sidebar on every page before reaching the content. */}
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <aside className="sidebar" aria-label="Primary navigation">
-        <Link to="/" className="brand" style={{ textDecoration: 'none' }}><Coffee size={26} color="#0f766e" /> Bean<span>stack</span></Link>
+      {/* Off-canvas on mobile (<=900px): closed by default, opened by the
+          hamburger in the topbar. `mobile-open` drives the slide-in in
+          index.css; on desktop the class is inert and the sidebar is
+          always visible. */}
+      {menuOpen && <div className="menu-backdrop" aria-hidden="true" onClick={closeMenu} />}
+      <aside ref={sidebarRef} id="primary-sidebar" className={`sidebar${menuOpen ? ' mobile-open' : ''}`} aria-label="Primary navigation">
+        <Link to="/" className="brand" style={{ textDecoration: 'none' }}><Coffee size={26} style={{ color: 'var(--accent)' }} /> Bean<span>stack</span></Link>
         <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>Learn Java, practise, and prepare for interviews — your progress is saved in this browser only.</p>
         <nav style={{ display: 'grid', gap: 2, marginTop: 12 }}>
           {NAV.map(n => (
@@ -157,6 +218,12 @@ export function Layout() {
       </aside>
       <div className="main">
         <header className="topbar">
+          {/* Mobile only (see .menu-btn in index.css): opens the
+              off-canvas navigation. Hidden on desktop, where the
+              sidebar is permanently visible. */}
+          <button ref={menuBtnRef} className="btn secondary small menu-btn" onClick={() => (menuOpen ? closeMenu() : setMenuOpen(true))} aria-expanded={menuOpen} aria-controls="primary-sidebar" aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}>
+            {menuOpen ? <X size={17} /> : <Menu size={17} />} Menu
+          </button>
           <button ref={searchBtnRef} className="btn secondary" onClick={() => setPaletteOpen(true)} aria-label="Open search and command palette" aria-haspopup="dialog">
             <Search size={17} /> Search <span className="kbd">Ctrl/Cmd+K</span>
           </button>

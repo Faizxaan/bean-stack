@@ -8,7 +8,7 @@ difficulty: Advanced
 importance: 5
 tags: [Concurrency, Threads, Executors, synchronized]
 prerequisites: [collections-framework, streams-lambdas]
-related: [garbage-collection, spring-ioc-di]
+related: [garbage-collection, spring-ioc-di, virtual-threads, concurrency-locks-synchronizers]
 status: complete
 lastUpdated: 2026-11-12
 summary: Threads, executors, synchronization, and the Java Memory Model — the concurrency fundamentals interviewers expect from experienced Java developers.
@@ -74,7 +74,7 @@ public class CounterDemo {
 
 Output:
 
-```
+```text
 1000
 ```
 
@@ -91,7 +91,7 @@ CompletableFuture.supplyAsync(() -> 21)
 
 Output (eventually):
 
-```
+```text
 42
 ```
 

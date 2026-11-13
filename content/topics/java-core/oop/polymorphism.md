@@ -96,7 +96,7 @@ System.out.println(checkout.checkout(new UpiPayment(), 250));
 
 Output:
 
-```
+```text
 Paid 500.0 by card
 Paid 250.0 by UPI
 ```
@@ -127,7 +127,7 @@ System.out.println(printer.print("hello"));
 
 Output:
 
-```
+```text
 int: 42
 String: hello
 ```
@@ -160,7 +160,7 @@ if (animal instanceof Dog dog) {
 
 Output:
 
-```
+```text
 woof
 fetching the ball
 ```

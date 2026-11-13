@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { contentIndex } from '../lib/content'
 import { useApp } from '../store/AppContext'
-import { localDateString, truncateImportErrors, validateImport } from '../lib/utils'
+import { localDateString, truncateImportErrors, validateImport, type ResetScope } from '../lib/utils'
 import { type UserData } from '../types'
 
 const MAX_IMPORT_BYTES = 5_000_000
@@ -147,7 +147,7 @@ export function Settings() {
   const currentSummary = countSummary(data as unknown as Record<string, unknown>)
   const hasData = currentSummary.progress + currentSummary.notes + currentSummary.bookmarks + currentSummary.attempts > 0
 
-  const resetWithMessage = (scope: 'progress' | 'bookmarks' | 'favorites' | 'notes' | 'practice' | 'all', message: string) => {
+  const resetWithMessage = (scope: ResetScope, message: string) => {
     resetScope(scope)
     setResetMessage(message)
   }
@@ -216,11 +216,12 @@ export function Settings() {
           <div><ConfirmButton label="Reset bookmarks" onConfirm={() => resetWithMessage('bookmarks', 'Bookmarks reset.')} /> <span style={{ color: 'var(--muted)' }}>Clears topic, interview-question, and flashcard bookmarks.</span></div>
           <div><ConfirmButton label="Reset favorites" onConfirm={() => resetWithMessage('favorites', 'Favorites reset.')} /> <span style={{ color: 'var(--muted)' }}>Clears favorited topics only.</span></div>
           <div><ConfirmButton label="Reset notes" onConfirm={() => resetWithMessage('notes', 'Notes reset.')} /> <span style={{ color: 'var(--muted)' }}>Deletes your personal notes on topic pages.</span></div>
-          <div><ConfirmButton label="Reset practice history" onConfirm={() => resetWithMessage('practice', 'Practice history reset.')} /> <span style={{ color: 'var(--muted)' }}>Clears practice attempts, flashcard progress, and interview Confident / Needs review marks.</span></div>
+          <div><ConfirmButton label="Reset practice history" onConfirm={() => resetWithMessage('practice', 'Practice history reset. Your interview Confident / Needs review marks are untouched.')} /> <span style={{ color: 'var(--muted)' }}>Clears practice attempts and Leitner flashcard progress only. Interview Confident / Needs review marks are not touched — use “Reset interview review” for those.</span></div>
+          <div><ConfirmButton label="Reset interview review" onConfirm={() => resetWithMessage('interview', 'Interview review reset. Your practice history, bookmarks, and notes are untouched.')} /> <span style={{ color: 'var(--muted)' }}>Clears your Confident / Needs review marks on interview questions (and on one-minute revision prompts, which share those marks). Practice attempts, flashcard progress, and bookmarks are not touched.</span></div>
           <div><ConfirmButton label="Reset everything (keeps settings)" onConfirm={() => resetWithMessage('all', 'Everything reset except your reading preferences. Export first next time if you might want it back.')} danger /> <span style={{ color: 'var(--muted)' }}>Clears all of the above. Your theme, font size, reading width, and motion settings stay as they are.</span></div>
         </div>
         {resetMessage && <p role="status" style={{ color: 'var(--accent)', marginTop: 12 }}>{resetMessage}</p>}
-        <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 12 }}>Resetting everything keeps your reading preferences, but clears progress, bookmarks, favorites, notes, and practice history. Export first if you might want it back.</p>
+        <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 12 }}>Resetting everything keeps your reading preferences, but clears progress, bookmarks, favorites, notes, practice history, and interview review marks. Export first if you might want it back.</p>
       </div>
     </div>
   )

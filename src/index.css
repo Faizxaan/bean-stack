@@ -76,18 +76,58 @@ p, li { overflow-wrap: break-word; }
 .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 900px) {
   .app-shell { grid-template-columns: 1fr; }
-  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-  /* On mobile the sidebar stacks above every page; the full 10-track list
-     plus the active track tree pushed content ~a screen down. Track browsing
-     on mobile goes through Home/Learn cards and the top/bottom topic nav. */
+  /* Batch 3 (2026-11-13): the sidebar used to stack above every page on
+     mobile — brand + tagline + 7 nav links, ~a screen of chrome before
+     any content. It is now off-canvas: hidden until the hamburger in
+     the topbar opens it. visibility:hidden while closed keeps its links
+     out of the Tab order and out of the accessibility tree; the delayed
+     visibility transition lets the slide-out animate before hiding. */
+  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 85vw); height: 100vh; height: 100dvh; z-index: 40; border-right: 1px solid var(--border); border-bottom: none; transform: translateX(-102%); visibility: hidden; transition: transform 0.2s ease, visibility 0s linear 0.2s; }
+  .sidebar.mobile-open { transform: none; visibility: visible; transition: transform 0.2s ease; }
+  /* Track browsing on mobile goes through Home/Learn cards and the
+     top/bottom topic nav — the track tree stays out of the menu. */
   .sidebar-tracks { display: none; }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  /* The old inline 1fr+220px topic grid squeezed article text beside the
-     TOC on phones. Single column, TOC first so jump links stay reachable
-     without scrolling past the whole article, and no longer sticky. */
+  /* The topic TOC used to render in full before the article on phones.
+     It is now a collapsed-by-default disclosure (see Learn.tsx); the
+     toggle sits above the article and the list stays reachable. */
   .topic-layout { grid-template-columns: minmax(0, 1fr); }
   .toc { position: static; order: -1; }
 }
+/* Hamburger: only exists on mobile, where the sidebar is off-canvas. */
+.menu-btn { display: none; }
+@media (max-width: 900px) {
+  .menu-btn { display: inline-flex; }
+}
+.menu-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 35; }
+@media (min-width: 901px) {
+  .menu-backdrop { display: none; }
+}
+/* TOC disclosure toggle (mobile only — desktop keeps the static
+   "On this page" heading and the always-visible list). */
+.toc-toggle { display: none; align-items: center; justify-content: space-between; gap: 8px; width: 100%; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-weight: 700; min-height: 44px; text-align: left; }
+/* Mobile TOC rules live after the base .toc-toggle rule above, so the
+   mobile display:flex wins over the base display:none at equal
+   specificity. Above 900px the list is always shown regardless of
+   data-open, so desktop scroll-spy is unaffected. */
+@media (max-width: 900px) {
+  .toc-toggle { display: flex; }
+  .toc-heading { display: none; }
+  .toc-body[data-open="false"] { display: none; }
+}
+/* Cheatsheet / revision tabs: the selected tab reads as the primary
+   button, the other as secondary. */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.tabs .btn[aria-selected="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+/* Copy button on MarkdownView code blocks. The <pre> is dark in both
+   themes (#0f172a light, #020617 dark), so the button uses fixed
+   dark-on-dark colours that read on it in either theme, instead of
+   the theme surface variables. It overlays the block's top-right
+   corner and never touches the block's own scrolling (tabIndex stays
+   on the <pre>). */
+.code-block { position: relative; }
+.code-copy-btn { position: absolute; top: 8px; right: 8px; display: inline-flex; align-items: center; gap: 4px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; font-weight: 600; min-height: 32px; }
+.code-copy-btn:hover { background: #334155; }
 /* Buttons: one style, one height. Primary buttons were ~36px tall and
    .btn.small ~32px — below a comfortable touch target. 44px primary /
    40px small, centred text so wrapped labels stay readable. */
@@ -121,6 +161,10 @@ p, li { overflow-wrap: break-word; }
    block instead of pushing the whole page sideways. */
 .topic-body pre { background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.55; tab-size: 2; max-width: 100%; }
 [data-theme="dark"] .topic-body pre { background: #020617; }
+/* Diagrams are static SVGs (see public/diagrams/): they carry their own
+   white node fills, so they read in both themes, and must never overflow
+   a narrow topic column. */
+.topic-body img { max-width: 100%; height: auto; display: block; margin: 14px 0; }
 .topic-body code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .topic-body :not(pre) > code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
 .topic-body table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }
@@ -253,7 +297,7 @@ p, li { overflow-wrap: break-word; }
 }
 
 @media print {
-  .sidebar, .topbar { display: none !important; }
+  .sidebar, .topbar, .code-copy-btn, .toc-toggle, .menu-backdrop { display: none !important; }
   .app-shell { display: block; }
   .card { box-shadow: none; }
   .topic-body pre, .card { break-inside: avoid; }

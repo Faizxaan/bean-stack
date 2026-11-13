@@ -8,7 +8,9 @@ import {
   filterQuestions,
   firstUnreviewed,
   groupQuestionsByArea,
+  interviewQuestionsOnly,
   isInterviewCategory,
+  isResumeEntry,
   moduleMeta,
   prevNextQuestion,
   reviewStats,
@@ -150,6 +152,22 @@ describe('interview filtering and review stats', () => {
     expect(filterQuestions(qs, { ...EMPTY_INTERVIEW_FILTERS, review: 'bookmarked' }, review, ['c']).map(x => x.id)).toEqual(['c'])
   })
 
+  it('filters by Learn topic (Batch 3 sub-filter), and general = no topic', () => {
+    const byTopic = [
+      q({ id: 'a', topicId: 't1' }),
+      q({ id: 'b', topicId: 't2' }),
+      q({ id: 'c', topicId: 't1' }),
+      q({ id: 'r', topicId: undefined, category: 'Resume', module: 'bonus-resume' }),
+    ]
+    expect(filterQuestions(byTopic, { ...EMPTY_INTERVIEW_FILTERS, topic: 't1' }, {}, []).map(x => x.id)).toEqual(['a', 'c'])
+    expect(filterQuestions(byTopic, { ...EMPTY_INTERVIEW_FILTERS, topic: 't2' }, {}, []).map(x => x.id)).toEqual(['b'])
+    expect(filterQuestions(byTopic, { ...EMPTY_INTERVIEW_FILTERS, topic: 'general' }, {}, []).map(x => x.id)).toEqual(['r'])
+    expect(filterQuestions(byTopic, { ...EMPTY_INTERVIEW_FILTERS, topic: 'missing-topic' }, {}, []).map(x => x.id)).toEqual([])
+    // Topic composes with the area filter: t1 has no Spring question here.
+    expect(filterQuestions(byTopic, { ...EMPTY_INTERVIEW_FILTERS, topic: 't1', category: 'Spring & Spring Boot' }, {}, []).map(x => x.id)).toEqual([])
+    expect(filterQuestions(byTopic, { ...EMPTY_INTERVIEW_FILTERS, topic: 'all' }, {}, []).map(x => x.id)).toEqual(['a', 'b', 'c', 'r'])
+  })
+
   it('reviewStats counts reviewed/confident/needs-review/bookmarked', () => {
     expect(reviewStats(qs, review, ['b', 'c'])).toEqual({ total: 3, reviewed: 2, confident: 1, needsReview: 1, bookmarked: 2, pctReviewed: 67 })
   })
@@ -170,5 +188,26 @@ describe('prev/next within a module in display order', () => {
     expect(prevNextQuestion(qs, 'c', ctx)).toEqual({ prev: qs[1], next: qs[3] })
     expect(prevNextQuestion(qs, 'd', ctx)).toEqual({ prev: qs[2], next: undefined })
     expect(prevNextQuestion(qs, 'missing', ctx)).toEqual({ prev: undefined, next: undefined })
+  })
+})
+
+describe('bonus-resume exclusion from interview progress totals', () => {
+  const qs = [
+    q({ id: 'a', module: 'module-1' }),
+    q({ id: 'b', module: 'module-2' }),
+    q({ id: 'r1', module: 'bonus-resume', category: 'Resume' }),
+    q({ id: 'r2', module: 'bonus-resume', category: 'Resume' }),
+  ]
+
+  it('flags only bonus-resume entries as resume entries', () => {
+    expect(isResumeEntry(qs[0])).toBe(false)
+    expect(isResumeEntry(qs[2])).toBe(true)
+  })
+
+  it('interviewQuestionsOnly drops the 12-style bonus entries and keeps the rest', () => {
+    const kept = interviewQuestionsOnly(qs)
+    expect(kept.map(x => x.id)).toEqual(['a', 'b'])
+    // reviewStats over the filtered list is the progress total (2, not 4).
+    expect(reviewStats(kept, { a: 'confident', r1: 'confident' }, [])).toEqual({ total: 2, reviewed: 1, confident: 1, needsReview: 0, bookmarked: 0, pctReviewed: 50 })
   })
 })

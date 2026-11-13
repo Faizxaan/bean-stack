@@ -8,7 +8,7 @@ difficulty: Beginner
 importance: 4
 tags: [Variables, Operators, Control Flow]
 prerequisites: [language-basics-syntax]
-related: []
+related: [java-pass-by-value]
 status: complete
 lastUpdated: 2026-11-04
 summary: How Java stores data in variables, combines values with operators, and directs execution with branches and loops.
@@ -77,7 +77,7 @@ public class TypesDemo {
 
 Output:
 
-```
+```text
 3
 1
 3.5
@@ -101,7 +101,7 @@ public class IncrementDemo {
 
 Output:
 
-```
+```text
 5
 7
 7
@@ -137,7 +137,7 @@ public class ControlDemo {
 
 Output:
 
-```
+```text
 B
 7
 Good

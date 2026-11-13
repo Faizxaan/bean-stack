@@ -8,7 +8,7 @@ difficulty: Advanced
 importance: 4
 tags: [Spring Security, JWT, Authentication, Authorization]
 prerequisites: [spring-mvc-rest, spring-ioc-di]
-related: [validation-exception-handling, spring-boot-autoconfig]
+related: [validation-exception-handling, spring-boot-autoconfig, spring-security-oauth2-oidc]
 status: complete
 lastUpdated: 2026-11-04
 summary: How Spring Security authenticates requests with filters and how stateless JWT authentication replaces server-side sessions.

@@ -81,7 +81,7 @@ public class StringBuilderDemo {
 
 Output:
 
-```
+```text
 abc
 ```
 
@@ -103,7 +103,7 @@ public class PrimitiveSumDemo {
 
 Output:
 
-```
+```text
 5050
 ```
 
@@ -128,7 +128,7 @@ public class PresizedListDemo {
 
 Output:
 
-```
+```text
 100
 ```
 
@@ -155,7 +155,7 @@ public class LoggingDemo {
 
 Output:
 
-```
+```text
 Done
 ```
 

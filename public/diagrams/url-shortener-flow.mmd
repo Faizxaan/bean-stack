@@ -1,0 +1,8 @@
+%% Mermaid source for public/diagrams/url-shortener-flow.svg — kept next to the SVG it generates.
+flowchart LR
+    User[User] --> LB[Load Balancer]
+    LB --> App[App Server]
+    App --> Cache[(Short Code Cache)]
+    App --> DB[(URL Database)]
+    App --> Queue[Click Event Queue]
+    Queue --> Analytics[Analytics Worker]

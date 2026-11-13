@@ -34,7 +34,7 @@ System.out.println(a == b);
 
 Output:
 
-```
+```text
 true
 ```
 
@@ -79,7 +79,7 @@ System.out.println(sb.toString());
 
 Output:
 
-```
+```text
 0,1,2,
 ```
 
@@ -96,7 +96,7 @@ System.out.println(s1.equals(s2));
 
 Output:
 
-```
+```text
 false
 true
 ```

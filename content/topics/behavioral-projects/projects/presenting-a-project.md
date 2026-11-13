@@ -52,7 +52,7 @@ Notice what this does: context in two sentences, role stated plainly, one hard p
 
 Template for preparing any project:
 
-```
+```text
 Project:  [What it is, in one sentence, for a non-expert]
 Problem:  [What was broken or missing, and for whom]
 My role:  [What you owned, and what others owned]

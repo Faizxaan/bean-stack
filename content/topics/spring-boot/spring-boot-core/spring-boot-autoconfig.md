@@ -79,7 +79,7 @@ class HelloController {
 
 Output (HTTP response to `GET /hello`):
 
-```
+```text
 Hello, Beanstack
 ```
 

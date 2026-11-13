@@ -60,7 +60,7 @@ Worked example — a fictional lesson learned:
 
 Template for any trade-off answer:
 
-```
+```text
 Decision:   [What you chose, plainly]
 Options:    [The real alternatives, fairly stated]
 Decided by: [The constraint or priority that tipped it]

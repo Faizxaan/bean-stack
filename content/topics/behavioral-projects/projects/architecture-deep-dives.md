@@ -55,7 +55,7 @@ Notice the pattern: each layer is a few sentences, each decision comes with a re
 
 Template for tracing a request:
 
-```
+```text
 User action:     [What the user does]
 Entry point:     [Where the request enters the system]
 Flow:            [Component A -> Component B -> Component C, with what each does]

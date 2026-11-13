@@ -3,7 +3,7 @@ id: spring-spel
 title: Spring Expression Language (SpEL)
 track: spring-boot
 section: spring-core
-order: 3
+order: 4
 difficulty: Intermediate
 importance: 3
 tags: [Spring, SpEL, expressions, Value, security]
@@ -106,7 +106,7 @@ System.out.println(label);
 
 Output:
 
-```
+```text
 118.0
 high
 ```

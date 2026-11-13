@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { motion, MotionConfig } from 'framer-motion'
-import { AppProvider } from './store/AppContext'
+import { AppProvider, useApp } from './store/AppContext'
 import { Layout } from './components/Layout'
 
 // Page components are lazy-loaded (2026-11-04 polish) so the initial
@@ -28,14 +28,26 @@ function Page({ children }: { children: React.ReactNode }) {
   )
 }
 
+// MotionShell binds MotionConfig to the in-app reduced-motion setting
+// (Settings → data.settings.reducedMotion). The [data-reduced-motion]
+// CSS rule in index.css alone cannot do this: it only kills CSS
+// animations/transitions, while framer-motion's page fade is driven by
+// JS inline styles, so with the toggle on and the OS setting off the
+// fade still ran. reducedMotion="always" makes framer-motion skip it;
+// "user" (toggle off) keeps the OS prefers-reduced-motion behaviour.
+function MotionShell({ children }: { children: React.ReactNode }) {
+  const { data } = useApp()
+  return (
+    <MotionConfig reducedMotion={data.settings.reducedMotion ? 'always' : 'user'}>
+      {children}
+    </MotionConfig>
+  )
+}
+
 export default function App() {
   return (
     <AppProvider>
-      {/* reducedMotion="user" makes the page fade respect the OS
-          reduced-motion setting; the in-app toggle is handled by the
-          [data-reduced-motion] CSS rule in index.css. Previously the
-          fade ran regardless of either setting. */}
-      <MotionConfig reducedMotion="user">
+      <MotionShell>
       <BrowserRouter>
         <Suspense fallback={<div style={{ padding: 24 }}>Loading Beanstack…</div>}>
           <Routes>
@@ -57,7 +69,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
-      </MotionConfig>
+      </MotionShell>
     </AppProvider>
   )
 }

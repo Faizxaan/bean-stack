@@ -92,7 +92,7 @@ WHERE p.amount > r.avg_amount;
 
 Output (with the sample data from `sql-window-functions`):
 
-```
+```text
  customer | region | amount | avg_amount
 ----------+--------+--------+------------
  Asha     | West   |    500 |        400
@@ -120,7 +120,7 @@ WHERE region = (SELECT region FROM top_region);
 
 Output:
 
-```
+```text
  customer | region | amount
 ----------+--------+--------
  Asha     | West   |    500
@@ -153,7 +153,7 @@ SELECT name, level FROM reports ORDER BY level, name;
 
 Output:
 
-```
+```text
  name  | level
 -------+-------
  Anita |     1

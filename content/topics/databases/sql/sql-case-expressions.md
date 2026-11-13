@@ -98,7 +98,7 @@ FROM payment;
 
 Output:
 
-```
+```text
  customer | amount | value_band
 ----------+--------+------------
  Asha     |    500 | High
@@ -122,7 +122,7 @@ GROUP BY region;
 
 Output:
 
-```
+```text
  region | high_count | other_count | west_total
 --------+------------+-------------+------------
  West   |          1 |           1 |        800
@@ -141,7 +141,7 @@ ORDER BY CASE region WHEN 'East' THEN 1 WHEN 'West' THEN 2 ELSE 3 END;
 
 Output:
 
-```
+```text
  customer | region
 ----------+--------
  Meera    | East

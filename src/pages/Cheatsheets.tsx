@@ -115,6 +115,29 @@ function RevisionDeck() {
 }
 
 export function CheatsheetsIndex() {
+  const location = useLocation()
+  // Batch 3 (2026-11-13): the 37 one-minute revision cards used to
+  // render before any cheatsheet on this page. The page is now two
+  // tabs — Cheatsheets first, One-minute revision second — so the page
+  // a user lands on is the cheatsheets they came for. Deep links keep
+  // working: #rev-<id> (Search / palette / Library) and
+  // #one-minute-revision open the revision tab; #cheatsheets opens
+  // the cheatsheets tab. RevisionDeck's own effect still scrolls to
+  // the #rev-<id> card once it loads.
+  type CheatsheetTab = 'cheatsheets' | 'revision'
+  const tabFromHash = (hash: string): CheatsheetTab =>
+    hash.startsWith('#rev-') || hash === '#one-minute-revision' ? 'revision' : 'cheatsheets'
+  const [tab, setTab] = useState<CheatsheetTab>(() => tabFromHash(location.hash))
+  useEffect(() => { setTab(tabFromHash(location.hash)) }, [location.hash])
+  // In-page jump links: switch the tab first, then scroll once the
+  // panel has rendered — a plain anchor would scroll before the
+  // target panel exists. The hash is kept in the URL so Back works.
+  const jumpTo = (next: CheatsheetTab, id: string) => (e: React.MouseEvent) => {
+    e.preventDefault()
+    setTab(next)
+    window.history.replaceState(null, '', `#${id}`)
+    setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: smoothScrollBehavior(), block: 'start' }), 0)
+  }
   return (
     <div>
       <nav className="breadcrumb" aria-label="Breadcrumb">
@@ -124,25 +147,36 @@ export function CheatsheetsIndex() {
       </nav>
       <h1>Revision &amp; Cheatsheets</h1>
       <p style={{ color: 'var(--muted)' }}>Two ways to revise. <strong>One-minute revision</strong> is a set of quick recall prompts — try to answer each in about a minute, then reveal. <strong>Cheatsheets</strong> are one-page quick-reference tables for a topic. Use your browser&apos;s print function for a clean print version.</p>
-      <p style={{ color: 'var(--muted)' }}>On this page: <a href="#one-minute-revision">One-minute revision (37 prompts)</a> · <a href="#cheatsheets">Cheatsheets ({contentIndex.cheatsheets.length})</a></p>
-      <RevisionDeck />
-      <h2 id="cheatsheets" style={{ marginBottom: 4, scrollMarginTop: 76 }}>Cheatsheets ({contentIndex.cheatsheets.length})</h2>
-      <p style={{ color: 'var(--muted)', marginTop: 0 }}>Each cheatsheet summarises one topic area in a few minutes. Open one to read it, or print it before an interview.</p>
-      {contentIndex.cheatsheets.length === 0 && (
-        <div className="card">
-          <p>No cheatsheets yet in this batch. Cheatsheets are concise and consistent with the topic content they summarise — for example HashMap vs ConcurrentHashMap, or @Component vs @Bean — and they are added with each content batch.</p>
-          <p>Meanwhile, every topic page has a Quick Revision Mode with definitions, key points, key code, common mistakes, interview questions, and a summary.</p>
-          <Link className="btn secondary" to="/learn">Browse topics →</Link>
+      <div className="tabs" role="tablist" aria-label="Revision and cheatsheets">
+        <button type="button" role="tab" id="tab-cheatsheets" aria-selected={tab === 'cheatsheets'} aria-controls="panel-cheatsheets" className="btn secondary" onClick={() => setTab('cheatsheets')}>Cheatsheets ({contentIndex.cheatsheets.length})</button>
+        <button type="button" role="tab" id="tab-revision" aria-selected={tab === 'revision'} aria-controls="panel-revision" className="btn secondary" onClick={() => setTab('revision')}>One-minute revision</button>
+      </div>
+      {tab === 'cheatsheets' && (
+        <div role="tabpanel" id="panel-cheatsheets" aria-labelledby="tab-cheatsheets">
+          <h2 id="cheatsheets" style={{ marginBottom: 4, scrollMarginTop: 76 }}>Cheatsheets ({contentIndex.cheatsheets.length})</h2>
+          <p style={{ color: 'var(--muted)', marginTop: 0 }}>Each cheatsheet summarises one topic area in a few minutes. Open one to read it, or print it before an interview. The one-minute revision prompts live on the other tab — <a href="#one-minute-revision" onClick={jumpTo('revision', 'one-minute-revision')}>open One-minute revision</a>.</p>
+          {contentIndex.cheatsheets.length === 0 && (
+            <div className="card">
+              <p>No cheatsheets yet in this batch. Cheatsheets are concise and consistent with the topic content they summarise — for example HashMap vs ConcurrentHashMap, or @Component vs @Bean — and they are added with each content batch.</p>
+              <p>Meanwhile, every topic page has a Quick Revision Mode with definitions, key points, key code, common mistakes, interview questions, and a summary.</p>
+              <Link className="btn secondary" to="/learn">Browse topics →</Link>
+            </div>
+          )}
+          <div className="grid grid-2">
+            {contentIndex.cheatsheets.map(c => (
+              <div key={c.id} className="card">
+                <h2 style={{ marginTop: 0 }}><Link to={`/cheatsheets/${c.id}`}>{c.title}</Link></h2>
+                <p style={{ color: 'var(--muted)' }}>{c.summary} · {c.readingMinutes} min · {c.category}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-      <div className="grid grid-2">
-        {contentIndex.cheatsheets.map(c => (
-          <div key={c.id} className="card">
-            <h2 style={{ marginTop: 0 }}><Link to={`/cheatsheets/${c.id}`}>{c.title}</Link></h2>
-            <p style={{ color: 'var(--muted)' }}>{c.summary} · {c.readingMinutes} min · {c.category}</p>
-          </div>
-        ))}
-      </div>
+      {tab === 'revision' && (
+        <div role="tabpanel" id="panel-revision" aria-labelledby="tab-revision">
+          <RevisionDeck />
+        </div>
+      )}
     </div>
   )
 }

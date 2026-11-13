@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { EMPTY_USER_DATA, type ProgressStatus, type UserData } from '../types'
 import { contentIndex } from '../lib/content'
-import { MAX_ACTIVITY_DATES, MAX_NOTE_LENGTH, MAX_PRACTICE_ATTEMPTS, clampFlashcardBox, nextDueDate, safeJsonParse, sanitizeSettings, sanitizeUserData, todayIso } from '../lib/utils'
+import { MAX_ACTIVITY_DATES, MAX_NOTE_LENGTH, MAX_PRACTICE_ATTEMPTS, applyResetScope, clampFlashcardBox, nextDueDate, safeJsonParse, sanitizeSettings, sanitizeUserData, todayIso, type ResetScope } from '../lib/utils'
 
 const STORAGE_KEY = 'beanstack-user-data-v1'
 
@@ -48,7 +48,7 @@ interface AppContextValue {
   setInterviewDate: (date: string | null) => void
   setSettings: (patch: Partial<UserData['settings']>) => void
   markExported: () => void
-  resetScope: (scope: 'progress' | 'bookmarks' | 'favorites' | 'notes' | 'practice' | 'all') => void
+  resetScope: (scope: ResetScope) => void
   replaceData: (data: UserData) => void
 }
 
@@ -123,15 +123,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // never set dataset.theme/fontSize/width to a bogus token again.
     setSettings: (patch) => setData(d => ({ ...d, settings: sanitizeSettings({ ...d.settings, ...patch }) })),
     markExported: () => setData(d => ({ ...d, lastExportedAt: new Date().toISOString() })),
-    resetScope: (scope) => setData(d => {
-      if (scope === 'all') return { ...EMPTY_USER_DATA, settings: d.settings }
-      if (scope === 'progress') return { ...d, progress: {} }
-      if (scope === 'bookmarks') return { ...d, bookmarks: [], questionBookmarks: [], flashcardBookmarks: [] }
-      if (scope === 'favorites') return { ...d, favorites: [] }
-      if (scope === 'notes') return { ...d, notes: {} }
-      if (scope === 'practice') return { ...d, practiceAttempts: [], flashcardStates: {}, interviewReview: {} }
-      return d
-    }),
+    // Pure logic lives in lib/utils (applyResetScope) so it is
+    // unit-tested there; this just applies it to state.
+    resetScope: (scope) => setData(d => applyResetScope(d, scope)),
     replaceData: (next) => setData(sanitizeUserData(next, KNOWN_IDS)),
   }), [data, storageError])
 

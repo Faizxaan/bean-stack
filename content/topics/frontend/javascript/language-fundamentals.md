@@ -58,7 +58,7 @@ console.log([] == false); // true — another reason to prefer ===
 
 Output:
 
-```
+```text
 false
 true
 true
@@ -84,7 +84,7 @@ console.log(counter.count); // undefined: count is not a property, it is capture
 
 Output:
 
-```
+```text
 1
 2
 undefined
@@ -109,7 +109,7 @@ console.log(dog instanceof Animal); // true
 
 Output:
 
-```
+```text
 Rex barks
 true
 ```

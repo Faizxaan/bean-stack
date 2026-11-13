@@ -8,26 +8,32 @@ difficulty: Beginner
 importance: 5
 tags: [OOP, constructors, inheritance]
 prerequisites: [jdk-jre-jvm]
-related: [strings, collections-framework]
+related: [oop-encapsulation, oop-inheritance, oop-polymorphism, oop-abstraction]
 status: complete
-lastUpdated: 2026-11-12
-summary: Encapsulation, inheritance, polymorphism, and abstraction in plain language, plus how constructors and initialization actually run.
+lastUpdated: 2026-11-13
+summary: A map of the four OOP pillars — each explained in depth in its own topic — plus how constructors and initialization actually run.
 ---
 
 ## Overview
 
 Object-oriented programming organizes code around objects that combine data (fields) and behaviour (methods). Java's four pillars are encapsulation, inheritance, polymorphism, and abstraction. In plain terms: encapsulation means hiding an object's inner workings behind methods, inheritance means building a new class on an existing one, polymorphism means the same method call can do different things for different objects, and abstraction means showing only the essential details.
 
-They are not just definitions to recite — each one solves a real maintenance problem: hiding complexity, reusing code safely, swapping implementations, and modelling only what matters.
+They are not just definitions to recite — each one solves a real maintenance problem: hiding complexity, reusing code safely, swapping implementations, and modelling only what matters. Each pillar has its own topic, linked below; this topic is the map, plus the one piece the pillar topics do not cover — how constructors and initialization run.
 
 ## Theory
 
-### The four pillars
+### The four pillars — where each one lives
 
-- **Encapsulation:** keep fields private and expose them through methods. This lets you change internal representation without breaking callers, and validate input in one place.
-- **Inheritance:** a subclass reuses and extends a superclass with `extends`. Java allows single inheritance for classes, multiple inheritance for interfaces.
-- **Polymorphism:** the same method call can behave differently depending on the runtime object. Method overriding (runtime) and overloading (compile time) are the two forms.
-- **Abstraction:** hide implementation details behind a simpler interface or abstract class. Callers depend on what something does, not how it does it.
+| Pillar | One line | Deep dive |
+|---|---|---|
+| Encapsulation | Keep fields private; expose behaviour through methods, so internals can change without breaking callers. | Encapsulation |
+| Inheritance | Build a new class on an existing one with `extends`; reuse and extend a superclass. | Inheritance |
+| Polymorphism | The same method call behaves differently depending on the runtime object; overriding is runtime, overloading is compile-time. | Polymorphism |
+| Abstraction | Hide implementation details behind a simpler interface or abstract class; callers depend on what something does, not how. | Abstraction |
+
+Read them in that order: encapsulation first (it is the habit every other pillar assumes), then inheritance, then polymorphism (which only makes sense once inheritance exists), then abstraction.
+
+Two distinctions interviewers return to: abstraction hides complexity — *what* is exposed — while encapsulation hides data and controls *how* it is accessed. They work together but are not the same. And prefer composition over inheritance when reuse does not need an "is a" relationship; inheritance couples the subclass to the superclass's implementation.
 
 ### Constructors and initialization order
 
@@ -86,33 +92,11 @@ System.out.println(account.getBalance());
 
 Output:
 
-```
+```text
 150.0
 ```
 
-Explanation: the field is private, so the only way to change it is through `deposit`, which validates the amount. The constructor validates the starting balance once, so an invalid account can never be created through the public API.
-
-### Polymorphism in action
-
-```java
-class Animal {
-    void speak() { System.out.println("Some sound"); }
-}
-class Dog extends Animal {
-    @Override
-    void speak() { System.out.println("Woof"); }
-}
-Animal a = new Dog();
-a.speak();
-```
-
-Output:
-
-```
-Woof
-```
-
-Explanation: the reference type is `Animal`, but the runtime object is `Dog`, so the overridden method runs. This is runtime polymorphism.
+Explanation: the field is private, so the only way to change it is through `deposit`, which validates the amount. The constructor validates the starting balance once, so an invalid account can never be created through the public API. For the same idea worked through in full — private state, validation, and invariants — see the encapsulation topic.
 
 ## Best Practices
 
@@ -130,7 +114,7 @@ Explanation: the reference type is `Animal`, but the runtime object is `Dog`, so
 
 ## Interview Importance
 
-OOP questions appear at every level, but the depth changes: beginners are asked for definitions and examples; experienced developers are asked about design trade-offs, composition vs inheritance, immutability, and why a design would break under change.
+OOP questions appear at every level, but the depth changes: beginners are asked for definitions and examples; experienced developers are asked about design trade-offs, composition vs inheritance, immutability, and why a design would break under change. Interviewers often ask for one pillar in depth — answer from its dedicated topic, not from this overview.
 
 ## Interview Questions
 
@@ -140,8 +124,8 @@ OOP questions appear at every level, but the depth changes: beginners are asked 
 
 ## Revision Summary
 
-- Encapsulation: private fields, public behaviour, validation in one place.
-- Inheritance: reuse via `extends`; single for classes, multiple for interfaces.
-- Polymorphism: overriding is runtime, overloading is compile-time.
-- Abstraction: depend on contracts, not implementations.
+- Encapsulation: private fields, public behaviour, validation in one place — see the encapsulation topic.
+- Inheritance: reuse via `extends`; single for classes, multiple for interfaces — see the inheritance topic.
+- Polymorphism: overriding is runtime, overloading is compile-time — see the polymorphism topic.
+- Abstraction: depend on contracts, not implementations — see the abstraction topic.
 - Initialization: static → instance initializers → constructor; `super()`/`this()` first.

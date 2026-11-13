@@ -110,7 +110,7 @@ System.out.println(e.yearlyPay());
 
 Output:
 
-```
+```text
 Asha earns 1050000.0
 1050000.0
 ```
@@ -142,7 +142,7 @@ System.out.println(new ElectricCar().start());
 
 Output:
 
-```
+```text
 Engine started silently (electric motor)
 ```
 

@@ -52,16 +52,7 @@ Replication copies data to multiple machines. A primary-replica setup routes wri
 
 Sharding splits data across machines by a shard key, scaling both reads and writes, but it makes cross-shard queries and transactions expensive and rebalancing painful. A good shard key is high-cardinality, evenly distributed, and aligned with the most common query pattern (so most queries hit one shard). Common mistakes are sharding too early, before a single database with replicas and a cache has been shown insufficient, and choosing a key that creates hot shards.
 
-```mermaid
-flowchart LR
-    Client[Client] --> App[App Server]
-    App --> Cache[(Cache)]
-    App --> Queue[Message Queue]
-    Queue --> Worker[Worker]
-    Worker --> DB[(Database)]
-    App --> DB
-    DB --> Replica[(Read Replica)]
-```
+![Flowchart: a client talks to an app server, which uses a cache and a message queue; a worker consumes the queue and writes to the database, which replicates to a read replica.](/diagrams/cache-queue-flow.svg)
 
 ## Key Concepts
 
