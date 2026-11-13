@@ -161,10 +161,24 @@ p, li { overflow-wrap: break-word; }
    block instead of pushing the whole page sideways. */
 .topic-body pre { background: #0f172a; color: #e2e8f0; padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.55; tab-size: 2; max-width: 100%; }
 [data-theme="dark"] .topic-body pre { background: #020617; }
-/* Diagrams are static SVGs (see public/diagrams/): they carry their own
-   white node fills, so they read in both themes, and must never overflow
-   a narrow topic column. */
+/* Diagrams are static SVGs (see public/diagrams/): each carries its
+   own opaque #f8fafc background rect, so the #475569 connector lines
+   read at 7.24:1 in both themes (they were 2.47:1 on the dark page
+   background, because an <img> SVG cannot see page CSS variables),
+   and they must never overflow a narrow topic column. */
 .topic-body img { max-width: 100%; height: auto; display: block; margin: 14px 0; }
+/* Diagram wrapper (MarkdownView, Batch 2): the SVGs are 790–964px
+   wide with 14px labels, so shrinking one to a 360px phone made the
+   text ~5px. The scroll region keeps a 720px minimum width instead
+   (labels ~10.5–12.8px) and scrolls sideways; the enlarge link opens
+   the SVG full-size in a new tab. This rule comes after
+   .topic-body img so its margin/max-width overrides win. The region
+   is a <span> (not a <div>) because react-markdown renders images
+   inside a <p>, where a <div> would be invalid HTML. */
+.diagram-wrap { display: block; margin: 14px 0; }
+.diagram-scroll { display: block; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; }
+.diagram-scroll img { min-width: 720px; width: 100%; max-width: none; height: auto; margin: 0; }
+.diagram-enlarge { display: inline-block; margin-top: 6px; font-size: 0.9rem; }
 .topic-body code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .topic-body :not(pre) > code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
 .topic-body table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }

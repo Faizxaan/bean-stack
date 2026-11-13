@@ -103,6 +103,8 @@ Encoding 125 gives "21" (2 times 62 plus 1), and 7 characters of base62 can repr
 Push fan-out stores a copy of each post id in every follower's feed, so reads are a single lookup. The sketch below keeps the idea visible; a production version would batch writes, handle celebrity followers separately, and bound feed length.
 
 ```java
+import java.util.List;
+
 public class FeedService {
     private final FollowGraph follows;
     private final FeedStore feeds;

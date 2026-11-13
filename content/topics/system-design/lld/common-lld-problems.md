@@ -85,6 +85,10 @@ public class ExpenseSplitter {
 A positive balance means the user is owed money; a negative balance means they owe. Settlement then pairs the largest debtor with the largest creditor repeatedly:
 
 ```java
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class SettlementService {
     public List<String> settle(Map<String, Double> balances) {
         List<String> payments = new ArrayList<>();

@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 4
 tags: [NoSQL, Redis, key-value, caching, TTL]
 prerequisites: [db-sql-fundamentals, db-document-stores]
-related: [db-choosing-nosql, db-sql-java-developers]
+related: [db-choosing-nosql, db-sql-java-developers, spring-cache-redis]
 status: complete
 lastUpdated: 2026-11-12
 summary: "Key-value stores such as Redis, the data structures beyond plain strings, and caching patterns that keep Java services fast without serving stale data."

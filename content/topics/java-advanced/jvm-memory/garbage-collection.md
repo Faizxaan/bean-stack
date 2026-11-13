@@ -8,9 +8,9 @@ difficulty: Advanced
 importance: 5
 tags: [JVM, GC, Memory, Performance]
 prerequisites: [jdk-jre-jvm, concurrency-basics]
-related: [concurrency-basics, spring-boot-autoconfig, jvm-class-loading-oom-diagnostics]
+related: [concurrency-basics, spring-boot-autoconfig, jvm-class-loading-oom-diagnostics, object-methods-clone-cleaner]
 status: complete
-lastUpdated: 2026-11-12
+lastUpdated: 2026-11-14
 summary: How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production.
 ---
 
@@ -91,7 +91,7 @@ Explanation: every byte array stays reachable via the static list, so the GC can
 - Calling `System.gc()` to "fix" performance — it is only a hint, and can hurt.
 - Raising heap size to hide a retention leak.
 - Assuming GC eliminates all memory problems.
-- Using `finalize()` (deprecated, removed in later Java) for cleanup — use try-with-resources and explicit close methods instead.
+- Using `finalize()` (deprecated in Java 9, deprecated for removal since Java 18 — still present, never rely on it) for cleanup — use try-with-resources and explicit close methods instead, with `Cleaner` only as a backstop; see the Object Methods topic.
 
 ## Interview Importance
 

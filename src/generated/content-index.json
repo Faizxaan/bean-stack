@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T22:05:11.307Z",
+  "generatedAt": "2026-11-13T22:15:01.581Z",
   "tracks": [
     {
       "comingSoon": false,
@@ -219,6 +219,32 @@
       ],
       "status": "complete",
       "title": "Spring & Spring Boot"
+    },
+    {
+      "comingSoon": false,
+      "description": "Kafka messaging and Redis caching, as used by Spring Boot developers.",
+      "domain": "Messaging & Caching",
+      "id": "kafka-redis",
+      "sections": [
+        {
+          "description": "Topics, partitions, consumer groups, @KafkaListener, KafkaTemplate, retries and dead-letter queues.",
+          "id": "kafka",
+          "plannedTopics": [
+            "Kafka with Spring Boot"
+          ],
+          "title": "Kafka"
+        },
+        {
+          "description": "Declarative Spring Cache with Redis — @Cacheable, TTLs, serialization, and stampede protection.",
+          "id": "redis",
+          "plannedTopics": [
+            "Spring Cache with Redis"
+          ],
+          "title": "Redis & Caching"
+        }
+      ],
+      "status": "complete",
+      "title": "Kafka & Redis"
     },
     {
       "comingSoon": false,
@@ -720,7 +746,8 @@
       ],
       "related": [
         "db-choosing-nosql",
-        "db-sql-java-developers"
+        "db-sql-java-developers",
+        "spring-cache-redis"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
@@ -1760,7 +1787,9 @@
         "Virtual Threads",
         "Java 21",
         "Carrier Threads",
-        "Pinning"
+        "Pinning",
+        "Structured Concurrency",
+        "ScopedValue"
       ],
       "prerequisites": [
         "concurrency-basics",
@@ -1772,9 +1801,9 @@
         "jdbc-networking"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-13T00:00:00.000Z",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
       "file": "topics/java-advanced/concurrency/virtual-threads.md",
-      "readingMinutes": 7,
+      "readingMinutes": 11,
       "summary": "Lightweight JVM-managed threads for blocking code at scale — carrier threads, pinning, the per-task executor, and when virtual threads are the wrong tool."
     },
     {
@@ -1826,12 +1855,13 @@
       "related": [
         "concurrency-basics",
         "spring-boot-autoconfig",
-        "jvm-class-loading-oom-diagnostics"
+        "jvm-class-loading-oom-diagnostics",
+        "object-methods-clone-cleaner"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-12T00:00:00.000Z",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
       "file": "topics/java-advanced/jvm-memory/garbage-collection.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "How the JVM lays out memory, how generational garbage collection works, and how to reason about GC choices in interviews and in production."
     },
     {
@@ -2127,7 +2157,8 @@
       ],
       "related": [
         "streams-lambdas",
-        "hashmap-internals"
+        "hashmap-internals",
+        "object-methods-clone-cleaner"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
@@ -2281,9 +2312,9 @@
         "streams-lambdas"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-12T00:00:00.000Z",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
       "file": "topics/java-core/exceptions-generics/exception-handling.md",
-      "readingMinutes": 4,
+      "readingMinutes": 5,
       "summary": "Checked vs unchecked exceptions, try-with-resources, custom exceptions, and generics with wildcards — the safety nets interviewers check."
     },
     {
@@ -2532,6 +2563,93 @@
       "summary": "Showing only the essential features of something and hiding the implementation behind a contract."
     },
     {
+      "id": "object-methods-clone-cleaner",
+      "title": "Object Methods: clone, Copying, and Cleaner",
+      "track": "java-core",
+      "section": "oop",
+      "order": 6,
+      "difficulty": "Intermediate",
+      "importance": 3,
+      "tags": [
+        "Object",
+        "clone",
+        "Copy Constructor",
+        "finalize",
+        "Cleaner"
+      ],
+      "prerequisites": [
+        "oop-principles"
+      ],
+      "related": [
+        "collections-deep-dive",
+        "garbage-collection"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
+      "file": "topics/java-core/oop/object-methods-clone-cleaner.md",
+      "readingMinutes": 8,
+      "summary": "Copying objects correctly — clone and shallow vs deep copy, copy constructors, and why finalize gave way to Cleaner."
+    },
+    {
+      "id": "kafka-spring-boot",
+      "title": "Kafka with Spring Boot",
+      "track": "kafka-redis",
+      "section": "kafka",
+      "order": 1,
+      "difficulty": "Advanced",
+      "importance": 4,
+      "tags": [
+        "Kafka",
+        "Messaging",
+        "Spring Kafka",
+        "Microservices",
+        "Event-Driven"
+      ],
+      "prerequisites": [
+        "spring-boot-autoconfig",
+        "spring-ioc-di"
+      ],
+      "related": [
+        "spring-cloud-basics",
+        "sd-caching-queues-databases",
+        "tst-testcontainers-basics"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
+      "file": "topics/kafka-redis/kafka/kafka-spring-boot.md",
+      "readingMinutes": 12,
+      "summary": "Kafka topics, partitions, and consumer groups with Spring Boot — @KafkaListener, KafkaTemplate, offsets, retries, dead-letter queues, and exactly-once semantics."
+    },
+    {
+      "id": "spring-cache-redis",
+      "title": "Spring Cache with Redis",
+      "track": "kafka-redis",
+      "section": "redis",
+      "order": 1,
+      "difficulty": "Intermediate",
+      "importance": 4,
+      "tags": [
+        "Spring Cache",
+        "Redis",
+        "Caching",
+        "Performance"
+      ],
+      "prerequisites": [
+        "spring-ioc-di",
+        "spring-aop-proxies"
+      ],
+      "related": [
+        "db-key-value-caching",
+        "spring-spel",
+        "spring-boot-autoconfig"
+      ],
+      "status": "complete",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
+      "file": "topics/kafka-redis/redis/spring-cache-redis.md",
+      "readingMinutes": 11,
+      "summary": "Declarative caching with @Cacheable, @CachePut, and @CacheEvict — condition vs unless, sync=true against stampedes, TTLs, and Redis serialization in Spring Boot 3.x."
+    },
+    {
       "id": "jpa-associations-entity-lifecycle",
       "title": "JPA Associations and Entity Lifecycle",
       "track": "spring-boot",
@@ -2671,9 +2789,9 @@
         "spring-data-jpa"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
       "file": "topics/spring-boot/mvc-rest/validation-exception-handling.md",
-      "readingMinutes": 7,
+      "readingMinutes": 10,
       "summary": "How to validate incoming REST payloads with Bean Validation and how to turn failures into consistent error responses."
     },
     {
@@ -3017,7 +3135,8 @@
       "related": [
         "spring-data-jpa",
         "spring-task-scheduling",
-        "design-patterns-solid"
+        "design-patterns-solid",
+        "spring-cache-redis"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-13T00:00:00.000Z",
@@ -3138,7 +3257,8 @@
         "spring-task-scheduling",
         "spring-rest-clients",
         "security-jwt",
-        "dv-deploying-java-aws"
+        "dv-deploying-java-aws",
+        "kafka-spring-boot"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-12T00:00:00.000Z",
@@ -3193,7 +3313,8 @@
         "sd-scalability-basics"
       ],
       "related": [
-        "sd-designing-real-systems"
+        "sd-designing-real-systems",
+        "kafka-spring-boot"
       ],
       "status": "complete",
       "lastUpdated": "2026-11-04T00:00:00.000Z",
@@ -3431,9 +3552,9 @@
         "tst-spring-boot-tests"
       ],
       "status": "complete",
-      "lastUpdated": "2026-11-04T00:00:00.000Z",
+      "lastUpdated": "2026-11-14T00:00:00.000Z",
       "file": "topics/testing/unit-testing/junit-mockito-fundamentals.md",
-      "readingMinutes": 10,
+      "readingMinutes": 11,
       "summary": "How to write fast, isolated unit tests with JUnit 5 and Mockito: assertions, lifecycle, stubbing, verification, and argument matchers."
     },
     {
@@ -3889,6 +4010,11 @@
     "iq-b2-oauth2-pkce",
     "iq-b2-pbv-stack-myth",
     "iq-b2-db-clustered",
+    "iq-b3-kafka-listener-dlq",
+    "iq-b3-spring-cache-condition-unless",
+    "iq-b3-problem-detail",
+    "iq-b3-clone-deep-copy",
+    "iq-b3-suppressed-exceptions",
     "iq-m3-generics-pecs-erasure",
     "iq-m3-concurrenthashmap-deep",
     "iq-m3-streams-parallel-reduction",
@@ -3960,6 +4086,9 @@
     "iq-b2-cl-delegation",
     "iq-b2-oom-metaspace",
     "iq-b2-db-mvcc",
+    "iq-b3-structured-concurrency",
+    "iq-b3-scoped-values",
+    "iq-b3-methodsource",
     "iq-m4-api-evolution-plugins",
     "iq-m4-collections-at-scale",
     "iq-m4-streams-vs-reactive",
@@ -4016,6 +4145,20 @@
     "iq-m4src2-lead-data-privacy",
     "iq-b2-sd-snowflake",
     "iq-b2-oom-diagnosis"
+  ],
+  "bonusResumeQuestionIds": [
+    "iq-resume-tips",
+    "iq-resume-template-0-3",
+    "iq-resume-template-3-5",
+    "iq-resume-template-5-8",
+    "iq-resume-template-8-15",
+    "iq-resume-ats-tailoring",
+    "iq-resume-impact-bullets",
+    "iq-resume-projects-github",
+    "iq-resume-switch-gaps",
+    "iq-resume-mistakes",
+    "iq-resume-interview-prep",
+    "iq-resume-final-checklist"
   ],
   "revisionPromptIds": [
     "iq-rev-jvm",
@@ -4161,6 +4304,18 @@
     "pr-b2-mcq-db-clustered",
     "pr-b2-mcq-db-mvcc",
     "pr-b2-fc-db-explain",
+    "pr-b3-mcq-kafka-ordering",
+    "pr-b3-mcq-kafka-dlq",
+    "pr-b3-mcq-cache-condition-unless",
+    "pr-b3-mcq-cache-sync",
+    "pr-b3-mcq-problem-detail",
+    "pr-b3-mcq-clone-shallow-deep",
+    "pr-b3-mcq-suppressed",
+    "pr-b3-mcq-structured-task-scope",
+    "pr-b3-fc-scoped-value",
+    "pr-b3-fc-method-source",
+    "pr-b3-fc-kafka-exactly-once",
+    "pr-b3-fc-redis-serialization",
     "pr-bh-star-proportions",
     "pr-bh-star-parts",
     "pr-bh-weak-answer",

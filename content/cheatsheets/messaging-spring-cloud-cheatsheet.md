@@ -9,7 +9,7 @@ summary: Kafka essentials, service discovery, circuit breakers, gateways, and sc
 
 ## Overview
 
-One page for messaging and Spring Cloud revision. No other cheatsheet covers Kafka, service discovery, or resilience patterns in detail. For full explanations, see the Caching, Queues, and Databases topic, the Actuator, Microservices and Deployment topic, and the matching Module 0 revision items.
+One page for messaging and Spring Cloud revision. No other cheatsheet covers Kafka, service discovery, or resilience patterns in detail. For full explanations, see the Kafka with Spring Boot topic, the Caching, Queues, and Databases topic, and the Actuator, Microservices and Deployment topic.
 
 ## Kafka at a Glance
 

@@ -8,7 +8,7 @@ difficulty: Advanced
 importance: 4
 tags: [Spring Cloud, microservices, Eureka, Config Server, Gateway, circuit breaker]
 prerequisites: [actuator-microservices-deployment, spring-boot-autoconfig, configuration-profiles]
-related: [spring-task-scheduling, spring-rest-clients, security-jwt, dv-deploying-java-aws]
+related: [spring-task-scheduling, spring-rest-clients, security-jwt, dv-deploying-java-aws, kafka-spring-boot]
 status: complete
 lastUpdated: 2026-11-12
 summary: The Spring Cloud pieces that make microservices work — service discovery, centralised config, an API gateway, and circuit breakers.

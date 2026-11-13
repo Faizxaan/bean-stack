@@ -211,3 +211,19 @@ describe('bonus-resume exclusion from interview progress totals', () => {
     expect(reviewStats(kept, { a: 'confident', r1: 'confident' }, [])).toEqual({ total: 2, reviewed: 1, confident: 1, needsReview: 0, bookmarked: 0, pctReviewed: 50 })
   })
 })
+
+describe('bonus-resume grouping in browse-by-area', () => {
+  it('puts the Resume group last and keeps only bonus entries in it', () => {
+    const qs = [
+      q({ id: 'a', module: 'module-1', category: 'Java' }),
+      q({ id: 'r1', module: 'bonus-resume', category: 'Resume' }),
+      q({ id: 'b', module: 'module-1', category: 'Behavioral & Projects' }),
+      q({ id: 'r2', module: 'bonus-resume', category: 'Resume' }),
+    ]
+    const groups = groupQuestionsByArea(qs, [], [])
+    expect(groups.map(g => g.category)).toEqual(['Java', 'Behavioral & Projects', 'Resume'])
+    const resume = groups[groups.length - 1]
+    expect(resume.questions.map(x => x.id)).toEqual(['r1', 'r2'])
+    expect(resume.questions.every(isResumeEntry)).toBe(true)
+  })
+})

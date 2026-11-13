@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 5
 tags: [Caching, Message Queues, SQL, NoSQL, Replication, Sharding]
 prerequisites: [sd-scalability-basics]
-related: [sd-designing-real-systems]
+related: [sd-designing-real-systems, kafka-spring-boot]
 status: complete
 lastUpdated: 2026-11-04
 summary: "How caches cut latency, queues decouple work, and SQL versus NoSQL plus replication and sharding shape what a database can and cannot do."

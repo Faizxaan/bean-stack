@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Bookmark, Calendar, Flame, ArrowRight, BookOpen, Layers } from 'lucide-react'
-import { contentIndex, getTopic, orderedTopics, usePracticeItems } from '../lib/content'
+import { contentIndex, getTopic, interviewOnlyQuestionCount, orderedTopics, usePracticeItems } from '../lib/content'
 import { useApp } from '../store/AppContext'
 import { daysUntilLocal, isDue, progressStats, studyStreak, topicUrl } from '../lib/utils'
 import { ProgressBar } from '../components/ProgressBar'
@@ -53,7 +53,7 @@ export function Home() {
         <h1 style={{ margin: '0 0 4px' }}>{isFirstVisit ? 'Welcome to Beanstack' : 'Welcome back to Beanstack'}</h1>
         <p style={{ color: 'var(--muted)', margin: 0 }}>Learn Java, practice, revise, and track your progress — all in one place, stored only in this browser.</p>
         <p style={{ color: 'var(--muted)', margin: '8px 0 0' }}>
-          {contentIndex.topics.length} topics · {contentIndex.cheatsheets.length} cheatsheets · {contentIndex.interviewQuestionIds.length} interview questions · {contentIndex.practiceItemIds.length} practice items.
+          {contentIndex.topics.length} topics · {contentIndex.cheatsheets.length} cheatsheets · {interviewOnlyQuestionCount()} interview questions · {contentIndex.practiceItemIds.length} practice items.
           Stars (★★★★★) show how often interviewers ask about a topic — five stars means it comes up most.
         </p>
       </div>

@@ -8,12 +8,14 @@ import { ProgressBar } from '../components/ProgressBar'
 import {
   EMPTY_INTERVIEW_FILTERS,
   INTERVIEW_MODULES,
+  RESUME_CATEGORY,
   areaSlug,
   categoryRank,
   filterQuestions,
   firstUnreviewed,
   groupQuestionsByArea,
   interviewQuestionsOnly,
+  isResumeEntry,
   moduleMeta,
   prevNextQuestion,
   reviewStats,
@@ -68,6 +70,11 @@ function QuestionCard({
       <p className="q-badges">
         <span className="badge">{q.category || 'General'}</span>{' '}
         <span className="badge">{q.difficulty || 'Medium'}</span>{' '}
+        {/* Batch 2 (2026-11-14): a bonus-resume entry is resume help,
+            not an interview question — label the card itself, not
+            just its area group, so it reads as one wherever it
+            appears (module view, browse-by-area, search results). */}
+        {isResumeEntry(q) && <span className="badge accent">Resume item — not an interview question</span>}{' '}
         {showModule && <span className="badge">{mod?.title || q.module}</span>}{' '}
         {topic && <span className="badge">Topic: {topic.title}</span>}{' '}
         <ReviewBadge status={status} />{' '}
@@ -153,6 +160,11 @@ function AreaGroupCard({
 }) {
   const { data } = useApp()
   const stats = reviewStats(group.questions, data.interviewReview, data.questionBookmarks)
+  // Batch 2 (2026-11-14): the Resume group holds the bonus-resume
+  // entries only (groupQuestionsByArea sorts 'Resume' last). Its
+  // heading must not call them "questions": label the group and use
+  // the "resume items" noun for its count.
+  const isResumeGroup = group.category === RESUME_CATEGORY
   // Within an area, the Learn topic is only a small sub-heading when
   // the topic changes — never a separate collapsible section.
   let lastTopicId = ''
@@ -167,10 +179,11 @@ function AreaGroupCard({
             <ChevronDown size={18} style={{ transform: open ? 'rotate(180deg)' : 'none' }} aria-hidden="true" />
             <span>
               {group.category}
-              <span className="topic-group-count"> — {group.questions.length} question{group.questions.length === 1 ? '' : 's'} · {stats.reviewed} reviewed · {stats.confident} confident</span>
+              <span className="topic-group-count"> — {group.questions.length} {isResumeGroup ? `resume item${group.questions.length === 1 ? '' : 's'}` : `question${group.questions.length === 1 ? '' : 's'}`} · {stats.reviewed} reviewed · {stats.confident} confident</span>
             </span>
           </button>
         </h2>
+        {isResumeGroup && <span className="badge accent">Resume help — not interview questions</span>}
       </div>
       {open && (
         <div className="topic-group-body" id={`area-body-${areaSlug(group.category)}`}>
@@ -283,6 +296,11 @@ export function InterviewIndex() {
     [scoped, filters, data.interviewReview, data.questionBookmarks],
   )
 
+  // Batch 2 (2026-11-14): the filtered list can include bonus-resume
+  // entries (browse-by-area view) — the count line below must not
+  // call them interview questions.
+  const bonusInFiltered = useMemo(() => filtered.filter(isResumeEntry).length, [filtered])
+
   const groups = useMemo(
     () => groupQuestionsByArea(filtered, contentIndex.topics, contentIndex.tracks),
     [filtered],
@@ -319,10 +337,10 @@ export function InterviewIndex() {
   const clearFilters = () => setFilters(EMPTY_INTERVIEW_FILTERS)
   const filtersActive =
     filters.query !== '' || filters.difficulty !== 'all' || filters.category !== 'all' || filters.review !== 'all' || filters.topic !== 'all'
-  // Overall progress counts interview questions only (317): the 12
-  // bonus-resume entries are resume help, not interview questions, so
-  // they must not inflate the total or the percentage. The Bonus
-  // module card below still shows its own count of 12.
+  // Overall progress counts interview questions only (interviewOnly
+  // below): the bonus-resume entries are resume help, not interview
+  // questions, so they must not inflate the total or the percentage.
+  // The Bonus module card below still shows its own count.
   const interviewOnly = useMemo(() => interviewQuestionsOnly(interviewQuestions), [interviewQuestions])
   const bonusCount = interviewQuestions.length - interviewOnly.length
   const overall = reviewStats(interviewOnly, data.interviewReview, data.questionBookmarks)
@@ -506,7 +524,7 @@ export function InterviewIndex() {
             </nav>
           )}
 
-          {groups.length > 0 && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{groups.length} broad area{groups.length === 1 ? '' : 's'} in this view · {filtered.length} question{filtered.length === 1 ? '' : 's'}. One area is open — click another area heading to open it, or use Jump to area above.</p>}
+          {groups.length > 0 && <p style={{ color: 'var(--muted)', fontSize: '0.9rem' }}>{groups.length} broad area{groups.length === 1 ? '' : 's'} in this view · {filtered.length - bonusInFiltered} interview question{filtered.length - bonusInFiltered === 1 ? '' : 's'}{bonusInFiltered > 0 ? ` + ${bonusInFiltered} resume item${bonusInFiltered === 1 ? '' : 's'}` : ''}. One area is open — click another area heading to open it, or use Jump to area above.</p>}
 
           {groups.map((group, i) => (
             <AreaGroupCard
@@ -583,6 +601,7 @@ export function InterviewQuestionPage() {
         <p className="q-badges">
           <span className="badge">{q.category || 'General'}</span>{' '}
           <span className="badge">{q.difficulty || 'Medium'}</span>{' '}
+          {isResumeEntry(q) && <span className="badge accent">Resume item — not an interview question</span>}{' '}
           {mod && <span className="badge">{mod.title}</span>}{' '}
           {topic && <span className="badge">Topic: {topic.title}</span>}{' '}
           <ReviewBadge status={status} />{' '}

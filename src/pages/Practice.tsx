@@ -244,7 +244,7 @@ export function Practice() {
       {!loaded && <div className="card"><p>Loading practice questions…</p></div>}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }} role="group" aria-label="Practice sections">
         {PRACTICE_TABS.map(t => (
-          <button key={t} className="btn secondary" aria-pressed={tab === t} onClick={() => setTab(t)}>{t === 'mcq' ? `MCQs (${byType('mcq').length})` : t === 'flashcard' ? `Flashcards (${dueFlashcards.length} due of ${byType('flashcard').length})` : t === 'coding' ? `Coding (${byType('coding').length})` : t === 'output' ? `Output-Based (${byType('output').length})` : t === 'scenario' ? `Scenario-Based (${byType('scenario').length})` : 'Mock Interview (10 questions)'} {tab === t ? '✓' : ''}</button>
+          <button key={t} className="btn secondary" aria-pressed={tab === t} onClick={() => setTab(t)}>{t === 'mcq' ? `MCQs (${byType('mcq').length})` : t === 'flashcard' ? `Flashcards (${dueFlashcards.length} due of ${byType('flashcard').length})` : t === 'coding' ? `Coding (${byType('coding').length})` : t === 'output' ? `Output-Based (${byType('output').length})` : t === 'scenario' ? `Scenario-Based (${byType('scenario').length})` : `Mock Interview (${Math.min(10, byType('mcq').length)} questions)`} {tab === t ? '✓' : ''}</button>
         ))}
       </div>
       {/* Track/section filters (Batch 3): narrow every tab to one Learn

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   accuracyByTopic,
+  applyResetScope,
   clampFlashcardBox,
   filterKnownIds,
   formatDate,
@@ -159,5 +160,81 @@ describe('misc degradation helpers', () => {
   it('filterKnownIds handles non-arrays and dedupes', () => {
     expect(filterKnownIds('t1', KNOWN.topics)).toEqual([])
     expect(filterKnownIds(['t1', 't1', 'nope'], KNOWN.topics)).toEqual(['t1'])
+  })
+})
+
+// Batch 2 (2026-11-14): malformed / hand-edited import files, exercised
+// for real against throwaway files in /tmp before these tests were
+// written (not-JSON, array top-level, unknown ids, __proto__ keys, and
+// a clean file). Import must reject the bad ones without throwing or
+// partially applying, and the clean one must round-trip intact.
+// Settings additionally caps files at 5 MB and JSON.parse failures
+// before validateImport ever runs.
+describe('validateImport + sanitizeUserData (malformed / hand-edited import files)', () => {
+  it('rejects non-object top levels without throwing', () => {
+    for (const bad of [[], 'garbage', 42, null]) {
+      expect(validateImport(bad, KNOWN.topics, KNOWN.questions, KNOWN.practice).ok).toBe(false)
+      expect(sanitizeUserData(bad, KNOWN).bookmarks).toEqual([])
+    }
+  })
+  it('rejects a hand-edited file with unknown ids, bad enums and wrong types', () => {
+    const r = validateImport(
+      {
+        progress: { t1: 'completed', 'no-such-topic': 'completed', t2: 'banana' },
+        bookmarks: ['t1', 'nope', 't1'],
+        notes: { t1: 123 },
+        flashcardStates: { p1: { box: 9, dueAt: 'junk' } },
+        interviewReview: { q1: 'shrugging' },
+        settings: { theme: 'neon' },
+        activityDates: ['2026-13-40', '2026-01-01'],
+      },
+      KNOWN.topics,
+      KNOWN.questions,
+      KNOWN.practice,
+    )
+    expect(r.ok).toBe(false)
+    expect(r.errors.length).toBeGreaterThanOrEqual(6)
+  })
+  it('rejects schemaVersion 2 and __proto__ keys; sanitisation drops them without polluting Object.prototype', () => {
+    const parsed = JSON.parse(
+      '{"schemaVersion": 2, "progress": {"__proto__": "completed"}, "flashcardStates": {"__proto__": {"box": 3, "dueAt": "2030-01-01T00:00:00.000Z"}}, "bookmarks": ["t1"]}',
+    )
+    expect(validateImport(parsed, KNOWN.topics, KNOWN.questions, KNOWN.practice).ok).toBe(false)
+    const s = sanitizeUserData(parsed, KNOWN)
+    expect(s.progress).toEqual({})
+    expect(Object.getPrototypeOf(s.flashcardStates)).toBe(Object.prototype)
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined()
+  })
+  it('accepts a clean hand-written file and round-trips it through sanitisation intact', () => {
+    const parsed = {
+      schemaVersion: 1,
+      progress: { t1: 'completed' },
+      bookmarks: ['t1', 't2'],
+      notes: { t1: 'my note' },
+      settings: { theme: 'dark' },
+      practiceAttempts: [{ itemId: 'p1', correct: true, at: '2026-01-01' }],
+    }
+    expect(validateImport(parsed, KNOWN.topics, KNOWN.questions, KNOWN.practice).ok).toBe(true)
+    const s = sanitizeUserData(parsed, KNOWN)
+    expect(s.progress).toEqual({ t1: 'completed' })
+    expect(s.bookmarks).toEqual(['t1', 't2'])
+    expect(s.notes).toEqual({ t1: 'my note' })
+    expect(s.settings.theme).toBe('dark')
+    expect(s.practiceAttempts.length).toBe(1)
+  })
+  it('sanitising never leaks entries into later calls or into "Reset everything"', () => {
+    // Regression: sanitize used to write into EMPTY_USER_DATA's own
+    // progress/notes/flashcardStates/interviewReview objects, so a
+    // second sanitize (or a reset-all) still carried the first
+    // file's entries. Found by this batch's import testing: the
+    // __proto__ test above failed with a stale {t1: 'completed'}.
+    const first = sanitizeUserData({ progress: { t1: 'completed' }, notes: { t1: 'x' }, interviewReview: { q1: 'confident' } }, KNOWN)
+    expect(first.progress).toEqual({ t1: 'completed' })
+    const second = sanitizeUserData({}, KNOWN)
+    expect(second.progress).toEqual({})
+    expect(second.notes).toEqual({})
+    expect(second.interviewReview).toEqual({})
+    expect(applyResetScope(first, 'all').progress).toEqual({})
+    expect(applyResetScope(first, 'all').notes).toEqual({})
   })
 })

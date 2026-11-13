@@ -10,7 +10,7 @@ tags: [JUnit, Mockito, Unit Testing, Assertions]
 prerequisites: [oop-principles, exception-handling]
 related: [tst-test-design, tst-spring-boot-tests]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-14
 summary: "How to write fast, isolated unit tests with JUnit 5 and Mockito: assertions, lifecycle, stubbing, verification, and argument matchers."
 ---
 
@@ -88,7 +88,7 @@ When stubbing or verifying, you can match arguments exactly (`"BOOK"`), or with 
 - **Argument matcher:** a placeholder such as `anyString()` or `eq(...)` used in stubbing and verification; never mixed with raw values in one call.
 - **Fake:** a small real implementation used in place of a collaborator, such as an in-memory repository.
 - **Spy:** a wrapper around a real object where real methods run unless stubbed.
-- **Parameterized test:** one test method run over many inputs via `@ParameterizedTest`.
+- **Parameterized test:** one test method run over many inputs via `@ParameterizedTest` — `@ValueSource` for one argument, `@CsvSource` for small literal tables, `@MethodSource` for cases built in code (the provider must be static unless the class uses `@TestInstance(Lifecycle.PER_CLASS)`).
 
 ## Code Examples
 
@@ -204,6 +204,51 @@ class DiscountServiceParameterizedTest {
 
 Explanation: one method now covers four cases, including the boundaries 0 and 100. When a case fails, JUnit reports which row failed, so you still know exactly what broke.
 
+`@CsvSource` is right for small literal tables. When the cases need objects, computation, or more than a few columns, `@MethodSource` names a factory method instead:
+
+```java
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class DiscountServiceMethodSourceTest {
+
+    @Mock
+    private PriceRepository priceRepository;
+
+    @InjectMocks
+    private DiscountService discountService;
+
+    // The provider must be static (unless the test class uses
+    // @TestInstance(Lifecycle.PER_CLASS)) and return a Stream,
+    // Iterable, or array of Arguments — one Arguments per case.
+    static Stream<Arguments> discountCases() {
+        return Stream.of(
+                Arguments.of(0, 200.0),
+                Arguments.of(10, 180.0),
+                Arguments.of(50, 100.0));
+    }
+
+    @ParameterizedTest
+    @MethodSource("discountCases")
+    void discountAppliedFromMethodSource(int percent, double expected) {
+        when(priceRepository.findPrice("BOOK")).thenReturn(200.0);
+
+        assertEquals(expected, discountService.discountedPrice("BOOK", percent), 0.001);
+    }
+}
+```
+
+Explanation: `@MethodSource` moves the table into code, so cases can be built from objects or computed values that do not fit in a `@CsvSource` string — for example, a list of `Money` values or cases read from a helper. `@ValueSource` covers the simplest case (one argument, one type, e.g. `@ValueSource(ints = {-1, 101})` for invalid inputs); `@CsvSource` covers small literal tables; `@MethodSource` covers everything else. `@ValueSource` and `@CsvSource` are also used in the Test Design topic for boundary testing.
+
 ### Stubbing exceptions, void methods, and matchers
 
 The collaborator used below is a small notification interface:
@@ -289,6 +334,7 @@ This is a baseline topic: interviewers assume a working Java developer can write
 - **How do you stub a void method to throw?** With the reverse form: `doThrow(new RuntimeException()).when(mock).voidMethod(args)`, because `when(mock.voidMethod())` cannot work — the void call returns nothing for `when` to receive.
 - **When should you verify an interaction instead of asserting state?** When the call itself is the observable contract, such as sending an email, saving an entity, or publishing an event — cases where there is no return value to assert on.
 - **JUnit 4 vs JUnit 5: what changed?** JUnit 5 uses `@BeforeEach` instead of `@Before`, `assertThrows` instead of `@Test(expected = ...)`, and an extension model (`@ExtendWith`) instead of runners.
+- **When would you use @MethodSource instead of @CsvSource?** When the cases need objects, computation, or more columns than a string table handles — `@MethodSource` names a static factory method returning a `Stream` of `Arguments`, one per case.
 
 ## Revision Summary
 

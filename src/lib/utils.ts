@@ -255,7 +255,21 @@ function parseableDate(v: unknown): v is string {
 // clamp what can, never throw, never return a half-shaped object.
 // Import is deliberately stricter — see validateImport.
 export function sanitizeUserData(data: unknown, known: KnownIdSets): UserData {
-  const base: UserData = { ...EMPTY_USER_DATA, settings: { ...EMPTY_USER_DATA.settings } }
+  // Fresh containers for every map/array the function writes into
+  // below (progress, notes, flashcardStates, interviewReview): a bare
+  // {...EMPTY_USER_DATA} shares those objects with the constant, so
+  // the old code wrote sanitised entries INTO EMPTY_USER_DATA itself.
+  // That leaked across calls in one session — importing file B after
+  // file A kept A's progress, and "Reset everything" (which returns
+  // {...EMPTY_USER_DATA}) failed to clear progress loaded at startup.
+  const base: UserData = {
+    ...EMPTY_USER_DATA,
+    settings: { ...EMPTY_USER_DATA.settings },
+    progress: {},
+    notes: {},
+    flashcardStates: {},
+    interviewReview: {},
+  }
   if (!isPlainObject(data)) return base
   const d = data as Record<string, unknown>
 

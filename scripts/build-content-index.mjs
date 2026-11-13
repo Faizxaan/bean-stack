@@ -67,6 +67,15 @@ function loadJsonDir(dir) {
 }
 const interviewQuestions = loadJsonDir(path.join(contentRoot, 'interview'))
 const practiceItems = loadJsonDir(path.join(contentRoot, 'practice'))
+// Bonus-resume entries are resume help, not interview questions: their
+// module is flagged isResume in src/lib/interview.ts (INTERVIEW_MODULES).
+// The slim index is id-only, so the builder pre-splits them here — the
+// same rule interviewQuestionsOnly() applies to the full objects — so
+// Home can show the interview-only total without loading the bodies.
+// interviewQuestionIds stays the full entry list (interview + bonus),
+// because import validation and sanitisation must accept both.
+const RESUME_MODULES = new Set(['bonus-resume'])
+const bonusResumeQuestionIds = interviewQuestions.filter(q => RESUME_MODULES.has(q.module)).map(q => q.id)
 // One-minute revision prompts: moved out of content/interview in the
 // 2026-11-12 second pass (they were Module 0, category Revision — recap
 // prompts, not interview questions). They live in content/revision so
@@ -90,6 +99,7 @@ const index = {
   topics,
   cheatsheets,
   interviewQuestionIds: interviewQuestions.map(q => q.id),
+  bonusResumeQuestionIds,
   revisionPromptIds: revisionPrompts.map(q => q.id),
   practiceItemIds: practiceItems.map(i => i.id),
 }
@@ -102,7 +112,7 @@ fs.writeFileSync(outFile, JSON.stringify(index, null, 2) + '\n')
 fs.writeFileSync(interviewFile, JSON.stringify({ generatedAt, interviewQuestions }, null, 2) + '\n')
 fs.writeFileSync(revisionFile, JSON.stringify({ generatedAt, revisionPrompts }, null, 2) + '\n')
 fs.writeFileSync(practiceFile, JSON.stringify({ generatedAt, practiceItems }, null, 2) + '\n')
-console.log(`Wrote ${outFile}: ${topics.length} topics, ${cheatsheets.length} cheatsheets, ${interviewQuestions.length} interview question ids, ${revisionPrompts.length} revision prompt ids, ${practiceItems.length} practice item ids, ${tracks.length} tracks, ${paths.length} paths`)
+console.log(`Wrote ${outFile}: ${topics.length} topics, ${cheatsheets.length} cheatsheets, ${interviewQuestions.length} interview question ids (${bonusResumeQuestionIds.length} of them bonus-resume), ${revisionPrompts.length} revision prompt ids, ${practiceItems.length} practice item ids, ${tracks.length} tracks, ${paths.length} paths`)
 console.log(`Wrote ${interviewFile}: ${interviewQuestions.length} interview questions`)
 console.log(`Wrote ${revisionFile}: ${revisionPrompts.length} revision prompts`)
 console.log(`Wrote ${practiceFile}: ${practiceItems.length} practice items`)

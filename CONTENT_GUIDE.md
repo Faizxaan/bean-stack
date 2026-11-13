@@ -15,10 +15,11 @@ content/
   cheatsheets/<cheatsheet-slug>.md
 ```
 
-Current totals (2026-11-13, from the generated index — re-check with
-`npm run build-content-index` rather than trusting this line): 105
-topics, 358 interview questions + 37 one-minute revision prompts,
-214 practice items, 19 cheatsheets, 10 tracks, 6 paths.
+Current totals (2026-11-14, from the generated index — re-check with
+`npm run build-content-index` rather than trusting this line): 108
+topics, 366 interview questions (354 interview + 12 bonus-resume) + 37
+one-minute revision prompts, 226 practice items, 19 cheatsheets,
+11 tracks, 6 paths.
 
 ## Tracks and sections
 
@@ -95,18 +96,18 @@ broad area (`interview-<area>.json`, e.g. `interview-testing.json`).
 }
 ```
 
-Modules: `module-1` (0–3 years, 88 questions), `module-2` (3–5 years, 109),
-`module-3` (5–8 years, 91), `module-4` (8–15 years, 58), `bonus-resume`
-(Resume Tips & Templates, 12) — 358 questions in total. There is no
+Modules: `module-1` (0–3 years, 88 questions), `module-2` (3–5 years, 114),
+`module-3` (5–8 years, 94), `module-4` (8–15 years, 58), `bonus-resume`
+(Resume Tips & Templates, 12) — 366 questions in total. There is no
 `module-0` in Interview Prep: the old Module 0 revision notes were moved
 to `content/revision/one-minute.json` (see below) and render as a
 one-minute revision deck under Revision & Cheatsheets, so they never
 appear in interview counts, filters, or progress.
 
 Questions group by 10 broad areas, in learning order within each module
-(Easy → Hard): Java (126), Spring & Spring Boot (83), SQL & Databases
-(26), Microservices (22), Behavioral & Projects (19), System Design (18),
-DevOps & Cloud (14), DSA & Coding (13), Testing (13), Frontend (12).
+(Easy → Hard): Java (130), Spring & Spring Boot (85), SQL & Databases
+(26), Microservices (23), Behavioral & Projects (19), System Design (18),
+DevOps & Cloud (14), DSA & Coding (13), Testing (14), Frontend (12).
 Resume (12) is bonus-only. The UI already lists all modules and shows a
 helpful placeholder state for modules with no questions yet, so adding
 questions is content-only.

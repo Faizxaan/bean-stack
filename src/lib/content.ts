@@ -11,6 +11,18 @@ import type { InterviewQuestion, NavContentIndex, PracticeItem, RevisionPrompt, 
 // bundle ~1.15 MB and tripped the 800 KB chunk-size warning.
 export const contentIndex = indexJson as unknown as NavContentIndex
 
+// Interview-only total from the slim index: all interview entries minus
+// the bonus-resume entries (resume help, not interview questions). Same
+// rule as interviewQuestionsOnly() in lib/interview.ts, applied to the
+// id lists the index builder pre-splits. Home must use this, not
+// interviewQuestionIds.length — that list holds every entry, bonus
+// included. No count is hardcoded here; both lists come from the
+// generated index. The `?? []` guards a stale generated index built
+// before the bonus list existed.
+export function interviewOnlyQuestionCount(): number {
+  return contentIndex.interviewQuestionIds.length - (contentIndex.bonusResumeQuestionIds ?? []).length
+}
+
 // Lazy loaders for the heavy content. Each dynamic import becomes its
 // own Vite chunk, fetched only when a page that needs it is visited
 // (Interview, Practice, Library, Search, or the command palette).

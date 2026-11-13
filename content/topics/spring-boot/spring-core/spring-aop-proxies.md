@@ -8,7 +8,7 @@ difficulty: Advanced
 importance: 4
 tags: [Spring AOP, Proxies, Aspect, Transactional, Advice]
 prerequisites: [spring-ioc-di, bean-scopes-lifecycle]
-related: [spring-data-jpa, spring-task-scheduling, design-patterns-solid]
+related: [spring-data-jpa, spring-task-scheduling, design-patterns-solid, spring-cache-redis]
 status: complete
 lastUpdated: 2026-11-13
 summary: Aspects, join points, pointcuts, and advice — plus how JDK dynamic proxies and CGLIB work, and why self-invocation breaks @Transactional and @Async.

@@ -10,7 +10,7 @@ tags: [Spring MVC, REST, Validation, Exception Handling]
 prerequisites: [spring-mvc-rest]
 related: [spring-boot-autoconfig, spring-data-jpa]
 status: complete
-lastUpdated: 2026-11-04
+lastUpdated: 2026-11-14
 summary: How to validate incoming REST payloads with Bean Validation and how to turn failures into consistent error responses.
 ---
 
@@ -41,6 +41,12 @@ Without any handling, a thrown exception produces Spring Boot's default error re
 
 A good error response includes: the HTTP status, a stable machine-readable error code (such as `USER_NOT_FOUND`), a human-readable message, and optionally the field-level errors for validation failures. It should not include stack traces, internal class names, or SQL — those belong in server logs, not in responses.
 
+### ProblemDetail and RFC 9457
+
+Instead of inventing a custom error shape, an API can use the standard one: **RFC 9457, "Problem Details for HTTP APIs"** (published 2023; it supersedes RFC 7807, which defined the same shape). A problem detail is a JSON body with a fixed set of members — `type` (a URI identifying the kind of problem, defaulting to `about:blank`), `title` (a short summary, the same for every occurrence), `status` (the HTTP status code), `detail` (a human-readable explanation of this occurrence), and `instance` (a URI for this occurrence, usually the request path) — plus any extension members the API adds, such as a stable error code. It is served with the media type `application/problem+json`, so clients, gateways, and OpenAPI tooling that understand the standard can handle errors without custom parsing.
+
+Spring Framework 6 (Spring Boot 3.x) ships this natively as `org.springframework.http.ProblemDetail`. Returning a `ProblemDetail` from an `@ExceptionHandler` sets the response status from its `status` field and the content type to `application/problem+json`; `setType(URI)` names the problem kind, and `setProperty("code", "USER_NOT_FOUND")` adds an extension member — the stable error code from the hand-rolled shape above, kept in the standard format. For Spring MVC's *own* exceptions (a 404 for an unknown URL, a 405 for the wrong method, a 415 for the wrong content type), setting `spring.mvc.problemdetails.enabled=true` in `application.properties` makes Boot register a handler that returns them as problem details too; it is off by default because it changes the shape of every default error response. The fuller version is to make the advice extend `ResponseEntityExceptionHandler`, whose methods already return `ProblemDetail` for each Spring MVC exception, and override only the cases you want to customize. This section sits alongside the `@ExceptionHandler` approach above — ProblemDetail standardizes the *body*, while `@RestControllerAdvice` still decides *which* exception maps to *which* problem.
+
 ### Which status for which failure
 
 - `400 Bad Request` — validation failures and malformed input.
@@ -60,6 +66,7 @@ A clean design distinguishes the two. Business exceptions (a user not found, an 
 - **MethodArgumentNotValidException:** thrown when `@Valid` body validation fails, carrying field-level errors.
 - **@RestControllerAdvice:** a global exception handler for all controllers, returning response bodies directly.
 - **@ExceptionHandler:** maps an exception type to a handler method and response.
+- **ProblemDetail (RFC 9457):** the standard error body (`type`, `title`, `status`, `detail`, `instance`, plus extension members), served as `application/problem+json`; RFC 9457 supersedes RFC 7807. `spring.mvc.problemdetails.enabled=true` makes Spring MVC's own errors use it too.
 - **Error contract:** a consistent response shape (status, code, message, field errors) for every failure.
 
 ## Code Examples
@@ -165,6 +172,62 @@ class UserNotFoundException extends RuntimeException {
 
 Explanation: validation failures become a `400` with per-field messages; a missing user becomes a `404` with a stable code; anything unexpected becomes a generic `500`. The generic `Exception` handler must be declared last in intent — Spring picks the most specific matching handler first — and it is the safety net that prevents stack traces from leaking.
 
+### The same handler returning a ProblemDetail
+
+```java
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class ProblemDetailHandler {
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleNotFound(UserNotFoundException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("User not found");
+        problem.setType(URI.create("https://api.example.com/problems/user-not-found"));
+        // A ProblemDetail returned from a custom handler is written
+        // as-is, so set the instance explicitly; only
+        // ResponseEntityExceptionHandler fills it in for you.
+        problem.setInstance(URI.create(request.getRequestURI()));
+        // Extension member: the stable machine-readable code, kept
+        // inside the standard format instead of a custom envelope.
+        problem.setProperty("code", "USER_NOT_FOUND");
+        return problem;
+    }
+}
+```
+
+```properties
+# Also return Spring MVC's own errors (404 unknown URL, 405 wrong
+# method, 415 wrong content type) as problem details. Off by default
+# in Spring Boot 3.x, because it changes every default error body.
+spring.mvc.problemdetails.enabled=true
+```
+
+The response body for a missing user:
+
+```text
+HTTP/1.1 404 Not Found
+Content-Type: application/problem+json
+
+{
+  "type": "https://api.example.com/problems/user-not-found",
+  "title": "User not found",
+  "status": 404,
+  "detail": "No user with id 42",
+  "instance": "/users/42",
+  "code": "USER_NOT_FOUND"
+}
+```
+
+Explanation: returning a `ProblemDetail` sets the status from its `status` field and the content type to `application/problem+json`. `type` is a stable URI for the problem kind (default `about:blank` when unset), and `setProperty` adds the error code as an extension member, so the hand-rolled contract from the previous example survives inside the standard shape. The property only covers Spring MVC's own exceptions; your business exceptions still need a handler like the one above, or an advice extending `ResponseEntityExceptionHandler` that overrides the framework cases you care about.
+
 ## Best Practices
 
 - Validate at the API boundary with `@Valid`, so invalid data never reaches the service layer.
@@ -194,6 +257,7 @@ Validation and exception handling are standard mid-level interview topics becaus
 - **Why handle exceptions globally instead of in each controller?** For consistency: the same failure always produces the same status and error format, and controllers stay free of repetitive try-catch code.
 - **@NotNull versus @NotBlank versus @NotEmpty?** `@NotNull` rejects only null; `@NotBlank` rejects null, empty, and whitespace-only strings; `@NotEmpty` rejects null and empty values and also applies to collections.
 - **What should a 500 response contain?** Only a generic message and a stable error code. The full exception and stack trace go to server logs, never to the client.
+- **What is ProblemDetail, and when would you use it instead of a custom error body?** `ProblemDetail` is Spring's implementation of RFC 9457 (which supersedes RFC 7807): a standard error body with `type`, `title`, `status`, `detail`, and `instance`, served as `application/problem+json`. Use it so clients and gateways that understand the standard can handle your errors without custom parsing; set `spring.mvc.problemdetails.enabled=true` to make Spring MVC's own errors use it too.
 
 ## Revision Summary
 
@@ -202,3 +266,4 @@ Validation and exception handling are standard mid-level interview topics becaus
 - `@RestControllerAdvice` plus `@ExceptionHandler` centralizes error handling across controllers.
 - Use `400` for validation, `404` for missing resources, `409` for conflicts, `500` for unexpected failures.
 - Error responses carry status, stable code, and message — never stack traces.
+- ProblemDetail (RFC 9457, supersedes RFC 7807) standardizes the error body as `application/problem+json`; `spring.mvc.problemdetails.enabled=true` extends it to Spring MVC's own errors.

@@ -75,6 +75,30 @@ export function MarkdownView({ markdown }: { markdown: string }) {
             const id = slug(children)
             return <h2 id={id} tabIndex={-1} data-heading={String(children ?? '')}>{children}</h2>
           },
+          // Diagrams (Batch 2, 2026-11-14): the three static SVGs are
+          // 790–964px wide with 14px labels, so at a 360px viewport
+          // the old plain <img> (max-width: 100%) shrank the text to
+          // ~5px. An SVG diagram now renders at a 720px minimum
+          // inside a horizontally scrollable region (labels
+          // ~10.5–12.8px) with an "open enlarged" link that shows
+          // the SVG at full size in a new tab for pinch-zooming.
+          // The wrapper follows the table-scroll pattern below:
+          // tabIndex 0 + role="region" + aria-label so a keyboard
+          // user can reach and scroll it, with the global
+          // :focus-visible outline as its focus style. Non-SVG
+          // images (none in the content today) render plain.
+          img: ({ src, alt }) => {
+            if (!src || !/\.svg($|\?)/i.test(src)) return <img src={src} alt={alt} />
+            const label = alt || 'diagram'
+            return (
+              <span className="diagram-wrap">
+                <span className="diagram-scroll" tabIndex={0} role="region" aria-label={`Scrollable diagram: ${label}. Scroll sideways to read it at full size.`}>
+                  <img src={src} alt={alt} />
+                </span>
+                <a className="diagram-enlarge" href={src} target="_blank" rel="noreferrer">Open diagram enlarged in a new tab ↗</a>
+              </span>
+            )
+          },
           // A pre with a long line is a scrollable region; without a
           // tab stop a keyboard user can never scroll it. The copy
           // button lives beside the pre (see CodeBlock), not in it.

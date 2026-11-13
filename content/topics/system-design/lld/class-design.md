@@ -141,6 +141,9 @@ public class HourlyPricing implements PricingStrategy {
 ```
 
 ```java
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Ticket {
     private final String ticketId;
     private final Vehicle vehicle;

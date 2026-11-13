@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T22:05:11.307Z",
+  "generatedAt": "2026-11-13T22:15:01.581Z",
   "interviewQuestions": [
     {
       "category": "Resume",
@@ -4653,7 +4653,7 @@
         "Name the stale-data bug as the first risk."
       ],
       "title": "Caching in Spring Boot: @Cacheable, eviction, and expiration",
-      "topicId": "performance-best-practices"
+      "topicId": "spring-cache-redis"
     },
     {
       "category": "Spring & Spring Boot",
@@ -4761,7 +4761,7 @@
         "Tie consumer scaling to partition count explicitly."
       ],
       "title": "Kafka topics, partitions, and consumer groups",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "kafka-spring-boot"
     },
     {
       "category": "Microservices",
@@ -4788,7 +4788,7 @@
         "Give the lag checklist in order — processing, partitions, rebalances."
       ],
       "title": "Kafka delivery guarantees: acks, idempotence, and exactly-once",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "kafka-spring-boot"
     },
     {
       "category": "Microservices",
@@ -5603,323 +5603,455 @@
       "topicId": "streams-lambdas"
     },
     {
-      "id": "iq-b2-aop-proxies",
-      "module": "module-2",
       "category": "Spring & Spring Boot",
-      "title": "JDK dynamic proxy vs CGLIB",
-      "question": "How does Spring decide between a JDK dynamic proxy and a CGLIB proxy, and what can each one not do?",
-      "shortAnswer": "A JDK proxy implements the bean's interfaces and needs one; a CGLIB proxy subclasses the bean and works without an interface, but cannot proxy final classes or methods. Spring Boot uses CGLIB by default.",
-      "detailedAnswer": "A JDK dynamic proxy is a runtime-generated class that implements the same interfaces as the target, so it only works when the bean implements an interface and only intercepts interface methods. A CGLIB proxy is a runtime-generated subclass of the target class, so it works with no interface, but a subclass cannot override a final method or extend a final class, so those are never advised. Spring Boot defaults to CGLIB proxies, which is why injecting a bean by its concrete class usually works even when the bean implements an interface.",
-      "followUps": [
-        "What happens if you inject a JDK-proxied bean by its concrete class?",
-        "Why can't a CGLIB proxy advise a final method?"
-      ],
-      "tips": [
-        "Name the default first: Spring Boot uses CGLIB unless configured otherwise.",
-        "Tie the answer to a failure: a final method silently skipping advice is the classic symptom."
-      ],
       "commonMistakes": [
         "Saying JDK proxies work for any class.",
         "Forgetting that final methods escape CGLIB proxies."
       ],
+      "detailedAnswer": "A JDK dynamic proxy is a runtime-generated class that implements the same interfaces as the target, so it only works when the bean implements an interface and only intercepts interface methods. A CGLIB proxy is a runtime-generated subclass of the target class, so it works with no interface, but a subclass cannot override a final method or extend a final class, so those are never advised. Spring Boot defaults to CGLIB proxies, which is why injecting a bean by its concrete class usually works even when the bean implements an interface.",
       "difficulty": "Medium",
-      "topicId": "spring-aop-proxies",
+      "followUps": [
+        "What happens if you inject a JDK-proxied bean by its concrete class?",
+        "Why can't a CGLIB proxy advise a final method?"
+      ],
+      "id": "iq-b2-aop-proxies",
+      "module": "module-2",
+      "question": "How does Spring decide between a JDK dynamic proxy and a CGLIB proxy, and what can each one not do?",
       "relatedTopics": [
         "bean-scopes-lifecycle",
         "spring-ioc-di"
-      ]
+      ],
+      "shortAnswer": "A JDK proxy implements the bean's interfaces and needs one; a CGLIB proxy subclasses the bean and works without an interface, but cannot proxy final classes or methods. Spring Boot uses CGLIB by default.",
+      "tips": [
+        "Name the default first: Spring Boot uses CGLIB unless configured otherwise.",
+        "Tie the answer to a failure: a final method silently skipping advice is the classic symptom."
+      ],
+      "title": "JDK dynamic proxy vs CGLIB",
+      "topicId": "spring-aop-proxies"
     },
     {
-      "id": "iq-b2-aop-self-invocation",
-      "module": "module-2",
       "category": "Spring & Spring Boot",
-      "title": "Why @Transactional fails on self-invocation",
-      "question": "A service method calls another @Transactional method in the same class, and no transaction starts. Why?",
-      "shortAnswer": "Spring applies transactions through a proxy, and a call on this never passes through the proxy, so the transactional advice never runs.",
-      "detailedAnswer": "The @Transactional behaviour is an interceptor on the proxy that wraps the bean. Calls arriving from outside go through the proxy and start a transaction; a method calling another method on the same object calls this directly, bypassing the proxy entirely. The annotation is silently ignored — no error, no warning. The same applies to @Async, @Cacheable, and @PreAuthorize. Fixes: have another bean call the annotated method, inject the bean into itself through the proxy, or restructure so the caller invokes the transactional method directly.",
-      "followUps": [
-        "Does @Transactional work on a private method?",
-        "How would you fix it without restructuring the classes?"
-      ],
-      "tips": [
-        "Draw the proxy in words: outside call goes through it, internal call does not.",
-        "Mention that the same trap applies to @Async and @Cacheable — interviewers love the generalisation."
-      ],
       "commonMistakes": [
         "Claiming Spring will warn you — it does not.",
         "Suggesting @Transactional on the calling method as a fix when the point is the called method's own boundary."
       ],
+      "detailedAnswer": "The @Transactional behaviour is an interceptor on the proxy that wraps the bean. Calls arriving from outside go through the proxy and start a transaction; a method calling another method on the same object calls this directly, bypassing the proxy entirely. The annotation is silently ignored — no error, no warning. The same applies to @Async, @Cacheable, and @PreAuthorize. Fixes: have another bean call the annotated method, inject the bean into itself through the proxy, or restructure so the caller invokes the transactional method directly.",
       "difficulty": "Medium",
-      "topicId": "spring-aop-proxies",
+      "followUps": [
+        "Does @Transactional work on a private method?",
+        "How would you fix it without restructuring the classes?"
+      ],
+      "id": "iq-b2-aop-self-invocation",
+      "module": "module-2",
+      "question": "A service method calls another @Transactional method in the same class, and no transaction starts. Why?",
       "relatedTopics": [
         "spring-data-jpa"
-      ]
+      ],
+      "shortAnswer": "Spring applies transactions through a proxy, and a call on this never passes through the proxy, so the transactional advice never runs.",
+      "tips": [
+        "Draw the proxy in words: outside call goes through it, internal call does not.",
+        "Mention that the same trap applies to @Async and @Cacheable — interviewers love the generalisation."
+      ],
+      "title": "Why @Transactional fails on self-invocation",
+      "topicId": "spring-aop-proxies"
     },
     {
-      "id": "iq-b2-jpa-mappedby",
-      "module": "module-2",
       "category": "Spring & Spring Boot",
-      "title": "mappedBy and association ownership",
-      "question": "What does mappedBy mean on a @OneToMany, and which side of the association owns the relationship?",
-      "shortAnswer": "mappedBy marks the inverse side. The owning side — usually the @ManyToOne — holds the foreign key and is the only side Hibernate writes.",
-      "detailedAnswer": "In a bidirectional association only one side owns the foreign key. For an order and its line items, the @ManyToOne side (LineItem.order, with @JoinColumn) owns it, and the @OneToMany side declares mappedBy = \"order\" to say so. Hibernate writes only the owning side's state: adding a child to the parent's collection without setting child.setOrder(parent) inserts the child with a null foreign key. The standard fix is a helper method on the parent that sets both sides, so the in-memory graph and the database row cannot disagree.",
-      "followUps": [
-        "What happens if you set only the inverse side?",
-        "When would you model a many-to-many with an explicit link entity?"
-      ],
-      "tips": [
-        "Answer with the foreign key: whoever holds it owns the relationship.",
-        "Mention the helper-method pattern — it shows you have debugged this."
-      ],
       "commonMistakes": [
         "Saying mappedBy owns the relationship.",
         "Claiming both sides are written to the database."
       ],
+      "detailedAnswer": "In a bidirectional association only one side owns the foreign key. For an order and its line items, the @ManyToOne side (LineItem.order, with @JoinColumn) owns it, and the @OneToMany side declares mappedBy = \"order\" to say so. Hibernate writes only the owning side's state: adding a child to the parent's collection without setting child.setOrder(parent) inserts the child with a null foreign key. The standard fix is a helper method on the parent that sets both sides, so the in-memory graph and the database row cannot disagree.",
       "difficulty": "Medium",
-      "topicId": "jpa-associations-entity-lifecycle",
+      "followUps": [
+        "What happens if you set only the inverse side?",
+        "When would you model a many-to-many with an explicit link entity?"
+      ],
+      "id": "iq-b2-jpa-mappedby",
+      "module": "module-2",
+      "question": "What does mappedBy mean on a @OneToMany, and which side of the association owns the relationship?",
       "relatedTopics": [
         "spring-data-jpa",
         "db-sql-java-developers"
-      ]
+      ],
+      "shortAnswer": "mappedBy marks the inverse side. The owning side — usually the @ManyToOne — holds the foreign key and is the only side Hibernate writes.",
+      "tips": [
+        "Answer with the foreign key: whoever holds it owns the relationship.",
+        "Mention the helper-method pattern — it shows you have debugged this."
+      ],
+      "title": "mappedBy and association ownership",
+      "topicId": "jpa-associations-entity-lifecycle"
     },
     {
-      "id": "iq-b2-jpa-orphan-removal",
-      "module": "module-2",
       "category": "Spring & Spring Boot",
-      "title": "Cascade REMOVE vs orphanRemoval",
-      "question": "What is the difference between CascadeType.REMOVE and orphanRemoval on a @OneToMany?",
-      "shortAnswer": "Cascade REMOVE deletes children when you explicitly delete the parent; orphanRemoval deletes a child when it is removed from the parent's collection, even though the parent still exists.",
-      "detailedAnswer": "Cascade propagates an operation you perform: with CascadeType.REMOVE, calling remove() on the parent deletes the children too. orphanRemoval is different — it reacts to the state of the collection: removing a child from the parent's list deletes that child's row at flush time, with no explicit delete call. orphanRemoval is the right tool for privately owned children such as order line items, and the wrong tool for shared entities, where removing a reference from one parent should not delete a row other parents still use.",
-      "followUps": [
-        "Would you cascade REMOVE from a parent to a shared entity?",
-        "What does CascadeType.PERSIST do?"
-      ],
-      "tips": [
-        "Contrast the trigger: an explicit operation versus a missing reference.",
-        "Give the line-item example for orphanRemoval."
-      ],
       "commonMistakes": [
         "Treating the two as the same feature.",
         "Enabling orphanRemoval on a shared association."
       ],
+      "detailedAnswer": "Cascade propagates an operation you perform: with CascadeType.REMOVE, calling remove() on the parent deletes the children too. orphanRemoval is different — it reacts to the state of the collection: removing a child from the parent's list deletes that child's row at flush time, with no explicit delete call. orphanRemoval is the right tool for privately owned children such as order line items, and the wrong tool for shared entities, where removing a reference from one parent should not delete a row other parents still use.",
       "difficulty": "Medium",
-      "topicId": "jpa-associations-entity-lifecycle",
+      "followUps": [
+        "Would you cascade REMOVE from a parent to a shared entity?",
+        "What does CascadeType.PERSIST do?"
+      ],
+      "id": "iq-b2-jpa-orphan-removal",
+      "module": "module-2",
+      "question": "What is the difference between CascadeType.REMOVE and orphanRemoval on a @OneToMany?",
       "relatedTopics": [
         "spring-data-jpa"
-      ]
+      ],
+      "shortAnswer": "Cascade REMOVE deletes children when you explicitly delete the parent; orphanRemoval deletes a child when it is removed from the parent's collection, even though the parent still exists.",
+      "tips": [
+        "Contrast the trigger: an explicit operation versus a missing reference.",
+        "Give the line-item example for orphanRemoval."
+      ],
+      "title": "Cascade REMOVE vs orphanRemoval",
+      "topicId": "jpa-associations-entity-lifecycle"
     },
     {
-      "id": "iq-b2-locks-reentrant",
-      "module": "module-2",
       "category": "Java",
-      "title": "ReentrantLock vs synchronized",
-      "question": "When would you choose ReentrantLock over synchronized?",
-      "shortAnswer": "When you need a timeout, an interruptible wait, fairness, or multiple Conditions — none of which synchronized offers.",
-      "detailedAnswer": "synchronized is the default: simple, automatically released, and understood by the JVM. ReentrantLock adds tryLock() (attempt without blocking), tryLock(timeout, unit) (give up after a wait instead of blocking forever), lockInterruptibly() (let a waiting thread be cancelled), an optional fairness policy, and multiple Condition objects per lock (for example separate not-full and not-empty conditions in a bounded buffer). The price is explicit release: every lock() must be paired with unlock() in a finally block, or an exception leaves the lock held forever.",
-      "followUps": [
-        "What does a Condition give you that wait/notify does not?",
-        "Why is fairness usually left off?"
-      ],
-      "tips": [
-        "List the four features, then name the cost: manual unlock in finally.",
-        "Give the bounded-buffer example for multiple Conditions."
-      ],
       "commonMistakes": [
         "Saying ReentrantLock is faster — it is not, it is more flexible.",
         "Forgetting unlock() on the exception path."
       ],
+      "detailedAnswer": "synchronized is the default: simple, automatically released, and understood by the JVM. ReentrantLock adds tryLock() (attempt without blocking), tryLock(timeout, unit) (give up after a wait instead of blocking forever), lockInterruptibly() (let a waiting thread be cancelled), an optional fairness policy, and multiple Condition objects per lock (for example separate not-full and not-empty conditions in a bounded buffer). The price is explicit release: every lock() must be paired with unlock() in a finally block, or an exception leaves the lock held forever.",
       "difficulty": "Medium",
-      "topicId": "concurrency-locks-synchronizers",
+      "followUps": [
+        "What does a Condition give you that wait/notify does not?",
+        "Why is fairness usually left off?"
+      ],
+      "id": "iq-b2-locks-reentrant",
+      "module": "module-2",
+      "question": "When would you choose ReentrantLock over synchronized?",
       "relatedTopics": [
         "concurrency-basics",
         "java-memory-model"
-      ]
+      ],
+      "shortAnswer": "When you need a timeout, an interruptible wait, fairness, or multiple Conditions — none of which synchronized offers.",
+      "tips": [
+        "List the four features, then name the cost: manual unlock in finally.",
+        "Give the bounded-buffer example for multiple Conditions."
+      ],
+      "title": "ReentrantLock vs synchronized",
+      "topicId": "concurrency-locks-synchronizers"
     },
     {
-      "id": "iq-b2-vt-carrier-pinning",
-      "module": "module-2",
       "category": "Java",
-      "title": "Virtual threads, carriers, and pinning",
-      "question": "How does a virtual thread differ from a platform thread, and what is pinning?",
-      "shortAnswer": "A virtual thread is JVM-managed and cheap to block: it unmounts from its carrier platform thread while waiting. Pinning is when it cannot unmount — blocking inside synchronized or a native call — so the carrier stays occupied.",
-      "detailedAnswer": "A platform thread maps one-to-one to an operating system thread and occupies it while blocked. A virtual thread runs on a carrier thread from a small pool; when it blocks on I/O, the JVM unmounts it and the carrier runs another virtual thread, so a million virtual threads can be alive at once. Pinning breaks that: blocking while holding a monitor (synchronized) or inside a native call keeps the virtual thread mounted, so the carrier cannot do other work and the pool can starve under load. The fix is to use ReentrantLock, which does not pin, and to keep blocking calls out of synchronized blocks.",
-      "followUps": [
-        "Why should you not pool virtual threads?",
-        "Does a virtual thread help CPU-bound work?"
-      ],
-      "tips": [
-        "Explain mount and unmount before naming pinning.",
-        "Give the ReentrantLock remedy, not just the problem."
-      ],
       "commonMistakes": [
         "Saying virtual threads are faster — they make blocking cheap, not computation fast.",
         "Forgetting that synchronized is the pinning cause."
       ],
+      "detailedAnswer": "A platform thread maps one-to-one to an operating system thread and occupies it while blocked. A virtual thread runs on a carrier thread from a small pool; when it blocks on I/O, the JVM unmounts it and the carrier runs another virtual thread, so a million virtual threads can be alive at once. Pinning breaks that: blocking while holding a monitor (synchronized) or inside a native call keeps the virtual thread mounted, so the carrier cannot do other work and the pool can starve under load. The fix is to use ReentrantLock, which does not pin, and to keep blocking calls out of synchronized blocks.",
       "difficulty": "Medium",
-      "topicId": "virtual-threads",
+      "followUps": [
+        "Why should you not pool virtual threads?",
+        "Does a virtual thread help CPU-bound work?"
+      ],
+      "id": "iq-b2-vt-carrier-pinning",
+      "module": "module-2",
+      "question": "How does a virtual thread differ from a platform thread, and what is pinning?",
       "relatedTopics": [
         "concurrency-basics",
         "executors-completablefuture"
-      ]
+      ],
+      "shortAnswer": "A virtual thread is JVM-managed and cheap to block: it unmounts from its carrier platform thread while waiting. Pinning is when it cannot unmount — blocking inside synchronized or a native call — so the carrier stays occupied.",
+      "tips": [
+        "Explain mount and unmount before naming pinning.",
+        "Give the ReentrantLock remedy, not just the problem."
+      ],
+      "title": "Virtual threads, carriers, and pinning",
+      "topicId": "virtual-threads"
     },
     {
-      "id": "iq-b2-vt-when-not",
-      "module": "module-2",
       "category": "Java",
-      "title": "When not to use virtual threads",
-      "question": "When should you not use virtual threads?",
-      "shortAnswer": "For CPU-bound work, for a small fixed set of long-lived tasks, or when the downstream system cannot handle unbounded concurrency — virtual threads remove the thread bottleneck, not the resource bottleneck.",
-      "detailedAnswer": "Virtual threads help when threads block on I/O: the cost they remove is the cost of a blocked thread. A computation that never blocks gains nothing and pays scheduling overhead, so CPU-bound work belongs on a bounded platform-thread pool. A small, fixed number of tasks is simpler on a platform pool too. And a million concurrent requests still hit one database: without a limit such as a semaphore or a bounded connection pool, virtual threads can overwhelm a downstream service faster than a bounded pool would. They also multiply ThreadLocal state — a million virtual threads can mean a million copies of a ThreadLocal value.",
-      "followUps": [
-        "What executor would you use for virtual threads?",
-        "How do you bound concurrency to a database with virtual threads?"
-      ],
-      "tips": [
-        "Name the bottleneck virtual threads do not remove.",
-        "Mention ThreadLocal as the less obvious hazard."
-      ],
       "commonMistakes": [
         "Claiming virtual threads make everything faster.",
         "Creating unbounded virtual threads against a 20-connection pool."
       ],
+      "detailedAnswer": "Virtual threads help when threads block on I/O: the cost they remove is the cost of a blocked thread. A computation that never blocks gains nothing and pays scheduling overhead, so CPU-bound work belongs on a bounded platform-thread pool. A small, fixed number of tasks is simpler on a platform pool too. And a million concurrent requests still hit one database: without a limit such as a semaphore or a bounded connection pool, virtual threads can overwhelm a downstream service faster than a bounded pool would. They also multiply ThreadLocal state — a million virtual threads can mean a million copies of a ThreadLocal value.",
       "difficulty": "Medium",
-      "topicId": "virtual-threads",
+      "followUps": [
+        "What executor would you use for virtual threads?",
+        "How do you bound concurrency to a database with virtual threads?"
+      ],
+      "id": "iq-b2-vt-when-not",
+      "module": "module-2",
+      "question": "When should you not use virtual threads?",
       "relatedTopics": [
         "executors-completablefuture",
         "modern-java-features"
-      ]
+      ],
+      "shortAnswer": "For CPU-bound work, for a small fixed set of long-lived tasks, or when the downstream system cannot handle unbounded concurrency — virtual threads remove the thread bottleneck, not the resource bottleneck.",
+      "tips": [
+        "Name the bottleneck virtual threads do not remove.",
+        "Mention ThreadLocal as the less obvious hazard."
+      ],
+      "title": "When not to use virtual threads",
+      "topicId": "virtual-threads"
     },
     {
-      "id": "iq-b2-hashmap-spreading",
-      "module": "module-2",
       "category": "Java",
-      "title": "HashMap hash spreading and indexing",
-      "question": "Why does HashMap spread the hash code, and how is the bucket index computed?",
-      "shortAnswer": "The index uses only the low bits of the hash, so spreading XORs the high bits down ((h ^ (h >>> 16))). The index is (n - 1) & hash, which works because capacity is always a power of two.",
-      "detailedAnswer": "A key's bucket index is (n - 1) & hash, where n is the table length. Because capacity is always a power of two, n - 1 is a run of 1-bits, so this is equivalent to hash % n but costs a bitwise AND instead of a division. The catch is that only the low bits of the hash decide the bucket — so HashMap first spreads the hash by XOR-ing it with its own top 16 bits, mixing the high bits into the low ones. Without spreading, keys whose hash codes differ only in the high bits would all collide in the same bucket.",
-      "followUps": [
-        "Why must capacity stay a power of two?",
-        "What is the default load factor, and when does the table resize?"
-      ],
-      "tips": [
-        "Write the two formulas: the spread and (n - 1) & hash.",
-        "Explain why the power-of-two capacity matters for the AND trick."
-      ],
       "commonMistakes": [
         "Saying the index is hash % capacity.",
         "Saying spreading is done to make hashes random."
       ],
+      "detailedAnswer": "A key's bucket index is (n - 1) & hash, where n is the table length. Because capacity is always a power of two, n - 1 is a run of 1-bits, so this is equivalent to hash % n but costs a bitwise AND instead of a division. The catch is that only the low bits of the hash decide the bucket — so HashMap first spreads the hash by XOR-ing it with its own top 16 bits, mixing the high bits into the low ones. Without spreading, keys whose hash codes differ only in the high bits would all collide in the same bucket.",
       "difficulty": "Medium",
-      "topicId": "hashmap-internals",
+      "followUps": [
+        "Why must capacity stay a power of two?",
+        "What is the default load factor, and when does the table resize?"
+      ],
+      "id": "iq-b2-hashmap-spreading",
+      "module": "module-2",
+      "question": "Why does HashMap spread the hash code, and how is the bucket index computed?",
       "relatedTopics": [
         "collections-framework"
-      ]
+      ],
+      "shortAnswer": "The index uses only the low bits of the hash, so spreading XORs the high bits down ((h ^ (h >>> 16))). The index is (n - 1) & hash, which works because capacity is always a power of two.",
+      "tips": [
+        "Write the two formulas: the spread and (n - 1) & hash.",
+        "Explain why the power-of-two capacity matters for the AND trick."
+      ],
+      "title": "HashMap hash spreading and indexing",
+      "topicId": "hashmap-internals"
     },
     {
-      "id": "iq-b2-chm-nulls",
-      "module": "module-2",
       "category": "Java",
-      "title": "ConcurrentHashMap nulls and locking",
-      "question": "Why does ConcurrentHashMap forbid null keys and values, and how does it stay thread-safe without one big lock?",
-      "shortAnswer": "Null is forbidden so that get() returning null unambiguously means absent. Safety comes from CAS on empty bins and synchronizing on the first node of an occupied bin — reads never block.",
-      "detailedAnswer": "In concurrent code, map.get(key) returning null must mean one thing: the key is absent. If null values were allowed, a null result could mean absent or present-with-null, and no atomic check could distinguish them. For safety, ConcurrentHashMap inserts into an empty bin with a compare-and-swap (no lock), synchronizes on the first node of an occupied bin so only writers to that bucket contend, lets multiple threads cooperate on a resize, and counts size with counter cells instead of one contended counter. Iterators are weakly consistent: they never throw ConcurrentModificationException and may or may not show concurrent updates.",
-      "followUps": [
-        "How would you atomically increment a counter in a ConcurrentHashMap?",
-        "When would you still use Collections.synchronizedMap?"
-      ],
-      "tips": [
-        "Answer the null question first — it is about ambiguity, not convenience.",
-        "Contrast bin-level locking with the old whole-map lock."
-      ],
       "commonMistakes": [
         "Saying ConcurrentHashMap locks the whole map.",
         "Storing null and expecting it to work like HashMap."
       ],
+      "detailedAnswer": "In concurrent code, map.get(key) returning null must mean one thing: the key is absent. If null values were allowed, a null result could mean absent or present-with-null, and no atomic check could distinguish them. For safety, ConcurrentHashMap inserts into an empty bin with a compare-and-swap (no lock), synchronizes on the first node of an occupied bin so only writers to that bucket contend, lets multiple threads cooperate on a resize, and counts size with counter cells instead of one contended counter. Iterators are weakly consistent: they never throw ConcurrentModificationException and may or may not show concurrent updates.",
       "difficulty": "Hard",
-      "topicId": "hashmap-internals",
+      "followUps": [
+        "How would you atomically increment a counter in a ConcurrentHashMap?",
+        "When would you still use Collections.synchronizedMap?"
+      ],
+      "id": "iq-b2-chm-nulls",
+      "module": "module-2",
+      "question": "Why does ConcurrentHashMap forbid null keys and values, and how does it stay thread-safe without one big lock?",
       "relatedTopics": [
         "concurrency-basics",
         "concurrency-locks-synchronizers"
-      ]
+      ],
+      "shortAnswer": "Null is forbidden so that get() returning null unambiguously means absent. Safety comes from CAS on empty bins and synchronizing on the first node of an occupied bin — reads never block.",
+      "tips": [
+        "Answer the null question first — it is about ambiguity, not convenience.",
+        "Contrast bin-level locking with the old whole-map lock."
+      ],
+      "title": "ConcurrentHashMap nulls and locking",
+      "topicId": "hashmap-internals"
     },
     {
-      "id": "iq-b2-oauth2-pkce",
-      "module": "module-2",
       "category": "Spring & Spring Boot",
-      "title": "Authorization code flow with PKCE",
-      "question": "Walk through the authorization code flow with PKCE. What does the code verifier prove?",
-      "shortAnswer": "The client creates a random verifier, sends its hash as the challenge, and presents the verifier when exchanging the code for tokens — proving the exchange comes from the client that started the flow.",
-      "detailedAnswer": "The client redirects the user to the authorization server with the requested scopes and a code_challenge (a hash of a random code_verifier). The user authenticates and consents, and the server redirects back with a short-lived authorization code. The client exchanges the code for tokens, sending the original code_verifier; the server checks it against the challenge. Even if the code leaks from the redirect, nobody else can redeem it, because they do not have the verifier. PKCE is required for public clients such as mobile and single-page apps, which cannot keep a secret, and recommended for every client. The older implicit flow, which returned tokens in the redirect itself, is deprecated.",
-      "followUps": [
-        "What is the difference between an access token and an id_token?",
-        "Why is the implicit flow deprecated?"
-      ],
-      "tips": [
-        "Walk the four steps in order: challenge, consent, code, exchange.",
-        "Say what the verifier proves — same client, not just any client."
-      ],
       "commonMistakes": [
         "Describing the implicit flow as the current standard.",
         "Confusing the code with the token."
       ],
+      "detailedAnswer": "The client redirects the user to the authorization server with the requested scopes and a code_challenge (a hash of a random code_verifier). The user authenticates and consents, and the server redirects back with a short-lived authorization code. The client exchanges the code for tokens, sending the original code_verifier; the server checks it against the challenge. Even if the code leaks from the redirect, nobody else can redeem it, because they do not have the verifier. PKCE is required for public clients such as mobile and single-page apps, which cannot keep a secret, and recommended for every client. The older implicit flow, which returned tokens in the redirect itself, is deprecated.",
       "difficulty": "Medium",
-      "topicId": "spring-security-oauth2-oidc",
+      "followUps": [
+        "What is the difference between an access token and an id_token?",
+        "Why is the implicit flow deprecated?"
+      ],
+      "id": "iq-b2-oauth2-pkce",
+      "module": "module-2",
+      "question": "Walk through the authorization code flow with PKCE. What does the code verifier prove?",
       "relatedTopics": [
         "security-jwt"
-      ]
+      ],
+      "shortAnswer": "The client creates a random verifier, sends its hash as the challenge, and presents the verifier when exchanging the code for tokens — proving the exchange comes from the client that started the flow.",
+      "tips": [
+        "Walk the four steps in order: challenge, consent, code, exchange.",
+        "Say what the verifier proves — same client, not just any client."
+      ],
+      "title": "Authorization code flow with PKCE",
+      "topicId": "spring-security-oauth2-oidc"
     },
     {
-      "id": "iq-b2-pbv-stack-myth",
-      "module": "module-2",
       "category": "Java",
-      "title": "Do primitives always live on the stack?",
-      "question": "Do primitives always live on the stack?",
-      "shortAnswer": "No. Primitive locals live in stack frames, but primitive fields live on the heap as part of their object — and escape analysis can stack-allocate objects too.",
-      "detailedAnswer": "The stack holds method frames: local variables (primitive locals and reference variables) and return addresses, freed when the method returns. Objects live on the heap — including their fields, so an int field of an object lives on the heap inside that object, and an int array's elements live on the heap in the array. The JIT compiler can also invert the rule through escape analysis: an object that never escapes its method may be allocated on the stack instead of the heap. The right mental model is about lifetimes, not types: stack data dies with the method call, heap data lives until unreachable.",
-      "followUps": [
-        "Where does a local reference variable live, and where does its object live?",
-        "What is escape analysis?"
-      ],
-      "tips": [
-        "Answer with locals versus fields, not with primitives versus objects.",
-        "Mention escape analysis as the exception that proves the rule."
-      ],
       "commonMistakes": [
         "Saying primitives always live on the stack.",
         "Saying objects always live on the heap with no exception."
       ],
+      "detailedAnswer": "The stack holds method frames: local variables (primitive locals and reference variables) and return addresses, freed when the method returns. Objects live on the heap — including their fields, so an int field of an object lives on the heap inside that object, and an int array's elements live on the heap in the array. The JIT compiler can also invert the rule through escape analysis: an object that never escapes its method may be allocated on the stack instead of the heap. The right mental model is about lifetimes, not types: stack data dies with the method call, heap data lives until unreachable.",
       "difficulty": "Medium",
-      "topicId": "java-pass-by-value",
+      "followUps": [
+        "Where does a local reference variable live, and where does its object live?",
+        "What is escape analysis?"
+      ],
+      "id": "iq-b2-pbv-stack-myth",
+      "module": "module-2",
+      "question": "Do primitives always live on the stack?",
       "relatedTopics": [
         "jdk-jre-jvm",
         "garbage-collection"
-      ]
+      ],
+      "shortAnswer": "No. Primitive locals live in stack frames, but primitive fields live on the heap as part of their object — and escape analysis can stack-allocate objects too.",
+      "tips": [
+        "Answer with locals versus fields, not with primitives versus objects.",
+        "Mention escape analysis as the exception that proves the rule."
+      ],
+      "title": "Do primitives always live on the stack?",
+      "topicId": "java-pass-by-value"
     },
     {
-      "id": "iq-b2-db-clustered",
-      "module": "module-2",
       "category": "SQL & Databases",
-      "title": "Clustered vs non-clustered indexes",
-      "question": "What is the difference between a clustered and a non-clustered index?",
-      "shortAnswer": "A clustered index stores the table's rows in index order (one per table, usually the primary key); a non-clustered index is a separate structure that points at rows, so each lookup costs an extra hop.",
-      "detailedAnswer": "A clustered index decides the physical order of the table's rows — the table itself is stored in index order, and a table has at most one, usually its primary key (InnoDB stores tables clustered by primary key). A non-clustered (secondary) index maps indexed values to row locations in a separate structure, and the database follows the pointer to fetch the row. A range scan on the clustered key is cheap because the rows are adjacent; a lookup through a secondary index costs a pointer chase per row, and a secondary index returning a large fraction of the table can be slower than a full scan, because random fetches cost more than a sequential read.",
-      "followUps": [
-        "What is a covering index, and why does it avoid the extra hop?",
-        "Why can a table have only one clustered index?"
-      ],
-      "tips": [
-        "Lead with physical order versus pointer.",
-        "Mention InnoDB's primary-key clustering as the concrete case."
-      ],
       "commonMistakes": [
         "Saying the two cost the same.",
         "Assuming PostgreSQL tables are clustered like InnoDB's."
       ],
+      "detailedAnswer": "A clustered index decides the physical order of the table's rows — the table itself is stored in index order, and a table has at most one, usually its primary key (InnoDB stores tables clustered by primary key). A non-clustered (secondary) index maps indexed values to row locations in a separate structure, and the database follows the pointer to fetch the row. A range scan on the clustered key is cheap because the rows are adjacent; a lookup through a secondary index costs a pointer chase per row, and a secondary index returning a large fraction of the table can be slower than a full scan, because random fetches cost more than a sequential read.",
       "difficulty": "Medium",
-      "topicId": "db-joins-indexes-transactions",
+      "followUps": [
+        "What is a covering index, and why does it avoid the extra hop?",
+        "Why can a table have only one clustered index?"
+      ],
+      "id": "iq-b2-db-clustered",
+      "module": "module-2",
+      "question": "What is the difference between a clustered and a non-clustered index?",
       "relatedTopics": [
         "db-sql-java-developers"
-      ]
+      ],
+      "shortAnswer": "A clustered index stores the table's rows in index order (one per table, usually the primary key); a non-clustered index is a separate structure that points at rows, so each lookup costs an extra hop.",
+      "tips": [
+        "Lead with physical order versus pointer.",
+        "Mention InnoDB's primary-key clustering as the concrete case."
+      ],
+      "title": "Clustered vs non-clustered indexes",
+      "topicId": "db-joins-indexes-transactions"
+    },
+    {
+      "category": "Microservices",
+      "commonMistakes": [
+        "Retrying a poison message forever with no dead-letter topic.",
+        "Assuming the dead-letter topic is monitored just because it exists.",
+        "Committing offsets before processing so failures vanish silently."
+      ],
+      "detailedAnswer": "A @KafkaListener that throws has its record redelivered, because offsets are committed only after successful processing. Without a failure policy, a poison message — one that fails on every attempt — is retried forever and blocks its whole partition. The standard shape is a DefaultErrorHandler (the current name in Spring Kafka 3.x) with a DeadLetterPublishingRecoverer and a FixedBackOff: after the configured retries, the recoverer publishes the failed record to a dead-letter topic, by default the original topic name plus -dlt, preserving the original headers including the exception, and the container commits the offset. The dead-letter topic must be watched — an alert or dashboard — or it becomes a quieter form of data loss. The listener itself must still be idempotent, because retries before the dead-letter step can run the same record twice.",
+      "difficulty": "Medium",
+      "followUps": [
+        "Where do dead-lettered records go, and how would you replay one?",
+        "Why must the listener still be idempotent even with a dead-letter topic?"
+      ],
+      "id": "iq-b3-kafka-listener-dlq",
+      "module": "module-2",
+      "question": "How do you stop one failing Kafka record from blocking its partition in Spring Boot?",
+      "relatedTopics": [
+        "sd-caching-queues-databases",
+        "tst-testcontainers-basics"
+      ],
+      "shortAnswer": "Configure a DefaultErrorHandler with a DeadLetterPublishingRecoverer on the listener container factory: retry the record with a backoff, then publish it to a dead-letter topic and commit the offset so the consumer moves on.",
+      "tips": [
+        "Name the two classes: DefaultErrorHandler and DeadLetterPublishingRecoverer.",
+        "Mention that the DLT needs monitoring, not just existence."
+      ],
+      "title": "Kafka listeners: retries and dead-letter topics",
+      "topicId": "kafka-spring-boot"
+    },
+    {
+      "category": "Spring & Spring Boot",
+      "commonMistakes": [
+        "Using condition where unless is needed, and wondering why #result is unavailable.",
+        "Caching nulls for missing rows with no TTL.",
+        "Assuming sync=true works across multiple caches."
+      ],
+      "detailedAnswer": "condition and unless both take SpEL, but at opposite moments. condition runs before the method, so it decides whether caching applies at all — condition = \"#id > 0\" skips the cache entirely for invalid ids — and it cannot see #result because the method has not run. unless runs after the method, so it judges the computed value — unless = \"#result == null\" keeps a missing row out of the cache, so a record created later is found immediately instead of serving a cached null until TTL expires. sync=true addresses the stampede: when a hot key expires, concurrent misses for that key block on the first caller, which loads once and shares the value. It works for a single cache only, and it relies on the cache implementation supporting the blocking load, which Spring Data Redis's RedisCache does.",
+      "difficulty": "Medium",
+      "followUps": [
+        "Why would you cache a null for a missing row at all, and with what TTL?",
+        "What happens if you put sync=true on an annotation with several caches?"
+      ],
+      "id": "iq-b3-spring-cache-condition-unless",
+      "module": "module-2",
+      "question": "What is the difference between condition and unless on @Cacheable, and what does sync=true do?",
+      "relatedTopics": [
+        "spring-aop-proxies"
+      ],
+      "shortAnswer": "condition is evaluated before the method runs and can only use the arguments; unless is evaluated after and can also use #result. sync=true makes concurrent misses for the same key wait on the first loader instead of all hitting the database.",
+      "tips": [
+        "Anchor on the evaluation moment: condition before, unless after.",
+        "Mention that unless is the only one that can see #result."
+      ],
+      "title": "Spring Cache: condition vs unless, and sync=true",
+      "topicId": "spring-cache-redis"
+    },
+    {
+      "category": "Spring & Spring Boot",
+      "commonMistakes": [
+        "Returning a ProblemDetail and expecting Spring to fill in instance automatically — a custom handler must set it.",
+        "Inventing a custom error envelope when the standard exists.",
+        "Enabling the property and assuming business exceptions are covered too."
+      ],
+      "detailedAnswer": "RFC 9457 defines one standard JSON shape for API errors instead of every team inventing its own envelope: type (a URI for the problem kind, default about:blank), title (a short summary, same for every occurrence), status, detail (this occurrence, for humans), and instance (this occurrence's URI, usually the request path), plus extension members such as a stable error code added with setProperty. Spring's ProblemDetail models it, and returning one from an @ExceptionHandler sets the response status from its status field and the content type to application/problem+json. For Spring MVC's own exceptions — 404 for an unknown URL, 405, 415 — spring.mvc.problemdetails.enabled=true makes Boot return them in the same shape; it is off by default because it changes every default error body. The fuller version is an advice extending ResponseEntityExceptionHandler, whose methods already return ProblemDetail for each framework exception. ProblemDetail standardizes the body; @RestControllerAdvice still decides which exception maps to which problem.",
+      "difficulty": "Medium",
+      "followUps": [
+        "What does spring.mvc.problemdetails.enabled=true change, and why is it off by default?",
+        "How do you keep a stable machine-readable error code inside a ProblemDetail?"
+      ],
+      "id": "iq-b3-problem-detail",
+      "module": "module-2",
+      "question": "What is ProblemDetail, and how does it relate to RFC 9457?",
+      "relatedTopics": [
+        "spring-mvc-rest"
+      ],
+      "shortAnswer": "ProblemDetail is Spring Framework 6's implementation of RFC 9457 (which supersedes RFC 7807): a standard error body with type, title, status, detail, and instance, served as application/problem+json. Returning one from an @ExceptionHandler sets the status and content type from the object.",
+      "tips": [
+        "Name the five members and the media type.",
+        "Note that RFC 9457 supersedes RFC 7807 — interviewers check for the current number."
+      ],
+      "title": "ProblemDetail and RFC 9457 error responses",
+      "topicId": "validation-exception-handling"
+    },
+    {
+      "category": "Java",
+      "commonMistakes": [
+        "Implementing Cloneable and forgetting to deep-copy mutable fields.",
+        "Assuming clone() runs a constructor.",
+        "Overriding finalize() to clean up instead of using close() and Cleaner."
+      ],
+      "detailedAnswer": "Object.clone() copies field by field: primitives by value, references by reference. That is a shallow copy — the clone and the original share every mutable object they point to, so mutating a list through one mutates it for the other. A deep copy duplicates the mutable parts as well, so the two are independent. clone() is awkward to use correctly: the class must implement Cloneable, a marker interface that declares no clone() method, or clone() throws CloneNotSupportedException at runtime even though the code compiled; the override must be public, call super.clone(), and then deep-copy each mutable field by hand; and clone() bypasses constructors, so constructor invariants are not checked on a clone. Cloning an array is shallow too. A copy constructor — new Team(other) — avoids all of it: no interface, no checked exception, the normal constructor path runs, and it works with final fields. That is why Effective Java calls Cloneable broken and prefers copy constructors.",
+      "difficulty": "Medium",
+      "followUps": [
+        "If a class holds a mutable list, what does a correct clone() have to do?",
+        "Why does cloning an array not give you a deep copy?"
+      ],
+      "id": "iq-b3-clone-deep-copy",
+      "module": "module-2",
+      "question": "What is the difference between a shallow copy and a deep copy, and why is clone() risky?",
+      "relatedTopics": [
+        "collections-deep-dive"
+      ],
+      "shortAnswer": "A shallow copy duplicates the fields, so mutable referenced objects are shared; a deep copy duplicates the mutable parts too. clone() is shallow by default, needs the marker interface Cloneable, bypasses constructors, and throws CloneNotSupportedException at runtime — a copy constructor is usually the safer choice.",
+      "tips": [
+        "Trace a concrete example: two objects sharing one list.",
+        "Quote the Effective Java verdict and say what it refers to."
+      ],
+      "title": "clone(): shallow vs deep copy, and copy constructors",
+      "topicId": "object-methods-clone-cleaner"
+    },
+    {
+      "category": "Java",
+      "commonMistakes": [
+        "Assuming the close exception replaces the body exception.",
+        "Printing only getMessage() and never checking getSuppressed()."
+      ],
+      "detailedAnswer": "Two exceptions can occur: one from the try body and one from closing a resource. Try-with-resources keeps the body's exception as the primary one and attaches the close exception with addSuppressed, so getSuppressed() returns it instead of it being lost. If the body completes normally and only the close throws, the close exception becomes the primary one. addSuppressed is also available to your own code when combining failures, for example when a cleanup step fails while another exception is already in flight. The point for an interview is the ordering rule: the body wins, the close is suppressed, nothing is silently dropped.",
+      "difficulty": "Easy",
+      "followUps": [
+        "How do you read the suppressed exceptions from a caught exception?",
+        "What happens if the body succeeds but the close throws?"
+      ],
+      "id": "iq-b3-suppressed-exceptions",
+      "module": "module-2",
+      "question": "What happens to an exception thrown while a try-with-resources resource is closing?",
+      "relatedTopics": [],
+      "shortAnswer": "It is attached to the primary exception as a suppressed exception, retrievable with getSuppressed() — it is not lost, and it never replaces the exception thrown by the try body.",
+      "tips": [
+        "State the ordering rule first: body wins, close is suppressed."
+      ],
+      "title": "Suppressed exceptions in try-with-resources",
+      "topicId": "exception-handling"
     },
     {
       "category": "Java",
@@ -6755,7 +6887,7 @@
         "Name the lost-write window explicitly."
       ],
       "title": "Kafka consumer lag, rebalances, and broker failure",
-      "topicId": "actuator-microservices-deployment"
+      "topicId": "kafka-spring-boot"
     },
     {
       "category": "Microservices",
@@ -7465,317 +7597,394 @@
       "topicId": "sd-scalability-basics"
     },
     {
-      "id": "iq-b2-aop-around",
-      "module": "module-3",
       "category": "Spring & Spring Boot",
-      "title": "When to use @Around advice",
-      "question": "When would you use @Around advice instead of @Before or @AfterReturning, and what can go wrong with it?",
-      "shortAnswer": "@Around is the only advice that wraps the call: it can time it, retry it, or replace its result. Forgetting proceed() skips the method; calling it twice runs it twice.",
-      "detailedAnswer": "@Before and @AfterReturning observe a call; only @Around controls it, because it receives a ProceedingJoinPoint and decides whether and when to call proceed(). That makes it the right tool for timing, retrying, caching a result, or short-circuiting a call. The risks follow from the power: forgetting proceed() means the method never executes and the caller gets whatever the advice returns; calling proceed() twice executes the method twice, which is dangerous for writes; and an @Around advice that swallows exceptions changes the method's contract silently. Prefer the narrower advice types unless you need to control the call.",
-      "followUps": [
-        "How would you write a retry aspect with @Around?",
-        "Why is a broad pointcut dangerous?"
-      ],
-      "tips": [
-        "Give the timing-aspect example, then name the two proceed() mistakes.",
-        "Say when you would not use @Around: pure logging belongs in @Before."
-      ],
       "commonMistakes": [
         "Using @Around for simple logging.",
         "Forgetting that proceed() can throw the method's checked exceptions."
       ],
+      "detailedAnswer": "@Before and @AfterReturning observe a call; only @Around controls it, because it receives a ProceedingJoinPoint and decides whether and when to call proceed(). That makes it the right tool for timing, retrying, caching a result, or short-circuiting a call. The risks follow from the power: forgetting proceed() means the method never executes and the caller gets whatever the advice returns; calling proceed() twice executes the method twice, which is dangerous for writes; and an @Around advice that swallows exceptions changes the method's contract silently. Prefer the narrower advice types unless you need to control the call.",
       "difficulty": "Hard",
-      "topicId": "spring-aop-proxies",
+      "followUps": [
+        "How would you write a retry aspect with @Around?",
+        "Why is a broad pointcut dangerous?"
+      ],
+      "id": "iq-b2-aop-around",
+      "module": "module-3",
+      "question": "When would you use @Around advice instead of @Before or @AfterReturning, and what can go wrong with it?",
       "relatedTopics": [
         "bean-scopes-lifecycle"
-      ]
+      ],
+      "shortAnswer": "@Around is the only advice that wraps the call: it can time it, retry it, or replace its result. Forgetting proceed() skips the method; calling it twice runs it twice.",
+      "tips": [
+        "Give the timing-aspect example, then name the two proceed() mistakes.",
+        "Say when you would not use @Around: pure logging belongs in @Before."
+      ],
+      "title": "When to use @Around advice",
+      "topicId": "spring-aop-proxies"
     },
     {
-      "id": "iq-b2-jpa-detached-merge",
-      "module": "module-3",
       "category": "Spring & Spring Boot",
-      "title": "Detached entities and merge()",
-      "question": "An entity is loaded in one transaction, modified after the transaction closes, and passed to merge(). What happens — and which object is managed afterwards?",
-      "shortAnswer": "merge() copies the detached object's state onto a managed instance and returns it. The object you passed in stays detached; changes to it after the merge are ignored.",
-      "detailedAnswer": "When the persistence context closes, a managed entity becomes detached: Hibernate stops tracking it, so setter calls change the object but write nothing. merge() takes that detached state, loads or creates the corresponding managed instance, copies the state onto it, and returns the managed instance. The common bug is continuing to use the original reference — it is still detached, so further changes to it are silently lost. persist() is different: it makes a transient object managed, and throws if the object already has an identity.",
-      "followUps": [
-        "How is persist() different from merge()?",
-        "Why does dirty checking not need an explicit save?"
-      ],
-      "tips": [
-        "Stress the return value: merge() returns the managed object; the argument stays detached.",
-        "Connect it to the four states: transient, managed, detached, removed."
-      ],
       "commonMistakes": [
         "Using the passed-in object after merge() as if it were managed.",
         "Calling persist() on a detached entity."
       ],
+      "detailedAnswer": "When the persistence context closes, a managed entity becomes detached: Hibernate stops tracking it, so setter calls change the object but write nothing. merge() takes that detached state, loads or creates the corresponding managed instance, copies the state onto it, and returns the managed instance. The common bug is continuing to use the original reference — it is still detached, so further changes to it are silently lost. persist() is different: it makes a transient object managed, and throws if the object already has an identity.",
       "difficulty": "Hard",
-      "topicId": "jpa-associations-entity-lifecycle",
+      "followUps": [
+        "How is persist() different from merge()?",
+        "Why does dirty checking not need an explicit save?"
+      ],
+      "id": "iq-b2-jpa-detached-merge",
+      "module": "module-3",
+      "question": "An entity is loaded in one transaction, modified after the transaction closes, and passed to merge(). What happens — and which object is managed afterwards?",
       "relatedTopics": [
         "spring-data-jpa"
-      ]
+      ],
+      "shortAnswer": "merge() copies the detached object's state onto a managed instance and returns it. The object you passed in stays detached; changes to it after the merge are ignored.",
+      "tips": [
+        "Stress the return value: merge() returns the managed object; the argument stays detached.",
+        "Connect it to the four states: transient, managed, detached, removed."
+      ],
+      "title": "Detached entities and merge()",
+      "topicId": "jpa-associations-entity-lifecycle"
     },
     {
-      "id": "iq-b2-locks-stampedlock",
-      "module": "module-3",
       "category": "Java",
-      "title": "StampedLock optimistic reads",
-      "question": "How does a StampedLock optimistic read work, and what is its main danger?",
-      "shortAnswer": "You take a stamp without locking, read, then validate(stamp): if a writer changed the data, validation fails and you retry under a read lock. The danger is that StampedLock is not reentrant — re-acquiring it in the same thread deadlocks.",
-      "detailedAnswer": "StampedLock has three modes: write, read, and optimistic read. tryOptimisticRead() returns a stamp without acquiring any lock, so the read runs fully concurrently; afterwards validate(stamp) checks whether a write happened in between, and if it did, the code falls back to a read lock and re-reads. This is faster than a ReadWriteLock when writes are rare. The trap is reentrancy: unlike synchronized or ReentrantLock, acquiring a read or write lock twice in the same thread deadlocks, so StampedLock suits short, carefully written sections, not general-purpose locking.",
-      "followUps": [
-        "When would ReadWriteLock beat StampedLock?",
-        "Why validate instead of just trusting the read?"
-      ],
-      "tips": [
-        "Explain the retry loop: optimistic read, validate, fall back to a read lock.",
-        "Name the non-reentrancy trap explicitly."
-      ],
       "commonMistakes": [
         "Treating StampedLock as a drop-in replacement for ReentrantLock.",
         "Skipping validation and using a possibly stale read."
       ],
+      "detailedAnswer": "StampedLock has three modes: write, read, and optimistic read. tryOptimisticRead() returns a stamp without acquiring any lock, so the read runs fully concurrently; afterwards validate(stamp) checks whether a write happened in between, and if it did, the code falls back to a read lock and re-reads. This is faster than a ReadWriteLock when writes are rare. The trap is reentrancy: unlike synchronized or ReentrantLock, acquiring a read or write lock twice in the same thread deadlocks, so StampedLock suits short, carefully written sections, not general-purpose locking.",
       "difficulty": "Hard",
-      "topicId": "concurrency-locks-synchronizers",
+      "followUps": [
+        "When would ReadWriteLock beat StampedLock?",
+        "Why validate instead of just trusting the read?"
+      ],
+      "id": "iq-b2-locks-stampedlock",
+      "module": "module-3",
+      "question": "How does a StampedLock optimistic read work, and what is its main danger?",
       "relatedTopics": [
         "concurrency-basics"
-      ]
+      ],
+      "shortAnswer": "You take a stamp without locking, read, then validate(stamp): if a writer changed the data, validation fails and you retry under a read lock. The danger is that StampedLock is not reentrant — re-acquiring it in the same thread deadlocks.",
+      "tips": [
+        "Explain the retry loop: optimistic read, validate, fall back to a read lock.",
+        "Name the non-reentrancy trap explicitly."
+      ],
+      "title": "StampedLock optimistic reads",
+      "topicId": "concurrency-locks-synchronizers"
     },
     {
-      "id": "iq-b2-locks-latch-barrier",
-      "module": "module-3",
       "category": "Java",
-      "title": "CountDownLatch vs CyclicBarrier",
-      "question": "What is the difference between a CountDownLatch and a CyclicBarrier, and when would you use each?",
-      "shortAnswer": "A latch is a one-shot countdown that waiting threads observe; a barrier is a reusable rendezvous where all parties wait for each other. Use a latch to wait for completion, a barrier for repeated phases.",
-      "detailedAnswer": "A CountDownLatch is created with a count; workers call countDown() as they finish and other threads block in await() until the count reaches zero. It cannot be reset — a second round needs a new latch. A CyclicBarrier makes N threads wait at a point until all N arrive, then releases them all together, optionally running a barrier action once; it resets automatically, so it fits repeated phases such as iterations of a parallel computation. A Semaphore is the third shape: permits limiting concurrent access to a resource, rather than coordinating timing.",
-      "followUps": [
-        "What would you use to limit concurrent access to a pool of ten connections?",
-        "Can a CountDownLatch be reused?"
-      ],
-      "tips": [
-        "Answer by coordination shape first, class second.",
-        "Add the Semaphore contrast to show the family."
-      ],
       "commonMistakes": [
         "Saying a latch is reusable.",
         "Using a barrier where a latch would do, or vice versa."
       ],
+      "detailedAnswer": "A CountDownLatch is created with a count; workers call countDown() as they finish and other threads block in await() until the count reaches zero. It cannot be reset — a second round needs a new latch. A CyclicBarrier makes N threads wait at a point until all N arrive, then releases them all together, optionally running a barrier action once; it resets automatically, so it fits repeated phases such as iterations of a parallel computation. A Semaphore is the third shape: permits limiting concurrent access to a resource, rather than coordinating timing.",
       "difficulty": "Medium",
-      "topicId": "concurrency-locks-synchronizers",
+      "followUps": [
+        "What would you use to limit concurrent access to a pool of ten connections?",
+        "Can a CountDownLatch be reused?"
+      ],
+      "id": "iq-b2-locks-latch-barrier",
+      "module": "module-3",
+      "question": "What is the difference between a CountDownLatch and a CyclicBarrier, and when would you use each?",
       "relatedTopics": [
         "executors-completablefuture"
-      ]
+      ],
+      "shortAnswer": "A latch is a one-shot countdown that waiting threads observe; a barrier is a reusable rendezvous where all parties wait for each other. Use a latch to wait for completion, a barrier for repeated phases.",
+      "tips": [
+        "Answer by coordination shape first, class second.",
+        "Add the Semaphore contrast to show the family."
+      ],
+      "title": "CountDownLatch vs CyclicBarrier",
+      "topicId": "concurrency-locks-synchronizers"
     },
     {
-      "id": "iq-b2-vt-threadlocal",
-      "module": "module-3",
       "category": "Java",
-      "title": "Virtual threads and ThreadLocal",
-      "question": "Why is ThreadLocal dangerous with virtual threads, and what should you use instead?",
-      "shortAnswer": "ThreadLocal state is per virtual thread, so a million virtual threads can mean a million copies of a value — a memory hazard. Pass context explicitly instead.",
-      "detailedAnswer": "With platform threads, a ThreadLocal costs one copy per pooled thread — a small, bounded number. Virtual threads are cheap and numerous by design, so the same pattern multiplies the state by the number of live virtual threads, and values can linger as long as the virtual thread does. The replacement is to pass context explicitly as a method argument, or to use scoped values, which are designed for carrying immutable context across virtual threads without per-thread storage.",
-      "followUps": [
-        "What is pinning, and how does it relate?",
-        "Would you use a thread pool for virtual threads?"
-      ],
-      "tips": [
-        "Quantify it: bounded pool versus unbounded virtual threads.",
-        "Name scoped values as the intended replacement."
-      ],
       "commonMistakes": [
         "Treating ThreadLocal as free because virtual threads are cheap.",
         "Using ThreadLocal for request context in a per-request virtual thread server."
       ],
+      "detailedAnswer": "With platform threads, a ThreadLocal costs one copy per pooled thread — a small, bounded number. Virtual threads are cheap and numerous by design, so the same pattern multiplies the state by the number of live virtual threads, and values can linger as long as the virtual thread does. The replacement is to pass context explicitly as a method argument, or to use scoped values, which are designed for carrying immutable context across virtual threads without per-thread storage.",
       "difficulty": "Hard",
-      "topicId": "virtual-threads",
+      "followUps": [
+        "What is pinning, and how does it relate?",
+        "Would you use a thread pool for virtual threads?"
+      ],
+      "id": "iq-b2-vt-threadlocal",
+      "module": "module-3",
+      "question": "Why is ThreadLocal dangerous with virtual threads, and what should you use instead?",
       "relatedTopics": [
         "concurrency-basics"
-      ]
+      ],
+      "shortAnswer": "ThreadLocal state is per virtual thread, so a million virtual threads can mean a million copies of a value — a memory hazard. Pass context explicitly instead.",
+      "tips": [
+        "Quantify it: bounded pool versus unbounded virtual threads.",
+        "Name scoped values as the intended replacement."
+      ],
+      "title": "Virtual threads and ThreadLocal",
+      "topicId": "virtual-threads"
     },
     {
-      "id": "iq-b2-oauth2-jwks",
-      "module": "module-3",
       "category": "Spring & Spring Boot",
-      "title": "Resource server JWKS validation",
-      "question": "How does a resource server validate a JWT without calling the authorization server on every request?",
-      "shortAnswer": "It verifies the signature against the provider's public keys from the JWKS endpoint, and checks issuer, audience, and expiry locally — the keys are fetched once and cached.",
-      "detailedAnswer": "A resource server does not ask the authorization server about each token. It fetches the provider's public keys from the JWKS endpoint (published at /.well-known/jwks.json), caches them, and verifies the token's signature, issuer (iss), audience (aud), and expiry (exp) locally. In Spring Boot, setting spring.security.oauth2.resourceserver.jwt.issuer-uri is enough: Boot discovers the JWKS endpoint from the provider's OpenID configuration and the framework's BearerTokenAuthenticationFilter does the validation before the request reaches a controller. A token with a valid signature but the wrong audience must still be rejected — signature alone is not enough.",
-      "followUps": [
-        "What is the difference between a scope and a role?",
-        "Where would you configure the issuer URI?"
-      ],
-      "tips": [
-        "Name the four checks: signature, issuer, audience, expiry.",
-        "Mention the issuer-uri one-liner — it shows you have configured one."
-      ],
       "commonMistakes": [
         "Saying the resource server calls the provider per request.",
         "Accepting a token on signature alone."
       ],
+      "detailedAnswer": "A resource server does not ask the authorization server about each token. It fetches the provider's public keys from the JWKS endpoint (published at /.well-known/jwks.json), caches them, and verifies the token's signature, issuer (iss), audience (aud), and expiry (exp) locally. In Spring Boot, setting spring.security.oauth2.resourceserver.jwt.issuer-uri is enough: Boot discovers the JWKS endpoint from the provider's OpenID configuration and the framework's BearerTokenAuthenticationFilter does the validation before the request reaches a controller. A token with a valid signature but the wrong audience must still be rejected — signature alone is not enough.",
       "difficulty": "Hard",
-      "topicId": "spring-security-oauth2-oidc",
+      "followUps": [
+        "What is the difference between a scope and a role?",
+        "Where would you configure the issuer URI?"
+      ],
+      "id": "iq-b2-oauth2-jwks",
+      "module": "module-3",
+      "question": "How does a resource server validate a JWT without calling the authorization server on every request?",
       "relatedTopics": [
         "security-jwt"
-      ]
+      ],
+      "shortAnswer": "It verifies the signature against the provider's public keys from the JWKS endpoint, and checks issuer, audience, and expiry locally — the keys are fetched once and cached.",
+      "tips": [
+        "Name the four checks: signature, issuer, audience, expiry.",
+        "Mention the issuer-uri one-liner — it shows you have configured one."
+      ],
+      "title": "Resource server JWKS validation",
+      "topicId": "spring-security-oauth2-oidc"
     },
     {
-      "id": "iq-b2-oauth2-access-vs-id",
-      "module": "module-3",
       "category": "Spring & Spring Boot",
-      "title": "Access token vs id_token",
-      "question": "What is the difference between an access token and an id_token, and what goes wrong if you confuse them?",
-      "shortAnswer": "The access token authorizes API calls; the OIDC id_token identifies the user. Sending an id_token to an API as a Bearer token is wrong — it was not issued for that API.",
-      "detailedAnswer": "The access token is what a client presents to a resource server: it carries scopes and is accepted as proof that the caller may do something. The id_token is an OpenID Connect JWT that states who the user is (subject, issuer, expiry, and profile claims) for the client that logged them in. An id_token is not an authorization credential for an API: the API cannot validate its audience or scopes, and accepting it would let a token minted for login authorize API access. Keep them separate — id_token for identity at the client, access token for authorization at the API.",
-      "followUps": [
-        "What does the refresh token do?",
-        "How do scopes appear as authorities in Spring Security?"
-      ],
-      "tips": [
-        "One sentence each, then the failure mode.",
-        "Mention SCOPE_ prefix mapping for scopes."
-      ],
       "commonMistakes": [
         "Sending the id_token as a Bearer token to an API.",
         "Treating the id_token as proof of authorization."
       ],
+      "detailedAnswer": "The access token is what a client presents to a resource server: it carries scopes and is accepted as proof that the caller may do something. The id_token is an OpenID Connect JWT that states who the user is (subject, issuer, expiry, and profile claims) for the client that logged them in. An id_token is not an authorization credential for an API: the API cannot validate its audience or scopes, and accepting it would let a token minted for login authorize API access. Keep them separate — id_token for identity at the client, access token for authorization at the API.",
       "difficulty": "Medium",
-      "topicId": "spring-security-oauth2-oidc",
+      "followUps": [
+        "What does the refresh token do?",
+        "How do scopes appear as authorities in Spring Security?"
+      ],
+      "id": "iq-b2-oauth2-access-vs-id",
+      "module": "module-3",
+      "question": "What is the difference between an access token and an id_token, and what goes wrong if you confuse them?",
       "relatedTopics": [
         "security-jwt"
-      ]
+      ],
+      "shortAnswer": "The access token authorizes API calls; the OIDC id_token identifies the user. Sending an id_token to an API as a Bearer token is wrong — it was not issued for that API.",
+      "tips": [
+        "One sentence each, then the failure mode.",
+        "Mention SCOPE_ prefix mapping for scopes."
+      ],
+      "title": "Access token vs id_token",
+      "topicId": "spring-security-oauth2-oidc"
     },
     {
-      "id": "iq-b2-sd-pacelc",
-      "module": "module-3",
       "category": "System Design",
-      "title": "PACELC trade-offs",
-      "question": "What does PACELC add to CAP?",
-      "shortAnswer": "CAP covers the partition case (availability vs consistency); PACELC adds the normal case (latency vs consistency), so the trade-off is made per dataset in both situations.",
-      "detailedAnswer": "CAP says that during a partition a system chooses availability or consistency. PACELC adds the else: when there is no partition, the system chooses latency or consistency. Strongly consistent reads usually cost a round trip to the leader or a quorum; reading the nearest replica is faster but possibly stale. So a system can be PA/EL (available during partitions, low-latency reads otherwise, like a social feed), PC/EC (consistent in both cases, slower, like a bank ledger), or mixed per dataset — strong consistency for payments, eventual consistency for recommendations. The interview point is naming the trade-off per dataset and what breaks if you choose wrong.",
-      "followUps": [
-        "Give an example of a PA/EL system and a PC/EC system.",
-        "How does Cassandra make this choice concrete?"
-      ],
-      "tips": [
-        "Say the acronym out: Partition, Availability/Consistency, Else, Latency/Consistency.",
-        "Answer per dataset, not once for the whole system."
-      ],
       "commonMistakes": [
         "Treating CAP as a one-time global choice.",
         "Forgetting the latency half entirely."
       ],
+      "detailedAnswer": "CAP says that during a partition a system chooses availability or consistency. PACELC adds the else: when there is no partition, the system chooses latency or consistency. Strongly consistent reads usually cost a round trip to the leader or a quorum; reading the nearest replica is faster but possibly stale. So a system can be PA/EL (available during partitions, low-latency reads otherwise, like a social feed), PC/EC (consistent in both cases, slower, like a bank ledger), or mixed per dataset — strong consistency for payments, eventual consistency for recommendations. The interview point is naming the trade-off per dataset and what breaks if you choose wrong.",
       "difficulty": "Medium",
-      "topicId": "sd-distributed-systems-fundamentals",
+      "followUps": [
+        "Give an example of a PA/EL system and a PC/EC system.",
+        "How does Cassandra make this choice concrete?"
+      ],
+      "id": "iq-b2-sd-pacelc",
+      "module": "module-3",
+      "question": "What does PACELC add to CAP?",
       "relatedTopics": [
         "sd-scalability-basics",
         "db-choosing-nosql"
-      ]
+      ],
+      "shortAnswer": "CAP covers the partition case (availability vs consistency); PACELC adds the normal case (latency vs consistency), so the trade-off is made per dataset in both situations.",
+      "tips": [
+        "Say the acronym out: Partition, Availability/Consistency, Else, Latency/Consistency.",
+        "Answer per dataset, not once for the whole system."
+      ],
+      "title": "PACELC trade-offs",
+      "topicId": "sd-distributed-systems-fundamentals"
     },
     {
-      "id": "iq-b2-sd-rate-limiting",
-      "module": "module-3",
       "category": "System Design",
-      "title": "Comparing rate limiting algorithms",
-      "question": "Compare token bucket and leaky bucket rate limiting. When would you choose each?",
-      "shortAnswer": "Token bucket allows bursts up to its capacity and bounds the long-run rate; leaky bucket smooths bursts into a fixed rate but queueing adds latency. Choose token bucket for bursty legitimate traffic, leaky bucket for a downstream that needs a steady rate.",
-      "detailedAnswer": "Both bound the rate, but they treat bursts differently. A token bucket holds up to N tokens, refills at a fixed rate, and serves a request immediately if a token is available — so a user opening an app and firing ten requests at once is served, while the long-run rate stays bounded. A leaky bucket queues requests and drains them at a fixed rate, so bursts wait instead of being served, adding latency but giving the downstream system a perfectly smooth load. A fixed-window counter is simpler but allows double the rate across a window boundary; a sliding window counter fixes that with one counter per window. A distributed limiter needs shared state, usually Redis, or each instance enforces its own limit.",
-      "followUps": [
-        "What status code and header should a rate-limited response carry?",
-        "Why does a per-instance limiter multiply the real limit?"
-      ],
-      "tips": [
-        "Compare on bursts: allowed versus smoothed.",
-        "Add the 429 with Retry-After detail — it is often the follow-up."
-      ],
       "commonMistakes": [
         "Recommending a fixed window without naming the boundary burst.",
         "Rate-limiting per instance in a multi-instance service."
       ],
+      "detailedAnswer": "Both bound the rate, but they treat bursts differently. A token bucket holds up to N tokens, refills at a fixed rate, and serves a request immediately if a token is available — so a user opening an app and firing ten requests at once is served, while the long-run rate stays bounded. A leaky bucket queues requests and drains them at a fixed rate, so bursts wait instead of being served, adding latency but giving the downstream system a perfectly smooth load. A fixed-window counter is simpler but allows double the rate across a window boundary; a sliding window counter fixes that with one counter per window. A distributed limiter needs shared state, usually Redis, or each instance enforces its own limit.",
       "difficulty": "Hard",
-      "topicId": "sd-distributed-systems-fundamentals",
+      "followUps": [
+        "What status code and header should a rate-limited response carry?",
+        "Why does a per-instance limiter multiply the real limit?"
+      ],
+      "id": "iq-b2-sd-rate-limiting",
+      "module": "module-3",
+      "question": "Compare token bucket and leaky bucket rate limiting. When would you choose each?",
       "relatedTopics": [
         "sd-scalability-basics"
-      ]
+      ],
+      "shortAnswer": "Token bucket allows bursts up to its capacity and bounds the long-run rate; leaky bucket smooths bursts into a fixed rate but queueing adds latency. Choose token bucket for bursty legitimate traffic, leaky bucket for a downstream that needs a steady rate.",
+      "tips": [
+        "Compare on bursts: allowed versus smoothed.",
+        "Add the 429 with Retry-After detail — it is often the follow-up."
+      ],
+      "title": "Comparing rate limiting algorithms",
+      "topicId": "sd-distributed-systems-fundamentals"
     },
     {
-      "id": "iq-b2-cl-delegation",
-      "module": "module-3",
       "category": "Java",
-      "title": "Parent delegation in class loading",
-      "question": "Why can two classes with the same name be different types in one JVM?",
-      "shortAnswer": "Because class identity is the name plus the defining classloader, and parent delegation means each loader asks its parent first — so two loaders can each define their own copy.",
-      "detailedAnswer": "Classes are loaded on demand by a hierarchy of loaders (bootstrap, platform, application, custom), and each loader asks its parent first before loading a class itself. That is why application code cannot shadow java.lang.String. A class is identified by its name plus the loader that defined it, so the same class loaded by two different loaders — for example, two web applications each loading their own copy of a library — is two different types, and casting between them throws ClassCastException even though the names match. The fix is to share the class through a common parent loader or communicate through an interface loaded by that parent.",
-      "followUps": [
-        "What is the difference between ClassNotFoundException and NoClassDefFoundError?",
-        "When would you write a custom classloader?"
-      ],
-      "tips": [
-        "Start with the identity rule: name plus loader.",
-        "Use the two-web-apps example — it is the concrete case."
-      ],
       "commonMistakes": [
         "Reading the ClassCastException as a type error.",
         "Saying parent delegation means the child never loads anything."
       ],
+      "detailedAnswer": "Classes are loaded on demand by a hierarchy of loaders (bootstrap, platform, application, custom), and each loader asks its parent first before loading a class itself. That is why application code cannot shadow java.lang.String. A class is identified by its name plus the loader that defined it, so the same class loaded by two different loaders — for example, two web applications each loading their own copy of a library — is two different types, and casting between them throws ClassCastException even though the names match. The fix is to share the class through a common parent loader or communicate through an interface loaded by that parent.",
       "difficulty": "Medium",
-      "topicId": "jvm-class-loading-oom-diagnostics",
+      "followUps": [
+        "What is the difference between ClassNotFoundException and NoClassDefFoundError?",
+        "When would you write a custom classloader?"
+      ],
+      "id": "iq-b2-cl-delegation",
+      "module": "module-3",
+      "question": "Why can two classes with the same name be different types in one JVM?",
       "relatedTopics": [
         "jdk-jre-jvm"
-      ]
+      ],
+      "shortAnswer": "Because class identity is the name plus the defining classloader, and parent delegation means each loader asks its parent first — so two loaders can each define their own copy.",
+      "tips": [
+        "Start with the identity rule: name plus loader.",
+        "Use the two-web-apps example — it is the concrete case."
+      ],
+      "title": "Parent delegation in class loading",
+      "topicId": "jvm-class-loading-oom-diagnostics"
     },
     {
-      "id": "iq-b2-oom-metaspace",
-      "module": "module-3",
       "category": "Java",
-      "title": "OutOfMemoryError: Metaspace",
-      "question": "Your service throws OutOfMemoryError: Metaspace. What do you check?",
-      "shortAnswer": "Class metadata, not the heap: classloader leaks (static references, ThreadLocal values, registered drivers keeping a loader alive) or unbounded class generation. Raising -Xmx does not help.",
-      "detailedAnswer": "Metaspace holds class metadata, and it fills for two reasons: loaders that cannot be collected, or classes generated without bound (dynamic proxies, generated bytecode). A classloader leak usually means something reachable from a GC root — a static map, a ThreadLocal, a JDBC driver registered in a shared registry — still references classes from a loader that should have been collected, for example on web-app redeploy. The diagnosis is a heap dump and a dominator-tree search for the loader and its classes, not a bigger heap: -Xmx sizes the Java heap, and Metaspace is a separate area.",
-      "followUps": [
-        "What is the difference between heap-space and Metaspace OOMs?",
-        "How do you capture a heap dump automatically?"
-      ],
-      "tips": [
-        "Name the two causes: leaks and unbounded generation.",
-        "Say explicitly that -Xmx is the wrong fix here."
-      ],
       "commonMistakes": [
         "Raising -Xmx for a Metaspace error.",
         "Restarting without a heap dump and destroying the evidence."
       ],
+      "detailedAnswer": "Metaspace holds class metadata, and it fills for two reasons: loaders that cannot be collected, or classes generated without bound (dynamic proxies, generated bytecode). A classloader leak usually means something reachable from a GC root — a static map, a ThreadLocal, a JDBC driver registered in a shared registry — still references classes from a loader that should have been collected, for example on web-app redeploy. The diagnosis is a heap dump and a dominator-tree search for the loader and its classes, not a bigger heap: -Xmx sizes the Java heap, and Metaspace is a separate area.",
       "difficulty": "Hard",
-      "topicId": "jvm-class-loading-oom-diagnostics",
+      "followUps": [
+        "What is the difference between heap-space and Metaspace OOMs?",
+        "How do you capture a heap dump automatically?"
+      ],
+      "id": "iq-b2-oom-metaspace",
+      "module": "module-3",
+      "question": "Your service throws OutOfMemoryError: Metaspace. What do you check?",
       "relatedTopics": [
         "garbage-collection"
-      ]
+      ],
+      "shortAnswer": "Class metadata, not the heap: classloader leaks (static references, ThreadLocal values, registered drivers keeping a loader alive) or unbounded class generation. Raising -Xmx does not help.",
+      "tips": [
+        "Name the two causes: leaks and unbounded generation.",
+        "Say explicitly that -Xmx is the wrong fix here."
+      ],
+      "title": "OutOfMemoryError: Metaspace",
+      "topicId": "jvm-class-loading-oom-diagnostics"
     },
     {
-      "id": "iq-b2-db-mvcc",
-      "module": "module-3",
       "category": "SQL & Databases",
-      "title": "MVCC and isolation",
-      "question": "How does MVCC let readers and writers run at the same time?",
-      "shortAnswer": "Each row exists in several versions stamped by transaction; a reader sees the version committed when its transaction (or statement) started, so it never blocks on a writer — old versions are later reclaimed.",
-      "detailedAnswer": "Most modern databases implement isolation with multi-version concurrency control rather than locking every row a transaction reads. Each row has several versions, and a transaction sees the version that was committed when it started (or, under READ COMMITTED, when the statement started). Readers never block writers and writers never block readers, which is why a long REPEATABLE READ transaction can read consistent data while other transactions update the same rows. The cost is garbage: old versions accumulate until no transaction can see them, then PostgreSQL's VACUUM or InnoDB's purge reclaims them. The mechanism also explains why databases differ at the edges — PostgreSQL uses a fixed snapshot, InnoDB uses next-key locks — even at the same isolation level.",
-      "followUps": [
-        "Why does a long transaction make VACUUM's job harder?",
-        "How does MVCC relate to phantom reads?"
-      ],
-      "tips": [
-        "Explain versions first, then the snapshot rule, then the cleanup cost.",
-        "Name VACUUM and purge as the concrete cleanup."
-      ],
       "commonMistakes": [
         "Saying isolation is implemented by locking everything.",
         "Assuming two databases behave identically at the same isolation level."
       ],
+      "detailedAnswer": "Most modern databases implement isolation with multi-version concurrency control rather than locking every row a transaction reads. Each row has several versions, and a transaction sees the version that was committed when it started (or, under READ COMMITTED, when the statement started). Readers never block writers and writers never block readers, which is why a long REPEATABLE READ transaction can read consistent data while other transactions update the same rows. The cost is garbage: old versions accumulate until no transaction can see them, then PostgreSQL's VACUUM or InnoDB's purge reclaims them. The mechanism also explains why databases differ at the edges — PostgreSQL uses a fixed snapshot, InnoDB uses next-key locks — even at the same isolation level.",
       "difficulty": "Hard",
-      "topicId": "db-joins-indexes-transactions",
+      "followUps": [
+        "Why does a long transaction make VACUUM's job harder?",
+        "How does MVCC relate to phantom reads?"
+      ],
+      "id": "iq-b2-db-mvcc",
+      "module": "module-3",
+      "question": "How does MVCC let readers and writers run at the same time?",
       "relatedTopics": [
         "spring-data-jpa"
-      ]
+      ],
+      "shortAnswer": "Each row exists in several versions stamped by transaction; a reader sees the version committed when its transaction (or statement) started, so it never blocks on a writer — old versions are later reclaimed.",
+      "tips": [
+        "Explain versions first, then the snapshot rule, then the cleanup cost.",
+        "Name VACUUM and purge as the concrete cleanup."
+      ],
+      "title": "MVCC and isolation",
+      "topicId": "db-joins-indexes-transactions"
+    },
+    {
+      "category": "Java",
+      "commonMistakes": [
+        "Copying a ShutdownOnFailure example onto JDK 25 and wondering why it does not compile.",
+        "Forgetting --enable-preview, which preview APIs require.",
+        "Assuming structured concurrency replaces ExecutorService for all patterns."
+      ],
+      "detailedAnswer": "Structured concurrency treats concurrent work as a single unit with one lifetime: a scope forks subtasks as virtual threads, join() waits for them, and if one fails the scope cancels the others, so no task outlives the block that created it. The idea is stable but the API is not. In Java 21–24 (JEP 453 and its successors) you wrote new StructuredTaskScope.ShutdownOnFailure(), fork() returned a Future, and you called join() then throwIfFailed() to surface the first failure. JDK 25 (JEP 505) reworked it: public constructors became static open() factories taking a Joiner completion policy, fork() returns a Subtask instead of a Future, and join() itself throws the failure — there is no throwIfFailed anymore. Both versions need --enable-preview on exactly the JDK they were written for. The interview point is the version trap: a 2023-era example does not compile on JDK 25, and the correct answer names the JDK it targets.",
+      "difficulty": "Hard",
+      "followUps": [
+        "What does the Joiner decide in the JDK 25 API?",
+        "How does a scope's lifetime differ from tasks submitted to an ExecutorService?"
+      ],
+      "id": "iq-b3-structured-concurrency",
+      "module": "module-3",
+      "question": "What is structured concurrency, and what changed in its API in JDK 25?",
+      "relatedTopics": [
+        "executors-completablefuture"
+      ],
+      "shortAnswer": "A StructuredTaskScope forks child tasks as virtual threads and joins them as one unit, cancelling the rest when one fails, so no subtask outlives its scope. It is still preview: the Java 21–24 API uses new StructuredTaskScope.ShutdownOnFailure() with join() plus throwIfFailed(), while JDK 25 (JEP 505) replaced it with StructuredTaskScope.open() and a Joiner — code written for one does not compile on the other.",
+      "tips": [
+        "Lead with the concept (one lifetime), then the version trap.",
+        "Name JEP 505 for the JDK 25 rework."
+      ],
+      "title": "Structured concurrency and the JDK 25 API change",
+      "topicId": "virtual-threads"
+    },
+    {
+      "category": "Java",
+      "commonMistakes": [
+        "Using ThreadLocal to carry request context across many virtual threads.",
+        "Expecting a scoped value to be visible outside its run scope."
+      ],
+      "detailedAnswer": "ThreadLocal has two problems at virtual-thread scale: a million virtual threads mean a million copies of the value, and a value set on a platform thread that gets reused can leak into the next request if nobody clears it. A ScopedValue is bound with ScopedValue.where(VALUE, x).run(...) and exists only for the duration of that run: any virtual thread forked inside the scope inherits the binding, nested code can shadow it with a new where without changing the outer value, and outside the scope the value is unbound (isBound() returns false). Because the binding is immutable, there is nothing to clear and nothing to leak. The API — newInstance, where, run, get, isBound — is the same in the Java 21 preview and the JDK 25 final version, so unlike StructuredTaskScope this code survives the upgrade; only the preview flag goes away.",
+      "difficulty": "Medium",
+      "followUps": [
+        "What happens if code reads a scoped value outside its scope?",
+        "Can a nested scope change the outer binding?"
+      ],
+      "id": "iq-b3-scoped-values",
+      "module": "module-3",
+      "question": "Why is ScopedValue a better fit than ThreadLocal for carrying request context with virtual threads?",
+      "relatedTopics": [
+        "concurrency-basics"
+      ],
+      "shortAnswer": "A scoped value is an immutable binding that exists only inside its scope and is inherited by virtual threads forked inside it, so it cannot leak between requests. A ThreadLocal is copied per virtual thread and can bleed into the next request if left uncleared. ScopedValue is preview in Java 21–24 and final in JDK 25 (JEP 506).",
+      "tips": [
+        "Contrast the two failure modes: ThreadLocal leaks and multiplies; scoped values expire with the scope."
+      ],
+      "title": "ScopedValue vs ThreadLocal for virtual threads",
+      "topicId": "virtual-threads"
+    },
+    {
+      "category": "Testing",
+      "commonMistakes": [
+        "Writing a non-static provider without PER_CLASS lifecycle.",
+        "Using @CsvSource for cases that need real objects."
+      ],
+      "detailedAnswer": "All three providers run one test method over many inputs. @ValueSource covers the simplest case — one argument of one type, such as @ValueSource(ints = {-1, 101}) for invalid inputs. @CsvSource covers small literal tables written inline, such as \"0, 200.0\". @MethodSource moves the table into code: a factory method returns a Stream, Iterable, or array of Arguments, so cases can be built from real objects, computed values, or a helper — anything that does not fit in a comma-separated string. The provider must be static unless the test class uses @TestInstance(Lifecycle.PER_CLASS), and each Arguments holds one case's parameters. When a case fails, JUnit reports which Arguments failed, so the failure still points at one case.",
+      "difficulty": "Medium",
+      "followUps": [
+        "Why must a @MethodSource provider be static by default?",
+        "What does JUnit report when one @MethodSource case fails?"
+      ],
+      "id": "iq-b3-methodsource",
+      "module": "module-3",
+      "question": "When would you use @MethodSource instead of @CsvSource for a parameterized test?",
+      "relatedTopics": [
+        "tst-test-design"
+      ],
+      "shortAnswer": "When the cases need objects, computation, or more columns than a string table handles: @MethodSource names a static factory method returning a Stream of Arguments, one per case, while @CsvSource only covers small literal tables.",
+      "tips": [
+        "Order the three providers by complexity: ValueSource, CsvSource, MethodSource."
+      ],
+      "title": "@MethodSource for parameterized tests",
+      "topicId": "tst-junit-mockito-fundamentals"
     },
     {
       "category": "Java",

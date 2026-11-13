@@ -10,7 +10,7 @@ tags: [Exceptions, Generics, try-with-resources]
 prerequisites: [oop-principles]
 related: [collections-framework, streams-lambdas]
 status: complete
-lastUpdated: 2026-11-12
+lastUpdated: 2026-11-14
 summary: Checked vs unchecked exceptions, try-with-resources, custom exceptions, and generics with wildcards — the safety nets interviewers check.
 ---
 
@@ -84,6 +84,42 @@ hello
 
 Explanation: the reader is closed automatically when the try block exits, even if `readLine` throws. No explicit `finally` block is needed.
 
+### Suppressed exceptions: nothing is lost
+
+```java
+import java.io.IOException;
+
+public class SuppressedDemo {
+
+    static class FailingClose implements AutoCloseable {
+        @Override
+        public void close() throws IOException {
+            throw new IOException("close failed");
+        }
+    }
+
+    public static void main(String[] args) {
+        try (FailingClose resource = new FailingClose()) {
+            throw new IOException("work failed");
+        } catch (IOException e) {
+            System.out.println("primary: " + e.getMessage());
+            for (Throwable suppressed : e.getSuppressed()) {
+                System.out.println("suppressed: " + suppressed.getMessage());
+            }
+        }
+    }
+}
+```
+
+Output:
+
+```text
+primary: work failed
+suppressed: close failed
+```
+
+Explanation: two exceptions happen — one from the body, one from closing the resource — and only one can be thrown. Try-with-resources keeps the body's exception as the primary one and attaches the close exception to it with `addSuppressed`, so it is retrievable with `getSuppressed()` instead of being lost. If the body completes normally and only the close throws, the close exception becomes the primary one. `addSuppressed` is also available to your own code when you combine failures yourself, for example when a cleanup step fails while another exception is already in flight — but never call it on an exception you are about to swallow silently.
+
 ### Generics in action
 
 ```java
@@ -130,6 +166,7 @@ Exception handling and generics are standard mid-level topics. Interviewers prob
 ## Interview Questions
 
 - **What is the difference between checked and unchecked exceptions?** Checked exceptions must be handled or declared; unchecked exceptions (subclasses of `RuntimeException`) do not have to be.
+- **What happens to an exception thrown while a try-with-resources resource is closing?** It is attached to the primary exception as a suppressed exception, retrievable with `getSuppressed()` — it is not lost, and it never replaces the exception from the try body.
 - **What does PECS mean?** Producer Extends, Consumer Super: use `? extends T` when a collection produces values, `? super T` when it consumes them.
 - **Why can't you create `new T()` in a generic class?** Because of type erasure — the runtime does not know what `T` is.
 
@@ -137,5 +174,6 @@ Exception handling and generics are standard mid-level topics. Interviewers prob
 
 - Checked: handle or declare. Unchecked: runtime errors and programming mistakes.
 - Try-with-resources closes resources automatically and preserves the primary exception.
+- A close failure is attached as a suppressed exception — read it with `getSuppressed()`.
 - Generics give compile-time safety; erasure removes type info at runtime.
 - PECS guides wildcard choice: producer extends, consumer super.

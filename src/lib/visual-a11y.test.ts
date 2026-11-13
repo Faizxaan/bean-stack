@@ -27,3 +27,38 @@ describe('smoothScrollBehavior (reduced motion)', () => {
     expect(smoothScrollBehavior()).toBe('auto')
   })
 })
+
+// Batch 2 (2026-11-14): diagrams — mobile readability and dark mode.
+// The three SVGs are 790–964px wide with 14px labels, so shrinking one
+// to a 360px phone made the text ~5px; each SVG now carries an opaque
+// #f8fafc background rect (the SVGs load via <img>, so page CSS
+// variables cannot reach them) and MarkdownView renders them in a
+// 720px-minimum horizontal-scroll region with an enlarge link.
+import { readFileSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+describe('diagrams (mobile readability + dark mode)', () => {
+  const diagramsDir = join(fileURLToPath(new URL('.', import.meta.url)), '..', '..', 'public', 'diagrams')
+  const svgs = readdirSync(diagramsDir).filter(f => f.endsWith('.svg'))
+  it('every diagram SVG starts with an opaque light background rect', () => {
+    expect(svgs.length).toBeGreaterThan(0)
+    for (const f of svgs) {
+      const svg = readFileSync(join(diagramsDir, f), 'utf8')
+      // First painted element after the opening <svg> tag (comments aside).
+      expect(svg).toMatch(/<svg[^>]*>\s*(<!--[\s\S]*?-->\s*)?<rect width="100%" height="100%" fill="#f8fafc"\/>/)
+      // On #f8fafc the #475569 connector lines are 7.24:1; on the dark
+      // page background (#0b1220) they were 2.47:1 — the opaque rect is
+      // what makes the same SVG read in both themes.
+      expect(svg).toContain('#475569')
+    }
+  })
+  it('the scroll-region CSS keeps diagrams at a readable minimum width on phones', () => {
+    const css = readFileSync(join(fileURLToPath(new URL('.', import.meta.url)), '..', '..', 'src', 'index.css'), 'utf8')
+    expect(css).toMatch(/\.diagram-scroll\s*\{[^}]*overflow-x:\s*auto[^}]*\}/)
+    expect(css).toMatch(/\.diagram-scroll img\s*\{[^}]*min-width:\s*720px[^}]*\}/)
+    const view = readFileSync(join(fileURLToPath(new URL('.', import.meta.url)), '..', '..', 'src', 'components', 'MarkdownView.tsx'), 'utf8')
+    expect(view).toContain('diagram-scroll')
+    expect(view).toContain('Open diagram enlarged in a new tab')
+  })
+})

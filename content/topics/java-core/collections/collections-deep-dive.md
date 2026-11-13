@@ -8,7 +8,7 @@ difficulty: Intermediate
 importance: 5
 tags: [Collections, List, Map, Set]
 prerequisites: [collections-framework]
-related: [streams-lambdas, hashmap-internals]
+related: [streams-lambdas, hashmap-internals, object-methods-clone-cleaner]
 status: complete
 lastUpdated: 2026-11-04
 summary: How the main List, Set, Map, and Queue implementations work and how to choose between them.

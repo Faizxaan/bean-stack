@@ -127,6 +127,7 @@ export interface NavContentIndex {
   topics: TopicMeta[]
   cheatsheets: CheatsheetMeta[]
   interviewQuestionIds: string[]
+  bonusResumeQuestionIds: string[]
   revisionPromptIds: string[]
   practiceItemIds: string[]
 }

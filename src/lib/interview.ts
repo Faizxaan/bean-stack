@@ -60,8 +60,8 @@ export function moduleMeta(id: string): InterviewModuleMeta | undefined {
 
 // A bonus-resume entry is resume help, not an interview question: its
 // module is flagged isResume above. Progress totals and percentages
-// must count interview questions only (317), never the 12 resume
-// entries — the Bonus card keeps its own count of 12.
+// must count interview questions only (see interviewQuestionsOnly),
+// never the bonus-resume entries — the Bonus card keeps its own count.
 export function isResumeEntry(q: InterviewQuestion): boolean {
   return moduleMeta(q.module)?.isResume === true
 }

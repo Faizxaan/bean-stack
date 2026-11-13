@@ -220,6 +220,32 @@
   },
   {
     "comingSoon": false,
+    "description": "Kafka messaging and Redis caching, as used by Spring Boot developers.",
+    "domain": "Messaging & Caching",
+    "id": "kafka-redis",
+    "sections": [
+      {
+        "description": "Topics, partitions, consumer groups, @KafkaListener, KafkaTemplate, retries and dead-letter queues.",
+        "id": "kafka",
+        "plannedTopics": [
+          "Kafka with Spring Boot"
+        ],
+        "title": "Kafka"
+      },
+      {
+        "description": "Declarative Spring Cache with Redis — @Cacheable, TTLs, serialization, and stampede protection.",
+        "id": "redis",
+        "plannedTopics": [
+          "Spring Cache with Redis"
+        ],
+        "title": "Redis & Caching"
+      }
+    ],
+    "status": "complete",
+    "title": "Kafka & Redis"
+  },
+  {
+    "comingSoon": false,
     "description": "JavaScript, TypeScript, and React for Java full-stack developers.",
     "domain": "Frontend",
     "id": "frontend",

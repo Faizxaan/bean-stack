@@ -98,4 +98,4 @@ src/
 
 ## Status
 
-All 10 tracks are built out: Core Java, Advanced Java, and Spring & Spring Boot, plus Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, and Behavioral & Projects. No track remains a "Coming Soon" placeholder. See `PROGRESS.md` for exact completed work and known limitations.
+All 11 tracks are built out: Core Java, Advanced Java, Spring & Spring Boot, and Kafka & Redis, plus Frontend, Databases, System Design, DSA & Coding, DevOps & Cloud, Testing, and Behavioral & Projects. No track remains a "Coming Soon" placeholder. See `PROGRESS.md` for exact completed work and known limitations.
